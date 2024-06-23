@@ -11,7 +11,7 @@ which_key.register({
       a = { "<cmd>lua vim.lsp.buf.code_action()<cr>", "Action" },
       d = { "<cmd>Telescope diagnostics bufnr=0 theme=get_ivy<cr>", "Buffer Diagnostics" },
       w = { "<cmd>Telescope diagnostics<cr>", "Diagnostics" },
-      f = { "<cmd>lua require('lvim.lsp.utils').format()<cr>", "Format" },
+      f = { "<cmd>lua vim.lsp.buf.format()<cr>", "Format" },
       i = { "<cmd>LspInfo<cr>", "Info" },
       j = { "<cmd>lua vim.diagnostic.goto_next()<cr>", "Next Diagnostic" },
       k = { "<cmd>lua vim.diagnostic.goto_prev()<cr>", "Prev Diagnostic" },
