@@ -1,5 +1,5 @@
 local icons = require("io.github.israiloff.config.icons")
-local which_key = require("which-key") 
+local which_key = require("which-key")
 
 which_key.register({
     f = { "<cmd>Telescope find_files<cr>", "Find Files" },
@@ -11,7 +11,7 @@ which_key.register({
       a = { "<cmd>lua vim.lsp.buf.code_action()<cr>", "Action" },
       d = { "<cmd>Telescope diagnostics bufnr=0 theme=get_ivy<cr>", "Buffer Diagnostics" },
       w = { "<cmd>Telescope diagnostics<cr>", "Diagnostics" },
-      f = { "<cmd>lua vim.lsp.buf.format()<cr>", "Format" },
+      f = { "<cmd>Format<cr>", "Format" },
       i = { "<cmd>LspInfo<cr>", "Info" },
       j = { "<cmd>lua vim.diagnostic.goto_next()<cr>", "Next Diagnostic" },
       k = { "<cmd>lua vim.diagnostic.goto_prev()<cr>", "Prev Diagnostic" },
