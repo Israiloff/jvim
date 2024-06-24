@@ -1,3 +1,4 @@
+require("io.github.israiloff.config.startup")
 require("io.github.israiloff.config.lazy")
 require("io.github.israiloff.config.keymap")
 require("io.github.israiloff.config.formatting")
