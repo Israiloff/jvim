@@ -92,4 +92,8 @@ return {
 	{
 		"tamago324/lir.nvim",
 	},
+	{
+		"akinsho/bufferline.nvim",
+		version = "*",
+	},
 }
