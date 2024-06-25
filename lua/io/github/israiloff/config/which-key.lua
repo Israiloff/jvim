@@ -6,6 +6,7 @@ which_key.register({
 	u = { "<cmd>so<cr>", "Update configs" },
 	c = { "<cmd>Ex<cr>", "Close buffer" },
 	q = { "<cmd>confirm q<CR>", "Quit" },
+	e = { "<cmd>NvimTreeToggle<CR>", "Explorer" },
 	l = {
 		name = "Code",
 		a = { "<cmd>lua vim.lsp.buf.code_action()<cr>", "Action" },
