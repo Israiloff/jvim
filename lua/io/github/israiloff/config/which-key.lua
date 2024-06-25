@@ -18,4 +18,14 @@ which_key.register({
 		k = { "<cmd>lua vim.diagnostic.goto_prev()<cr>", "Prev Diagnostic" },
 		r = { "<cmd>lua vim.lsp.buf.rename()<cr>", "Rename" },
 	},
+	F = {
+		name = "File",
+		h = { "<cmd>Telescope file_history history<CR>", "View the file’s history", mode = { "n" } },
+		l = { "<cmd>Telescope file_history log<CR>", "View the file’s history incrementally", mode = { "n" } },
+		f = { "<cmd>Telescope file_history files<CR>", "View every file in the repo", mode = { "n" } },
+	},
+	n = {
+		name = "Notifications",
+		l = { "<cmd>mess<CR>", "Show notification log", mode = { "n" } },
+	},
 }, { prefix = "<leader>", mode = "n" })
