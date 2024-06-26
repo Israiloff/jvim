@@ -109,4 +109,9 @@ return {
 	{
 		"xiyaowong/transparent.nvim",
 	},
+	{
+		"lukas-reineke/indent-blankline.nvim",
+		main = "ibl",
+		opts = {},
+	},
 }
