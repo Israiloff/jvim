@@ -106,4 +106,7 @@ return {
 	{
 		"archibate/lualine-time",
 	},
+	{
+		"xiyaowong/transparent.nvim",
+	},
 }
