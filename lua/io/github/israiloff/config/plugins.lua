@@ -100,4 +100,10 @@ return {
 		"kevinhwang91/nvim-ufo",
 		dependencies = "kevinhwang91/promise-async",
 	},
+	{
+		"nvim-lualine/lualine.nvim",
+	},
+	{
+		"archibate/lualine-time",
+	},
 }
