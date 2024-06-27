@@ -112,9 +112,6 @@ return {
 		"archibate/lualine-time",
 	},
 	{
-		"xiyaowong/transparent.nvim",
-	},
-	{
 		"lukas-reineke/indent-blankline.nvim",
 		main = "ibl",
 		opts = {},
