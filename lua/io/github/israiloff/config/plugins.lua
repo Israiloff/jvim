@@ -20,7 +20,9 @@ return {
 	},
 	{
 		"israiloff/darcula-java",
-		dependencies = "rktjmp/lush.nvim",
+		dependencies = {
+			"rktjmp/lush.nvim",
+		},
 	},
 	{
 		"github/copilot.vim",
@@ -40,6 +42,9 @@ return {
 	},
 	{
 		"nvimtools/none-ls.nvim",
+		dependencies = {
+			"nvimtools/none-ls-extras.nvim",
+		},
 	},
 	{
 		"hrsh7th/nvim-cmp",
