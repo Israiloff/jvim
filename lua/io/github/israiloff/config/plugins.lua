@@ -121,4 +121,7 @@ return {
 		version = "*",
 		config = true,
 	},
+	{
+		"onsails/lspkind.nvim",
+	},
 }
