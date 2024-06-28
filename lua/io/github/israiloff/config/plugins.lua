@@ -116,4 +116,9 @@ return {
 		main = "ibl",
 		opts = {},
 	},
+	{
+		"akinsho/toggleterm.nvim",
+		version = "*",
+		config = true,
+	},
 }
