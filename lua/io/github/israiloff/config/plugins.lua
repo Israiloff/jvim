@@ -134,4 +134,12 @@ return {
 			"folke/trouble.nvim",
 		},
 	},
+	{
+		"folke/noice.nvim",
+		event = "VeryLazy",
+		opts = {},
+		dependencies = {
+			"rcarriga/nvim-notify",
+		},
+	},
 }
