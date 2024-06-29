@@ -127,4 +127,11 @@ return {
 	{
 		"petertriho/nvim-scrollbar",
 	},
+	{
+		"jackMort/ChatGPT.nvim",
+		dependencies = {
+			"MunifTanjim/nui.nvim",
+			"folke/trouble.nvim",
+		},
+	},
 }
