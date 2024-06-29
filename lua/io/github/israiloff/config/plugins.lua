@@ -124,4 +124,7 @@ return {
 	{
 		"onsails/lspkind.nvim",
 	},
+	{
+		"petertriho/nvim-scrollbar",
+	},
 }
