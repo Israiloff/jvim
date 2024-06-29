@@ -1,4 +1,3 @@
-local icons = require("io.github.israiloff.config.icons")
 local which_key = require("which-key")
 
 which_key.register({
