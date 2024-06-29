@@ -1,0 +1,9 @@
+{
+    "diagnostics.globals": [
+        "len",
+        "title",
+        "left",
+        "right",
+        "diagnostics_indicator"
+    ]
+}
