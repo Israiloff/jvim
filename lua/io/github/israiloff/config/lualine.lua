@@ -1,3 +1,5 @@
+local icons = require("io.github.israiloff.config.icons")
+
 ---@diagnostic disable: param-type-mismatch
 local nvim_tree_shift = {
 	function()
@@ -39,8 +41,13 @@ require("lualine").setup({
 		lualine_b = { "branch" },
 		lualine_c = { "filename" },
 		lualine_x = { "encoding", "fileformat", "filetype" },
-		lualine_y = { "progress" },
-		lualine_z = { "location" },
+		lualine_y = { "location" },
+		lualine_z = {
+			function()
+				return icons.ui.Clock
+			end,
+			"ctime",
+		},
 	},
 	inactive_sections = {
 		lualine_a = {},
