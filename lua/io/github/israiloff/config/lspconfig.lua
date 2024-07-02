@@ -1,11 +1,13 @@
-local lspconfig = require('lspconfig')
+local lspconfig = require("lspconfig")
 
 lspconfig.lua_ls.setup({
-  settings = {
-    Lua = {
-      completion = {
-        callSnippet = "Replace"
-      }
-    }
-  }
+	settings = {
+		Lua = {
+			completion = {
+				callSnippet = "Replace",
+			},
+		},
+	},
 })
+
+lspconfig.jdtls.setup({})

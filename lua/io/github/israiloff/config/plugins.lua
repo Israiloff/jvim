@@ -134,4 +134,7 @@ return {
 			"folke/trouble.nvim",
 		},
 	},
+	{
+		"nvim-java/nvim-java",
+	},
 }
