@@ -137,4 +137,7 @@ return {
 	{
 		"nvim-java/nvim-java",
 	},
+	{
+		"numToStr/Comment.nvim",
+	},
 }

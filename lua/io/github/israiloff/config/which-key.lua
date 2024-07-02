@@ -160,9 +160,23 @@ which_key.register({
 			"Git Diff",
 		},
 	},
+	["/"] = {
+		"<Plug>(comment_toggle_linewise_current)",
+		"Comment current line",
+	},
 }, {
 	prefix = "<leader>",
 	mode = "n",
+})
+
+which_key.register({
+	["/"] = {
+		"<Plug>(comment_toggle_linewise_visual)",
+		"Comment",
+	},
+}, {
+	prefix = "<leader>",
+	mode = { "v" },
 })
 
 which_key.register({
@@ -182,15 +196,14 @@ which_key.register({
 		r = { "<cmd>ChatGPTRun roxygen_edit<CR>", "Roxygen Edit" },
 		l = { "<cmd>ChatGPTRun code_readability_analysis<CR>", "Code Readability Analysis" },
 	},
+	A = {
+		name = "Copilot",
+		p = { "<cmd>Copilot panel<CR>", "Open Copilot Panel" },
+	},
 	l = {
 		name = "Code",
 		a = { "<cmd>lua vim.lsp.buf.code_action()<cr>", "Action" },
 		f = { "<cmd>Format<cr>", "Format" },
-	},
-	A = {
-		name = "Copilot",
-		mode = { "n", "v" },
-		p = { "<cmd>Copilot panel<CR>", "Open Copilot Panel" },
 	},
 }, {
 	prefix = "<leader>",
