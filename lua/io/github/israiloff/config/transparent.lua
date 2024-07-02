@@ -1,10 +1,3 @@
---require("transparent").setup()
---vim.cmd([[
---highlight NvimTreeNormal guibg=NONE ctermbg=NONE
---highlight NvimTreeEndOfBuffer guibg=NONE ctermbg=NONE
---TransparentEnable
---]])
--- init.lua or a separate lua configuration file
 vim.cmd([[
 highlight Normal guibg=NONE ctermbg=NONE
 highlight NormalNC guibg=NONE ctermbg=NONE
