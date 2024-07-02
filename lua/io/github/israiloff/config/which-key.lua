@@ -114,12 +114,7 @@ which_key.register({
 	},
 	n = {
 		name = "Notifications",
-		l = { "<cmd>Noice last<CR>", "Last notification" },
-		h = { "<cmd>Noice history<CR>", "Notification history" },
-		e = { "<cmd>Noice errors<CR>", "Error history" },
-		t = { "<cmd>Noice telescope<CR>", "Telescope history" },
-		i = { "<cmd>Noice enable<CR>", "Enable notifications" },
-		d = { "<cmd>Noice disable<CR>", "Disable notifications" },
+		l = { "<cmd>mess<CR>", "Log" },
 	},
 	s = {
 		name = "Search",
