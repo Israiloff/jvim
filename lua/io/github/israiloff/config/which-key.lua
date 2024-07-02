@@ -97,10 +97,8 @@ which_key.register({
 	e = { "<cmd>NvimTreeToggle<CR>", "Explorer" },
 	l = {
 		name = "Code",
-		a = { "<cmd>lua vim.lsp.buf.code_action()<cr>", "Action" },
 		d = { "<cmd>Telescope diagnostics bufnr=0 theme=get_ivy<cr>", "Buffer Diagnostics" },
 		w = { "<cmd>Telescope diagnostics<cr>", "Diagnostics" },
-		f = { "<cmd>Format<cr>", "Format" },
 		i = { "<cmd>LspInfo<cr>", "Info" },
 		j = { "<cmd>lua vim.diagnostic.goto_next()<cr>", "Next Diagnostic" },
 		k = { "<cmd>lua vim.diagnostic.goto_prev()<cr>", "Prev Diagnostic" },
@@ -114,7 +112,7 @@ which_key.register({
 	},
 	n = {
 		name = "Notifications",
-		l = { "<cmd>mess<CR>", "Log" },
+		l = { "<cmd>mess<CR>", "Show notification log" },
 	},
 	s = {
 		name = "Search",
@@ -162,20 +160,39 @@ which_key.register({
 			"Git Diff",
 		},
 	},
+}, {
+	prefix = "<leader>",
+	mode = "n",
+})
+
+which_key.register({
 	a = {
 		name = "Open AI",
 		c = { "<cmd>ChatGPT<CR>", "ChatGPT" },
-		e = { "<cmd>ChatGPTEditWithInstruction<CR>", "Edit with instruction", mode = { "n", "v" } },
-		g = { "<cmd>ChatGPTRun grammar_correction<CR>", "Grammar Correction", mode = { "n", "v" } },
-		t = { "<cmd>ChatGPTRun translate<CR>", "Translate", mode = { "n", "v" } },
-		k = { "<cmd>ChatGPTRun keywords<CR>", "Keywords", mode = { "n", "v" } },
-		d = { "<cmd>ChatGPTRun docstring<CR>", "Docstring", mode = { "n", "v" } },
-		a = { "<cmd>ChatGPTRun add_tests<CR>", "Add Tests", mode = { "n", "v" } },
-		o = { "<cmd>ChatGPTRun optimize_code<CR>", "Optimize Code", mode = { "n", "v" } },
-		s = { "<cmd>ChatGPTRun summarize<CR>", "Summarize", mode = { "n", "v" } },
-		f = { "<cmd>ChatGPTRun fix_bugs<CR>", "Fix Bugs", mode = { "n", "v" } },
-		x = { "<cmd>ChatGPTRun explain_code<CR>", "Explain Code", mode = { "n", "v" } },
-		r = { "<cmd>ChatGPTRun roxygen_edit<CR>", "Roxygen Edit", mode = { "n", "v" } },
-		l = { "<cmd>ChatGPTRun code_readability_analysis<CR>", "Code Readability Analysis", mode = { "n", "v" } },
+		e = { "<cmd>ChatGPTEditWithInstruction<CR>", "Edit with instruction" },
+		g = { "<cmd>ChatGPTRun grammar_correction<CR>", "Grammar Correction" },
+		t = { "<cmd>ChatGPTRun translate<CR>", "Translate" },
+		k = { "<cmd>ChatGPTRun keywords<CR>", "Keywords" },
+		d = { "<cmd>ChatGPTRun docstring<CR>", "Docstring" },
+		a = { "<cmd>ChatGPTRun add_tests<CR>", "Add Tests" },
+		o = { "<cmd>ChatGPTRun optimize_code<CR>", "Optimize Code" },
+		s = { "<cmd>ChatGPTRun summarize<CR>", "Summarize" },
+		f = { "<cmd>ChatGPTRun fix_bugs<CR>", "Fix Bugs" },
+		x = { "<cmd>ChatGPTRun explain_code<CR>", "Explain Code" },
+		r = { "<cmd>ChatGPTRun roxygen_edit<CR>", "Roxygen Edit" },
+		l = { "<cmd>ChatGPTRun code_readability_analysis<CR>", "Code Readability Analysis" },
 	},
-}, { prefix = "<leader>", mode = "n" })
+	l = {
+		name = "Code",
+		a = { "<cmd>lua vim.lsp.buf.code_action()<cr>", "Action" },
+		f = { "<cmd>Format<cr>", "Format" },
+	},
+	A = {
+		name = "Copilot",
+		mode = { "n", "v" },
+		p = { "<cmd>Copilot panel<CR>", "Open Copilot Panel" },
+	},
+}, {
+	prefix = "<leader>",
+	mode = { "n", "v" },
+})
