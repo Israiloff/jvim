@@ -12,7 +12,7 @@ require("toggleterm").setup({
 	close_on_exit = true,
 	shell = vim.o.shell,
 	float_opts = {
-		border = "curved",
+		border = "single",
 		winblend = 0,
 	},
 })
