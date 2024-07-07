@@ -16,4 +16,11 @@ vim.opt.rtp:prepend(lazypath)
 vim.g.mapleader = " "
 vim.g.maplocalleader = "\\"
 
-require("lazy").setup(require("io.github.israiloff.config.plugins"))
+require("lazy").setup({
+	spec = {
+		require("io.github.israiloff.config.plugins"),
+	},
+	ui = {
+		border = "single",
+	},
+})
