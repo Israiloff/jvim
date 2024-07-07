@@ -1,5 +1,11 @@
 require("toggleterm").setup({
-	size = 20,
+	size = function(term)
+		if term.direction == "horizontal" then
+			return 15
+		elseif term.direction == "vertical" then
+			return vim.o.columns * 0.4
+		end
+	end,
 	hide_numbers = true,
 	shade_filetypes = {},
 	shade_terminals = true,
@@ -21,7 +27,7 @@ local Terminal = require("toggleterm.terminal").Terminal
 
 -- Create the terminal instances once and reuse them
 local float_term = Terminal:new({ direction = "float", hidden = true })
-local vertical_term = Terminal:new({ direction = "vertical", hidden = true, size = 30 })
+local vertical_term = Terminal:new({ direction = "vertical", hidden = true })
 local horizontal_term = Terminal:new({ direction = "horizontal", hidden = true })
 
 -- Functions to toggle the terminals
