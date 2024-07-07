@@ -23,12 +23,23 @@ require("toggleterm").setup({
 	},
 })
 
-local Terminal = require("toggleterm.terminal").Terminal
+local function create_terminal(direction)
+	return require("toggleterm.terminal").Terminal:new({
+		direction = direction,
+		hidden = true,
+		highlights = {
+			border = {
+				"FloatBorder",
+				"Normal",
+			},
+		},
+	})
+end
 
 -- Create the terminal instances once and reuse them
-local float_term = Terminal:new({ direction = "float", hidden = true })
-local vertical_term = Terminal:new({ direction = "vertical", hidden = true })
-local horizontal_term = Terminal:new({ direction = "horizontal", hidden = true })
+local float_term = create_terminal("float")
+local vertical_term = create_terminal("vertical")
+local horizontal_term = create_terminal("horizontal")
 
 -- Functions to toggle the terminals
 function _G.toggle_float_term()
