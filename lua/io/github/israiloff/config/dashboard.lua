@@ -21,6 +21,11 @@ dashboard.section.header.val = {
 	[[     JJJJJJJJJ                   VVV            IIIIIIIIIIMMMMMMMM               MMMMMMMM]],
 }
 
+dashboard.section.header.opts = {
+	position = "center",
+	hl = "FloatBorder",
+}
+
 -- Set the menu
 dashboard.section.buttons.val = {
 	dashboard.button("f", icons.ui.FindFile .. " Find file", ":Telescope find_files<CR>"),
