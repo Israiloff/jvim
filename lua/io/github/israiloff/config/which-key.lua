@@ -91,13 +91,28 @@ which_key.setup({
 })
 
 which_key.register({
-	f = { "<cmd>Telescope find_files<cr>", "Find Files" },
-	u = { "<cmd>so<cr>", "Update configs" },
-	c = { "<cmd>bd<cr>", "Close buffer" },
-	q = { "<cmd>confirm q<CR>", "Quit" },
-	e = { "<cmd>NvimTreeToggle<CR>", "Explorer" },
+	f = {
+		"<cmd>Telescope find_files<cr>",
+		icons.ui.FindFile .. " Find Files",
+	},
+	u = {
+		"<cmd>so<cr>",
+		icons.ui.Refresh .. " Update configs",
+	},
+	c = {
+		"<cmd>bd<cr>",
+		icons.ui.Close .. " Close buffer",
+	},
+	q = {
+		"<cmd>confirm q<CR>",
+		icons.ui.SignOut .. " Quit",
+	},
+	e = {
+		"<cmd>NvimTreeToggle<CR>",
+		icons.ui.EmptyFolderOpen .. " Explorer",
+	},
 	l = {
-		name = "Code",
+		name = icons.diagnostics.Hint .. " Code Action",
 		d = { "<cmd>Telescope diagnostics bufnr=0 theme=get_ivy<cr>", "Buffer Diagnostics" },
 		w = { "<cmd>Telescope diagnostics<cr>", "Diagnostics" },
 		i = { "<cmd>LspInfo<cr>", "Info" },
@@ -106,17 +121,17 @@ which_key.register({
 		r = { "<cmd>lua vim.lsp.buf.rename()<cr>", "Rename" },
 	},
 	F = {
-		name = "File",
+		name = icons.kind.File .. " File",
 		h = { "<cmd>Telescope file_history history<CR>", "View the file’s history", mode = { "n" } },
 		l = { "<cmd>Telescope file_history log<CR>", "View the file’s history incrementally", mode = { "n" } },
 		f = { "<cmd>Telescope file_history files<CR>", "View every file in the repo", mode = { "n" } },
 	},
 	n = {
-		name = "Notifications",
+		name = icons.ui.Notification .. " Notifications",
 		l = { "<cmd>mess<CR>", "Show notification log" },
 	},
 	s = {
-		name = "Search",
+		name = icons.ui.Search .. " Search",
 		b = { "<cmd>Telescope git_branches<cr>", "Checkout branch" },
 		c = { "<cmd>Telescope colorscheme<cr>", "Colorscheme" },
 		f = { "<cmd>Telescope find_files<cr>", "Find File" },
@@ -221,7 +236,7 @@ which_key.register({
 		p = { "<cmd>Copilot panel<CR>", "Open Copilot Panel" },
 	},
 	l = {
-		name = icons.ui.Code .. " Code",
+		name = icons.diagnostics.Hint .. " Code Action",
 		a = { "<cmd>lua vim.lsp.buf.code_action()<cr>", "Action" },
 		f = { "<cmd>Format<cr>", "Format" },
 	},

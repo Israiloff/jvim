@@ -131,7 +131,9 @@ return {
 		TriangleShortArrowUp = "",
 		ArrowRightSimple = "",
 		Copilot = "",
-		CommentCode = "󰿟󰿟",
+		CommentCode = "󰿟",
+		Refresh = "",
+		Notification = "",
 	},
 	diagnostics = {
 		BoldError = "",
