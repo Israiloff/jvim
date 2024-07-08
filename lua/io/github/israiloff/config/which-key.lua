@@ -1,4 +1,5 @@
 local which_key = require("which-key")
+local icons = require("io.github.israiloff.config.icons")
 
 which_key.setup({
 	plugins = {
@@ -36,7 +37,7 @@ which_key.setup({
 	icons = {
 		breadcrumb = "»", -- symbol used in the command line area that shows your active key combo
 		separator = "➜", -- symbol used between a key and it's label
-		group = "+", -- symbol prepended to a group
+		group = "", -- symbol prepended to a group
 	},
 	popup_mappings = {
 		scroll_down = "<c-d>", -- binding to scroll down inside the popup
@@ -164,7 +165,7 @@ which_key.register({
 		"<Plug>(comment_toggle_linewise_current)",
 		"Comment current line",
 	},
-	p = {
+	P = {
 		name = "Plugins",
 		i = { "<cmd>Lazy install<cr>", "Install" },
 		s = { "<cmd>Lazy sync<cr>", "Sync" },
@@ -174,6 +175,14 @@ which_key.register({
 		p = { "<cmd>Lazy profile<cr>", "Profile" },
 		l = { "<cmd>Lazy log<cr>", "Log" },
 		d = { "<cmd>Lazy debug<cr>", "Debug" },
+	},
+	p = {
+		"<cmd>Telescope projects<cr>",
+		"Projects",
+	},
+	r = {
+		"<cmd>Telescope oldfiles<cr>",
+		"Recent Files",
 	},
 }, {
 	prefix = "<leader>",
