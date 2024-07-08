@@ -140,4 +140,7 @@ return {
 	{
 		"numToStr/Comment.nvim",
 	},
+	{
+		"goolord/alpha-nvim",
+	},
 }
