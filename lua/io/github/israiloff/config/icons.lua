@@ -50,6 +50,7 @@ return {
 		Repo = "",
 		Octoface = "",
 		Branch = "",
+		Git = "",
 	},
 	ui = {
 		ArrowCircleDown = "",
@@ -130,6 +131,7 @@ return {
 		TriangleShortArrowUp = "",
 		ArrowRightSimple = "",
 		Copilot = "",
+		CommentCode = "󰿟󰿟",
 	},
 	diagnostics = {
 		BoldError = "",

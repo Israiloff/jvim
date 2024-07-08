@@ -135,7 +135,7 @@ which_key.register({
 		},
 	},
 	g = {
-		name = "Git",
+		name = icons.git.Git .. " Git",
 		g = { "<cmd>lua require 'lvim.core.terminal'.lazygit_toggle()<cr>", "Lazygit" },
 		j = { "<cmd>lua require 'gitsigns'.nav_hunk('next', {navigation_message = false})<cr>", "Next Hunk" },
 		k = { "<cmd>lua require 'gitsigns'.nav_hunk('prev', {navigation_message = false})<cr>", "Prev Hunk" },
@@ -163,10 +163,10 @@ which_key.register({
 	},
 	["/"] = {
 		"<Plug>(comment_toggle_linewise_current)",
-		"Comment current line",
+		icons.ui.CommentCode .. " Comment current line",
 	},
 	P = {
-		name = "Plugins",
+		name = icons.kind.Module .. " Plugins",
 		i = { "<cmd>Lazy install<cr>", "Install" },
 		s = { "<cmd>Lazy sync<cr>", "Sync" },
 		S = { "<cmd>Lazy clear<cr>", "Status" },
@@ -178,11 +178,11 @@ which_key.register({
 	},
 	p = {
 		"<cmd>Telescope projects<cr>",
-		"Projects",
+		icons.ui.Project .. " Projects",
 	},
 	r = {
 		"<cmd>Telescope oldfiles<cr>",
-		"Recent Files",
+		icons.ui.Files .. " Recent Files",
 	},
 }, {
 	prefix = "<leader>",
@@ -192,7 +192,7 @@ which_key.register({
 which_key.register({
 	["/"] = {
 		"<Plug>(comment_toggle_linewise_visual)",
-		"Comment",
+		icons.ui.CommentCode .. " Comment",
 	},
 }, {
 	prefix = "<leader>",
