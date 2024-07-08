@@ -128,6 +128,8 @@ return {
 		TriangleShortArrowLeft = "",
 		TriangleShortArrowRight = "",
 		TriangleShortArrowUp = "",
+		ArrowRightSimple = "",
+		Copilot = "",
 	},
 	diagnostics = {
 		BoldError = "",
