@@ -112,7 +112,7 @@ which_key.register({
 		icons.ui.EmptyFolderOpen .. " Explorer",
 	},
 	l = {
-		name = icons.diagnostics.Hint .. " Code Action",
+		name = icons.diagnostics.Hint .. " Code Actions",
 		d = { "<cmd>Telescope diagnostics bufnr=0 theme=get_ivy<cr>", "Buffer Diagnostics" },
 		w = { "<cmd>Telescope diagnostics<cr>", "Diagnostics" },
 		i = { "<cmd>LspInfo<cr>", "Info" },
@@ -236,7 +236,7 @@ which_key.register({
 		p = { "<cmd>Copilot panel<CR>", "Open Copilot Panel" },
 	},
 	l = {
-		name = icons.diagnostics.Hint .. " Code Action",
+		name = icons.diagnostics.Hint .. " Code Actions",
 		a = { "<cmd>lua vim.lsp.buf.code_action()<cr>", "Action" },
 		f = { "<cmd>Format<cr>", "Format" },
 	},
