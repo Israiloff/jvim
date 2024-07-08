@@ -143,4 +143,7 @@ return {
 	{
 		"goolord/alpha-nvim",
 	},
+	{
+		"ahmedkhalf/project.nvim",
+	},
 }
