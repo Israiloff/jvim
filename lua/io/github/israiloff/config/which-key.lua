@@ -35,9 +35,9 @@ which_key.setup({
 		count = true,
 	},
 	icons = {
-		breadcrumb = "»", -- symbol used in the command line area that shows your active key combo
-		separator = "➜", -- symbol used between a key and it's label
-		group = "", -- symbol prepended to a group
+		breadcrumb = icons.ui.DoubleChevronRight, -- symbol used in the command line area that shows your active key combo
+		separator = icons.ui.ArrowRightSimple, -- symbol used between a key and it's label
+		group = icons.ui.TriangleShortArrowRight .. " ", -- symbol prepended to a group
 	},
 	popup_mappings = {
 		scroll_down = "<c-d>", -- binding to scroll down inside the popup
@@ -201,7 +201,7 @@ which_key.register({
 
 which_key.register({
 	a = {
-		name = "Open AI",
+		name = icons.misc.Robot .. " Open AI",
 		c = { "<cmd>ChatGPT<CR>", "ChatGPT" },
 		e = { "<cmd>ChatGPTEditWithInstruction<CR>", "Edit with instruction" },
 		g = { "<cmd>ChatGPTRun grammar_correction<CR>", "Grammar Correction" },
@@ -217,11 +217,11 @@ which_key.register({
 		l = { "<cmd>ChatGPTRun code_readability_analysis<CR>", "Code Readability Analysis" },
 	},
 	A = {
-		name = "Copilot",
+		name = icons.ui.Copilot .. " Copilot",
 		p = { "<cmd>Copilot panel<CR>", "Open Copilot Panel" },
 	},
 	l = {
-		name = "Code",
+		name = icons.ui.Code .. " Code",
 		a = { "<cmd>lua vim.lsp.buf.code_action()<cr>", "Action" },
 		f = { "<cmd>Format<cr>", "Format" },
 	},
