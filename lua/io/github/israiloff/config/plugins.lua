@@ -135,9 +135,6 @@ return {
 		},
 	},
 	{
-		"nvim-java/nvim-java",
-	},
-	{
 		"numToStr/Comment.nvim",
 	},
 	{
@@ -145,5 +142,15 @@ return {
 	},
 	{
 		"ahmedkhalf/project.nvim",
+	},
+	{
+		"mfussenegger/nvim-jdtls",
+	},
+	{
+		"rcarriga/nvim-dap-ui",
+		dependencies = {
+			"mfussenegger/nvim-dap",
+			"nvim-neotest/nvim-nio",
+		},
 	},
 }
