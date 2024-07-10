@@ -134,6 +134,7 @@ return {
 		CommentCode = "󰿟",
 		Refresh = "",
 		Notification = "",
+		Java = "",
 	},
 	diagnostics = {
 		BoldError = "",
