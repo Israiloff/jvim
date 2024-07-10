@@ -161,4 +161,7 @@ return {
 	{
 		"mason-org/mason-registry",
 	},
+	{
+		"Tastyep/structlog.nvim",
+	},
 }
