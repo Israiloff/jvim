@@ -147,10 +147,18 @@ return {
 		"mfussenegger/nvim-jdtls",
 	},
 	{
-		"rcarriga/nvim-dap-ui",
-		dependencies = {
-			"mfussenegger/nvim-dap",
-			"nvim-neotest/nvim-nio",
-		},
+		"mfussenegger/nvim-dap-ui",
+	},
+	{
+		"mfussenegger/nvim-dap",
+	},
+	{
+		"WhoIsSethDaniel/mason-tool-installer.nvim",
+	},
+	{
+		"nvim-telescope/telescope-dap.nvim",
+	},
+	{
+		"mason-org/mason-registry",
 	},
 }
