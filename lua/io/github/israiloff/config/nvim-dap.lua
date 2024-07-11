@@ -1,26 +1,13 @@
-local dap = require("dap")
+local log_status, log = pcall(require, "io.github.israiloff.config.logger")
 
-dap.adapters.java = {
-	type = "executable",
-	command = "java",
-	args = {
-		"-jar",
-		vim.fn.stdpath("data")
-			.. "/mason/packages/java-debug/com.microsoft.java.debug.plugin/target/com.microsoft.java.debug.plugin-*.jar",
-	},
-}
+if not log_status then
+	print("Error: 'io.github.israiloff.config.logger' not found")
+	return
+end
 
-dap.configurations.java = {
-	{
-		type = "java",
-		request = "launch",
-		name = "Launch Java",
-		mainClass = function()
-			return vim.fn.input("Path to main class > ", vim.fn.getcwd() .. "/", "file")
-		end,
-		projectName = function()
-			return vim.fn.input("Path to project > ", vim.fn.getcwd(), "file")
-		end,
-		cwd = "${workspaceFolder}",
-	},
-}
+local dap_status, _ = pcall(require, "dap")
+
+if not dap_status then
+	log.error("'nvim.dap' not found")
+	return
+end
