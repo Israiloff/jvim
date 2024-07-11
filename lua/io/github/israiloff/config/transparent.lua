@@ -12,3 +12,5 @@ highlight EndOfBuffer guibg=NONE ctermbg=NONE
 highlight MsgArea guibg=NONE ctermbg=NONE
 highlight SignColumn guibg=NONE ctermbg=NONE
 ]])
+
+vim.opt.cursorline = true
