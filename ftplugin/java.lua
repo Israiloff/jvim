@@ -76,7 +76,7 @@ local config = {
 		"-Declipse.product=org.eclipse.jdt.ls.core.product",
 		"-Dlog.protocol=true",
 		"-Dlog.level=ALL",
-        "-javaagent:" .. lombok.lombok_path,
+		"-javaagent:" .. lombok.lombok_path,
 		"-Xms512m",
 		"-Xmx2048m",
 		"--add-modules=ALL-SYSTEM",
@@ -110,35 +110,7 @@ local config = {
 
 	on_attach = function(client)
 		if client.name == "jdtls" then
-			local which_key_status, which_key = pcall(require, "which-key")
-			if which_key_status then
-				local icons = require("io.github.israiloff.config.icons")
-				which_key.register({
-					j = {
-						name = icons.ui.Java .. " Java",
-						o = { "<Cmd>lua require('jdtls').organize_imports()<CR>", "Organize Imports" },
-						v = { "<Cmd>lua require('jdtls').extract_variable()<CR>", "Extract Variable" },
-						c = { "<Cmd>lua require('jdtls').extract_constant()<CR>", "Extract Constant" },
-						t = { "<Cmd>lua require('jdtls').test_nearest_method()<CR>", "Test Method" },
-						T = { "<Cmd>lua require('jdtls').test_class()<CR>", "Test Class" },
-						u = { "<Cmd>lua require('jdtls').update_project_config()<CR>", "Update Config" },
-					},
-				}, {
-					prefix = "<leader>",
-					mode = "n",
-				})
-				which_key.register({
-					j = {
-						name = icons.ui.Java .. " Java",
-						v = { "<Esc><Cmd>lua require('jdtls').extract_variable(true)<CR>", "Extract Variable" },
-						c = { "<Esc><Cmd>lua require('jdtls').extract_constant(true)<CR>", "Extract Constant" },
-						m = { "<Esc><Cmd>lua require('jdtls').extract_method(true)<CR>", "Extract Method" },
-					},
-				}, {
-					prefix = "<leader>",
-					mode = "v",
-				})
-			end
+			require("io.github.israiloff.config.java.keymap")
 			jdtls = require("jdtls")
 			jdtls.setup_dap({ hotcodereplace = "auto" })
 			require("jdtls.dap").setup_dap_main_class_configs({
