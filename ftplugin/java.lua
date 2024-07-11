@@ -65,6 +65,9 @@ local jdtls_path = mason_registry.get_package("jdtls"):get_install_path()
 
 logger.debug(file_name, "JAVA: jdtls path: " .. jdtls_path)
 
+local lombok = require("io.github.israiloff.config.java.lombok")
+lombok.setup()
+
 local config = {
 	cmd = {
 		"java",
@@ -73,6 +76,7 @@ local config = {
 		"-Declipse.product=org.eclipse.jdt.ls.core.product",
 		"-Dlog.protocol=true",
 		"-Dlog.level=ALL",
+        "-javaagent:" .. lombok.lombok_path,
 		"-Xms512m",
 		"-Xmx2048m",
 		"--add-modules=ALL-SYSTEM",
