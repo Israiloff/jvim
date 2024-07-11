@@ -5,6 +5,7 @@ vim.o.wrap = false
 vim.o.sidescroll = 1
 vim.o.sidescrolloff = 10
 vim.opt.mouse = ""
+vim.opt.cursorline = true
 
 -- search settings
 vim.opt.hlsearch = false
