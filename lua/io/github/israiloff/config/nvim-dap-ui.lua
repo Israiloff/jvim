@@ -19,12 +19,19 @@ if not dap_ui_status then
 	return
 end
 
+local icons_status, icons = pcall(require, "io.github.israiloff.config.icons")
+
+if not icons_status then
+	log.warn("'io.github.israiloff.config.icons' not found. Dap UI will not be configured")
+	return
+end
+
 dapui.setup({
 	icons = {
-		expanded = "",
-		collapsed = "",
-		circular = "",
-		current_frame = "",
+		expanded = icons.dap.Expanded,
+		collapsed = icons.dap.Collapsed,
+		circular = icons.dap.Circular,
+		current_frame = icons.dap.CurrentFrame,
 	},
 	mappings = {
 		expand = { "<CR>" },
@@ -62,20 +69,20 @@ dapui.setup({
 		-- Display controls in this element
 		element = "repl",
 		icons = {
-			pause = "",
-			play = "",
-			step_into = "",
-			step_over = "",
-			step_out = "",
-			step_back = "",
-			run_last = "",
-			terminate = "",
+			pause = icons.dap.Pause,
+			play = icons.dap.Play,
+			step_into = icons.dap.StepInto,
+			step_over = icons.dap.StepOver,
+			step_out = icons.dap.StepOut,
+			step_back = icons.dap.StepBack,
+			run_last = icons.dap.RunLast,
+			terminate = icons.dap.Terminate,
 		},
 	},
 	floating = {
 		max_height = 0.9,
 		max_width = 0.5, -- Floats will be treated as percentage of your screen.
-		border = "rounded",
+		border = "single",
 		mappings = {
 			close = { "q", "<Esc>" },
 		},
@@ -88,13 +95,6 @@ dapui.setup({
 	},
 	force_buffers = true,
 })
-
-local icons_status, icons = pcall(require, "io.github.israiloff.config.icons")
-
-if not icons_status then
-	log.warn("'io.github.israiloff.config.icons' not found. Dap breakpoints will not be available")
-	return
-end
 
 vim.fn.sign_define("DapBreakpoint", {
 	text = icons.ui.Bug,

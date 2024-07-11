@@ -159,4 +159,18 @@ return {
 		Package = "",
 		CircuitBoard = "",
 	},
+	dap = {
+		Pause = "",
+		Play = "",
+		StepInto = "",
+		StepOver = "",
+		StepOut = "",
+		StepBack = "",
+		RunLast = "",
+		Terminate = "",
+		Expanded = "",
+		Collapsed = "",
+		Circular = "",
+		CurrentFrame = "",
+	},
 }
