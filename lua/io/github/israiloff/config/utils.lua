@@ -1,30 +1,33 @@
 M = {}
 local logger = require("io.github.israiloff.config.logger")
 local file_name = vim.fn.expand("<sfile>:p")
+local curl_status, curl = pcall(require, "plenary.curl")
 
-function M.file_exists(path)
+local function file_exists(path)
 	logger.debug(file_name, "Checking if file exists: " .. path)
-	local file = io.open(path, "r")
-	if file then
-		file:close()
-		return true
-	else
-		return false
-	end
+	return vim.fn.filereadable(path) == 1
 end
 
-function M.download(url, path)
+local function download(url, path)
 	logger.debug(file_name, "Downloading " .. url .. " to " .. path)
-	local cmd = string.format("curl -fLo %s --create-dirs %s", path, url)
-	os.execute(cmd)
+	if not curl_status then
+		logger.error(file_name, "plenary.curl not found, please install it and try again")
+		return
+	end
+	local response = curl.get(url, { output = path })
+	if response.status == 200 then
+		logger.debug(file_name, "Downloaded file '" .. path .. "' from " .. url)
+	else
+		logger.error(file_name, "Failed to download file '" .. path .. "' from " .. url)
+	end
 end
 
 function M.download_if_missing(file_path, file_url)
-	logger.debug(file_name, "Downloading if missing: " .. file_path)
-	if not M.file_exists(file_path) then
-		M.download(file_url, file_path)
+	logger.debug(file_name, "Downloading if missing file " .. file_path .. " from " .. file_url)
+	if not file_exists(file_path) then
+		download(file_url, file_path)
 	end
-
+	logger.debug(file_name, "Downloaded: " .. file_path)
 	return file_path
 end
 
