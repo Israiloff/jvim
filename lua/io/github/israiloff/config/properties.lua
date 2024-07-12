@@ -9,4 +9,7 @@ return {
 			error = true,
 		},
 	},
+	gui = {
+		transparent = true,
+	},
 }

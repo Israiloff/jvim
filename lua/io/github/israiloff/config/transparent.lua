@@ -1,3 +1,9 @@
+local prop_status, properties = pcall(require, "io.github.israiloff.config.properties")
+
+if not prop_status or not properties.gui.transparent then
+	return
+end
+
 vim.cmd([[
 highlight Normal guibg=NONE ctermbg=NONE
 highlight NormalNC guibg=NONE ctermbg=NONE
