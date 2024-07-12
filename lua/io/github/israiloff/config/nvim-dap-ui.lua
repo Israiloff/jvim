@@ -5,24 +5,25 @@ if not log_status then
 	return
 end
 
+local logger_name = "io.github.israiloff.config.nvim-dap-ui"
 local dap_status, _ = pcall(require, "dap")
 
 if not dap_status then
-	log.error("'nvim.dap' not found")
+	log.error(logger_name, "'nvim.dap' not found")
 	return
 end
 
 local dap_ui_status, dapui = pcall(require, "dapui")
 
 if not dap_ui_status then
-	log.error("'nvim-dap-ui' not found")
+	log.error(logger_name, "'nvim-dap-ui' not found")
 	return
 end
 
 local icons_status, icons = pcall(require, "io.github.israiloff.config.icons")
 
 if not icons_status then
-	log.warn("'io.github.israiloff.config.icons' not found. Dap UI will not be configured")
+	log.warn(logger_name, "'io.github.israiloff.config.icons' not found. Dap UI will not be configured")
 	return
 end
 
