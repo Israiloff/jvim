@@ -173,4 +173,15 @@ return {
 		Circular = "",
 		CurrentFrame = "",
 	},
+	gpt = {
+		Question = "󰋧",
+		Answer = "󰚩",
+		BorderLeft = "",
+		BorderRight = "",
+		CurrentLine = "󰐊",
+		Active = "󱚣",
+		Inactive = "󱚧",
+        Prompt = "",
+        Setting = "",
+	},
 }

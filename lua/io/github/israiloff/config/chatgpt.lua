@@ -1,3 +1,18 @@
+local log_status, log = pcall(require, "io.github.israiloff.config.logger")
+
+if not log_status then
+	print("Error: 'io.github.israiloff.config.logger' not found")
+	return
+end
+
+local logger_name = "io.github.israiloff.config.nvim-dap-ui"
+local icons_status, icons = pcall(require, "io.github.israiloff.config.icons")
+
+if not icons_status then
+	log.warn(logger_name, "'io.github.israiloff.config.icons' not found. ChatGPT will not be configured")
+	return
+end
+
 require("chatgpt").setup({
 	api_key_cmd = nil,
 	yank_register = "+",
@@ -15,15 +30,15 @@ require("chatgpt").setup({
 	},
 	chat = {
 		loading_text = "Loading, please wait ...",
-		question_sign = "", -- 🙂
-		answer_sign = "ﮧ", -- 🤖
-		border_left_sign = "[",
-		border_right_sign = "]",
+		question_sign = icons.gpt.Question,
+		answer_sign = icons.gpt.Answer,
+		border_left_sign = icons.gpt.BorderLeft,
+		border_right_sign = icons.gpt.BorderRight,
 		max_line_length = 120,
 		sessions_window = {
-			active_sign = "  ",
-			inactive_sign = "  ",
-			current_line_sign = "",
+			active_sign = " " .. icons.gpt.Active .. " ",
+			inactive_sign = " " .. icons.gpt.Inactive .. " ",
+			current_line_sign = icons.gpt.CurrentLine,
 			border = {
 				style = "rounded",
 				text = {
@@ -104,7 +119,7 @@ require("chatgpt").setup({
 		},
 	},
 	popup_input = {
-		prompt = "  ",
+		prompt = " " .. icons.gpt.Prompt .. " ",
 		border = {
 			highlight = "FloatBorder",
 			style = "rounded",
@@ -121,7 +136,7 @@ require("chatgpt").setup({
 		max_visible_lines = 20,
 	},
 	settings_window = {
-		setting_sign = "  ",
+		setting_sign = " " .. icons.gpt.Setting .. " ",
 		border = {
 			style = "rounded",
 			text = {
@@ -133,7 +148,7 @@ require("chatgpt").setup({
 		},
 	},
 	help_window = {
-		setting_sign = "  ",
+		setting_sign = " " .. icons.gpt.Setting .. " ",
 		border = {
 			style = "rounded",
 			text = {
