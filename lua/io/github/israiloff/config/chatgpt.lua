@@ -13,7 +13,14 @@ if not icons_status then
 	return
 end
 
-require("chatgpt").setup({
+local status, chatgpt = pcall(require, "chatgpt")
+
+if not status then
+	log.error(logger_name, "'chatgpt' not found. ChatGPT will not be configured")
+	return
+end
+
+chatgpt.setup({
 	api_key_cmd = nil,
 	yank_register = "+",
 	edit_with_instructions = {
