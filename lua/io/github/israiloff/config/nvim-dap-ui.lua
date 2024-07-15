@@ -101,19 +101,19 @@ vim.fn.sign_define("DapBreakpoint", {
 	text = icons.ui.Bug,
 	texthl = "DapBreakpointHL",
 	linehl = "",
-	numhl = "",
+	numhl = "DapBreakpointHL",
 })
 
 vim.fn.sign_define("DapBreakpointRejected", {
 	text = icons.ui.Bug,
 	texthl = "DapBreakpointRejectedHL",
 	linehl = "",
-	numhl = "",
+	numhl = "DapBreakpointRejectedHL",
 })
 
 vim.fn.sign_define("DapStopped", {
 	text = icons.ui.BoldArrowRight,
 	texthl = "DapStoppedHL",
 	linehl = "",
-	numhl = "",
+	numhl = "DapStoppedHL",
 })
