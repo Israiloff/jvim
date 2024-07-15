@@ -108,7 +108,11 @@ local config = {
 	},
 	capabilities = jdtls.extendedClientCapabilities,
 
-	on_attach = function(client)
+	on_attach = function(client, bufnr)
+		local navic_status, navic = pcall(require, "io.github.israiloff.config.nvim-navic")
+		if navic_status then
+			navic.attach(client, bufnr)
+		end
 		if client.name == "jdtls" then
 			require("io.github.israiloff.config.java.keymap")
 			jdtls = require("jdtls")

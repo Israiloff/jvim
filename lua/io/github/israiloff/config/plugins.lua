@@ -170,4 +170,7 @@ return {
 			"nvim-neotest/nvim-nio",
 		},
 	},
+	{
+		"SmiteshP/nvim-navic",
+	},
 }
