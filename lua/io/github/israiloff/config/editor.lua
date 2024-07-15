@@ -13,3 +13,4 @@ vim.opt.incsearch = true
 
 -- text serfing settings
 vim.opt.scrolloff = 10
+vim.opt["updatetime"] = 100
