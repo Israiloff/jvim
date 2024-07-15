@@ -17,4 +17,5 @@ highlight NvimTreeNormalNC guibg=NONE ctermbg=NONE
 highlight EndOfBuffer guibg=NONE ctermbg=NONE
 highlight MsgArea guibg=NONE ctermbg=NONE
 highlight SignColumn guibg=NONE ctermbg=NONE
+highlight WinBarNC guibg=NONE ctermbg=NONE
 ]])
