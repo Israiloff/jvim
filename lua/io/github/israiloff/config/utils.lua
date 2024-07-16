@@ -42,4 +42,32 @@ function M.isempty(s)
 	return s == nil or s == ""
 end
 
+function M.get_java_path()
+	local java_home = vim.fn.getenv("JAVA_HOME")
+	if java_home ~= vim.NIL and java_home ~= "" then
+		return java_home .. "/bin/java"
+	end
+
+	-- Use `which java` to find the Java executable in the system PATH
+	-- local java_path = vim.fn.system("which java")
+	-- if vim.v.shell_error == 0 then
+	-- 	return vim.fn.trim(java_path)
+	-- else
+		-- Fallback: common locations (Linux/Unix example)
+		local common_paths = {
+			"/usr/bin/java",
+			"/usr/local/bin/java",
+			"/opt/java/bin/java",
+		}
+		for _, path in ipairs(common_paths) do
+			if vim.fn.filereadable(path) == 1 then
+				return path
+			end
+		end
+	-- end
+
+	-- If Java is not found
+	logger.error(logger_name, "Java not found in JAVA_HOME or PATH")
+end
+
 return M

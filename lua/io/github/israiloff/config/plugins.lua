@@ -180,4 +180,8 @@ return {
 		ft = { "markdown" },
 		build = "cd app && yarn install",
 	},
+	{
+		"Israiloff/lemminx-compiled",
+		version = "v0.28.0",
+	},
 }
