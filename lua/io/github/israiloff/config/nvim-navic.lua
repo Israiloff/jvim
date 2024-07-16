@@ -180,7 +180,7 @@ local function get_winbar()
 	log.debug(logger_name, "winbar successfully set")
 end
 
-local function create_winbar()
+function CREATE_WINBAR()
 	vim.api.nvim_create_augroup("_winbar", {})
 	vim.api.nvim_create_autocmd({
 		"CursorHoldI",
@@ -203,7 +203,7 @@ local function create_winbar()
 end
 
 function M.setup()
-	create_winbar()
+	CREATE_WINBAR()
 
 	navic.setup({
 		icons = {
