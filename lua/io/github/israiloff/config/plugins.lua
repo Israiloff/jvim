@@ -14,6 +14,7 @@ return {
 			vim.o.timeoutlen = 300
 		end,
 		opts = {},
+		version = "v2.1.0",
 	},
 	{
 		"neovim/nvim-lspconfig",
