@@ -1,5 +1,7 @@
 # JVIM - Neovim Configuration for Java Development
 
+[![Latest Release](https://img.shields.io/github/v/release/Israiloff/jvim)](https://github.com/Israiloff/jvim/releases/latest)
+
 JVIM is a Neovim configuration tailored for Java development. This documentation describes the plugins used and key
 configurations.
 
