@@ -163,9 +163,6 @@ return {
 		"mason-org/mason-registry",
 	},
 	{
-		"Tastyep/structlog.nvim",
-	},
-	{
 		"rcarriga/nvim-dap-ui",
 		dependencies = {
 			"nvim-neotest/nvim-nio",
