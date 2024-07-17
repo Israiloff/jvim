@@ -236,6 +236,25 @@ Press `<Space>` to activate the which-key menu.
 | `<Space>j c`    | Extract Constant (Visual Mode) |
 | `<Space>j m`    | Extract Method (Visual Mode)   |
 
+## Docker Container
+You can use the [Docker container](https://hub.docker.com/r/israiloff/jvim) configured in a separate 
+[project](https://github.com/Israiloff/jvim-docker) in a few simple steps.
+
+- Pull the image
+```bash
+docker pull israiloff/jvim:latest
+```
+
+- Run the container with all ports exposed and with full access to your local docker
+```bash
+docker run -it -d --network host --name jvim -v /var/run/docker.sock:/var/run/docker.sock -v /usr/local/bin/docker:/usr/local/bin/docker israiloff/jvim
+```
+
+- Enter the container
+```bash
+docker exec -it jvim /bin/zsh
+```
+
 ## Gallery
 
 ### Welcome Screen
