@@ -233,3 +233,20 @@ Press `<Space>` to activate the which-key menu.
 | `<Space>j v`    | Extract Variable (Visual Mode) |
 | `<Space>j c`    | Extract Constant (Visual Mode) |
 | `<Space>j m`    | Extract Method (Visual Mode)   |
+
+## Gallery
+
+### Welcome Screen
+![Welcome](https://github.com/Israiloff/jvim-gallery/blob/master/welcome.png)
+
+### Nvim-Tree
+![Nvim-Tree](https://github.com/Israiloff/jvim-gallery/blob/master/nvim-tree_and_java_code.png)
+
+### Which-Key Menu
+![Which-Key](https://github.com/Israiloff/jvim-gallery/blob/master/which-key.png)
+
+### File search with Telescope
+![Telescope](https://github.com/Israiloff/jvim-gallery/blob/master/telescope.png)
+
+### Built-in Terminal (horizontal)
+![Terminal](https://github.com/Israiloff/jvim-gallery/blob/master/toggleterm_horizontal.png)
