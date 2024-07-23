@@ -103,9 +103,14 @@ vim.api.nvim_create_autocmd("BufReadPost", {
 			return
 		end
 
+		if utils.install_package(filetype .. "-language-server") then
+			log.info(logger_name, "Server for '" .. filetype .. "' installed successfully")
+			return
+		end
+
 		for _, server in ipairs(availables) do
 			log.info(logger_name, "Server: " .. vim.inspect(server))
-			if Utils.install_package(server) then
+			if utils.install_package(server) then
 				log.info(logger_name, "Server for '" .. filetype .. "' installed successfully")
 				break
 			end
