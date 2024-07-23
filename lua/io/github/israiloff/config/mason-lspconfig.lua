@@ -49,17 +49,46 @@ local utils_status, utils = pcall(require, "io.github.israiloff.config.lsp-utils
 if not utils_status then
 	log.error(
 		logger_name,
+		"'io.github.israiloff.config.lsp-utils' not found. Filetype auto resolve will not be configured."
+	)
+	return
+end
+
+local c_utils_status, c_utils = pcall(require, "io.github.israiloff.config.utils")
+
+if not c_utils_status then
+	log.error(
+		logger_name,
 		"'io.github.israiloff.config.utils' not found. Filetype auto resolve will not be configured."
 	)
 	return
 end
 
+local ignored_filetypes = {
+	"TelescopePrompt",
+	"packer",
+	"toggleterm",
+	"lua",
+}
+
+vim.list_extend(ignored_filetypes, c_utils.get_ftplugin_filetypes())
+
 log.info(logger_name, "Setting up Mason LSPConfig filetype auto resolve")
 
-vim.api.nvim_create_autocmd("BufEnter", {
-	once = true,
+vim.api.nvim_create_augroup("LSPAutoInstall", {
+	clear = false,
+})
+
+vim.api.nvim_create_autocmd("BufReadPost", {
+	group = "LSPAutoInstall",
 	callback = function()
 		local filetype = vim.bo.filetype
+
+		if c_utils.isempty(filetype) or vim.tbl_contains(ignored_filetypes, filetype) then
+			log.warn(logger_name, "Ignoring filetype '" .. filetype .. "'")
+			return
+		end
+
 		local availables = utils.get_available_servers({ filetype = filetype })
 
 		log.info(logger_name, "Available servers for '" .. filetype .. "' : " .. vim.inspect(availables))
