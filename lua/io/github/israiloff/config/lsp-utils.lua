@@ -55,8 +55,16 @@ function Utils.get_available_servers(filter)
 
 	registry.refresh()
 
-	local supported_servers = mason_lspconfig.get_available_servers(filter)
-	return supported_servers or {}
+	local ss_status, supported_servers = pcall(function()
+		return mason_lspconfig.get_available_servers(filter)
+	end)
+
+	if not ss_status or not supported_servers then
+		log.error(logger_name, "Error getting supported servers.")
+		return {}
+	end
+
+	return supported_servers
 end
 
 function Utils.already_installed(available)
