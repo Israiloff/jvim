@@ -57,6 +57,7 @@ end
 log.info(logger_name, "Setting up Mason LSPConfig filetype auto resolve")
 
 vim.api.nvim_create_autocmd("BufEnter", {
+	once = true,
 	callback = function()
 		local filetype = vim.bo.filetype
 		local availables = utils.get_available_servers({ filetype = filetype })
