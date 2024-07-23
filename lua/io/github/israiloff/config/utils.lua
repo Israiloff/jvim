@@ -48,26 +48,29 @@ function M.get_java_path()
 		return java_home .. "/bin/java"
 	end
 
-	-- Use `which java` to find the Java executable in the system PATH
-	-- local java_path = vim.fn.system("which java")
-	-- if vim.v.shell_error == 0 then
-	-- 	return vim.fn.trim(java_path)
-	-- else
-		-- Fallback: common locations (Linux/Unix example)
-		local common_paths = {
-			"/usr/bin/java",
-			"/usr/local/bin/java",
-			"/opt/java/bin/java",
-		}
-		for _, path in ipairs(common_paths) do
-			if vim.fn.filereadable(path) == 1 then
-				return path
-			end
+	local common_paths = {
+		"/usr/bin/java",
+		"/usr/local/bin/java",
+		"/opt/java/bin/java",
+	}
+	for _, path in ipairs(common_paths) do
+		if vim.fn.filereadable(path) == 1 then
+			return path
 		end
-	-- end
+	end
 
-	-- If Java is not found
 	logger.error(logger_name, "Java not found in JAVA_HOME or PATH")
+end
+
+function M.get_ftplugin_filetypes()
+	local ftplugin_filetypes = {}
+	local ftplugin_dir = vim.fn.stdpath("config") .. "/ftplugin"
+	local ftplugin_files = vim.fn.glob(ftplugin_dir .. "/*.lua", false, true)
+	for _, file in ipairs(ftplugin_files) do
+		local filetype = vim.fn.fnamemodify(file, ":t:r")
+		table.insert(ftplugin_filetypes, filetype)
+	end
+	return ftplugin_filetypes
 end
 
 return M
