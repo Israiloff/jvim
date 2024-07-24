@@ -1,4 +1,50 @@
+---@diagnostic disable: undefined-field
 local icons = require("io.github.israiloff.config.icons")
+
+local function diagnostics_indicator(_, _, diagnostics, _)
+	local result = {}
+
+	local symbols = {
+		error = icons.diagnostics.Error,
+		warning = icons.diagnostics.Warning,
+		info = icons.diagnostics.Information,
+	}
+
+	for name, count in pairs(diagnostics) do
+		if symbols[name] and count > 0 then
+			table.insert(result, symbols[name] .. " " .. count)
+		end
+	end
+
+	---@diagnostic disable-next-line: cast-local-type
+	result = table.concat(result, " ")
+
+	return #result > 0 and result or ""
+end
+
+local function is_ft(b, ft)
+	return vim.bo[b].filetype == ft
+end
+
+local function custom_filter(buf, buf_nums)
+	local logs = vim.tbl_filter(function(b)
+		return is_ft(b, "log")
+	end, buf_nums or {})
+
+	if vim.tbl_isempty(logs) then
+		return true
+	end
+
+	local tab_num = vim.fn.tabpagenr()
+	local last_tab = vim.fn.tabpagenr("$")
+	local is_log = is_ft(buf, "log")
+
+	if last_tab == 1 then
+		return true
+	end
+
+	return (tab_num == last_tab and is_log) or (tab_num ~= last_tab and not is_log)
+end
 
 require("bufferline").setup({
 	options = {
@@ -11,7 +57,7 @@ require("bufferline").setup({
 		groups = { items = {}, options = { toggle_hidden_on_enter = true } },
 		mode = "buffers",
 		numbers = "none",
-		close_command = function(bufnr)
+		close_command = function(_)
 			vim.cmd("bd")
 		end,
 		right_mouse_command = "vert sbuffer %d",
@@ -30,6 +76,7 @@ require("bufferline").setup({
 			if buf.name:match("%.md") then
 				return vim.fn.fnamemodify(buf.name, ":t:r")
 			end
+			return buf.name
 		end,
 		max_name_length = 18,
 		max_prefix_length = 15,
