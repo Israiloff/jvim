@@ -27,3 +27,27 @@ lspconfig.lua_ls.setup({
 })
 
 require("lspconfig.ui.windows").default_options.border = "single"
+
+-- Set up a custom handler for hover and signature tooltips with borders
+
+-- Define the border style
+local border = {
+	{ "╭", "FloatBorder" },
+	{ "─", "FloatBorder" },
+	{ "╮", "FloatBorder" },
+	{ "│", "FloatBorder" },
+	{ "╯", "FloatBorder" },
+	{ "─", "FloatBorder" },
+	{ "╰", "FloatBorder" },
+	{ "│", "FloatBorder" },
+}
+
+-- Set up a custom handler for hover with a border
+vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, {
+	border = border,
+})
+
+-- Set up a custom handler for signature help with a border
+vim.lsp.handlers["textDocument/signatureHelp"] = vim.lsp.with(vim.lsp.handlers.signature_help, {
+	border = border,
+})
