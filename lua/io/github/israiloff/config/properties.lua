@@ -1,5 +1,5 @@
 return {
-	version = "0.0.2",
+	version = "0.1.3",
 	logger = {
 		enabled = false,
 		level = {
