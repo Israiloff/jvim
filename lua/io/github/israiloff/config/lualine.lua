@@ -41,7 +41,7 @@ require("lualine").setup({
 		lualine_b = {
 			{
 				"b:gitsigns_head",
-				icon = "%#SLGitIcon#" .. icons.git.Branch .. "%*" .. "%#SLBranchName#",
+				icon = "%#SLGitIcon#" .. icons.git.Branch .. "%*%#SLBranchName#",
 				color = { gui = "bold" },
 			},
 		},
