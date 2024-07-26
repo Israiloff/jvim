@@ -50,7 +50,28 @@ require("lualine").setup({
 				color = { gui = "bold" },
 			},
 		},
-		lualine_c = {},
+		lualine_c = {
+			{
+				"diff",
+				source = function()
+					local gitsigns = vim.b.gitsigns_status_dict
+					if gitsigns then
+						return {
+							added = gitsigns.added,
+							modified = gitsigns.changed,
+							removed = gitsigns.removed,
+						}
+					end
+				end,
+				symbols = {
+					added = icons.git.LineAdded .. " ",
+					modified = icons.git.LineModified .. " ",
+					removed = icons.git.LineRemoved .. " ",
+				},
+				padding = { left = 2, right = 1 },
+				cond = nil,
+			},
+		},
 		lualine_x = {
 			"filename",
 			{
