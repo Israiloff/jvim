@@ -38,7 +38,13 @@ require("lualine").setup({
 			nvim_tree_shift,
 			"mode",
 		},
-		lualine_b = { "branch" },
+		lualine_b = {
+			{
+				"b:gitsigns_head",
+				icon = "%#SLGitIcon#" .. icons.git.Branch .. "%*" .. "%#SLBranchName#",
+				color = { gui = "bold" },
+			},
+		},
 		lualine_c = { "filename" },
 		lualine_x = {
 			{
