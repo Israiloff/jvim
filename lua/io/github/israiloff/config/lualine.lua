@@ -40,7 +40,20 @@ require("lualine").setup({
 		},
 		lualine_b = { "branch" },
 		lualine_c = { "filename" },
-		lualine_x = { "encoding", "fileformat", "filetype" },
+		lualine_x = {
+			{
+				"diagnostics",
+				sources = { "nvim_diagnostic" },
+				symbols = {
+					error = icons.diagnostics.BoldError .. " ",
+					warn = icons.diagnostics.BoldWarning .. " ",
+					info = icons.diagnostics.BoldInformation .. " ",
+					hint = icons.diagnostics.BoldHint .. " ",
+				},
+			},
+			"encoding",
+			"filetype",
+		},
 		lualine_y = { "location" },
 		lualine_z = {
 			function()
