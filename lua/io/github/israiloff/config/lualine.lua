@@ -36,7 +36,12 @@ require("lualine").setup({
 	sections = {
 		lualine_a = {
 			nvim_tree_shift,
-			"mode",
+			{
+				function()
+					return " " .. icons.ui.Vim .. " "
+				end,
+				padding = { left = 0, right = 0 },
+			},
 		},
 		lualine_b = {
 			{
@@ -45,8 +50,9 @@ require("lualine").setup({
 				color = { gui = "bold" },
 			},
 		},
-		lualine_c = { "filename" },
+		lualine_c = {},
 		lualine_x = {
+			"filename",
 			{
 				"diagnostics",
 				sources = { "nvim_diagnostic" },
