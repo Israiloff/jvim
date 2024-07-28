@@ -199,6 +199,10 @@ which_key.register({
 		"<cmd>Telescope oldfiles<cr>",
 		icons.ui.Files .. " Recent Files",
 	},
+    m = {
+        "<cmd>Mason<cr>",
+        icons.kind.Package .. " Mason",
+    },
 }, {
 	prefix = "<leader>",
 	mode = "n",
