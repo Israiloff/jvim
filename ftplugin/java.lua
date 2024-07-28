@@ -4,35 +4,35 @@ if not logger_status then
 	return
 end
 
-local file_name = vim.fn.expand("<sfile>:p")
+local logger_name = "ftplugin.java"
 
-logger.debug(file_name, "JAVA: starting configuration forming...")
+logger.debug(logger_name, "JAVA: starting configuration forming...")
 
 local mason_status, _ = pcall(require, "mason")
 if not mason_status then
-	logger.debug(file_name, "JAVA: mason not found, please install it and try again")
+	logger.debug(logger_name, "JAVA: mason not found, please install it and try again")
 	return
 end
 
 local jdtls_status, jdtls = pcall(require, "jdtls")
 
-logger.debug(file_name, "JAVA: jdtls status: " .. tostring(jdtls_status))
+logger.debug(logger_name, "JAVA: jdtls status: " .. tostring(jdtls_status))
 
 if not jdtls_status then
-	logger.debug(file_name, "JAVA: jdtls not found, please install it and try again")
+	logger.debug(logger_name, "JAVA: jdtls not found, please install it and try again")
 	return
 end
 
 local utils_status, utils = pcall(require, "io.github.israiloff.config.utils")
 if not utils_status then
-	logger.debug(file_name, "JAVA: io.github.israiloff.config.utils not found, please install it and try again")
+	logger.debug(logger_name, "JAVA: io.github.israiloff.config.utils not found, please install it and try again")
 	return
 end
 
 local registry_status, mason_registry = pcall(require, "mason-registry")
 
 if not registry_status then
-	logger.debug(file_name, "JAVA: mason.registry not found, please install it and try again")
+	logger.debug(logger_name, "JAVA: mason.registry not found, please install it and try again")
 	return
 end
 
@@ -42,7 +42,7 @@ local workspace_dir = share_dir .. "/nvim/java/" .. project_name
 
 utils.create_dirs(workspace_dir)
 
-logger.debug(file_name, "JAVA: forming bundles...")
+logger.debug(logger_name, "JAVA: forming bundles...")
 
 local bundles = {
 	vim.fn.glob(
@@ -51,7 +51,7 @@ local bundles = {
 	),
 }
 
-logger.debug(file_name, "JAVA: bundles formed: " .. table.concat(bundles, ", "))
+logger.debug(logger_name, "JAVA: bundles formed: " .. table.concat(bundles, ", "))
 
 vim.list_extend(
 	bundles,
@@ -63,7 +63,7 @@ vim.list_extend(
 
 local jdtls_path = mason_registry.get_package("jdtls"):get_install_path()
 
-logger.debug(file_name, "JAVA: jdtls path: " .. jdtls_path)
+logger.debug(logger_name, "JAVA: jdtls path: " .. jdtls_path)
 
 local lombok = require("io.github.israiloff.config.java.lombok")
 lombok.setup()
@@ -159,8 +159,8 @@ local config = {
 	},
 }
 
-logger.debug(file_name, "JAVA: configuration formed")
+logger.debug(logger_name, "JAVA: configuration formed")
 
 jdtls.start_or_attach(config)
 
-logger.debug(file_name, "JAVA: configuration applied")
+logger.debug(logger_name, "JAVA: configuration applied")
