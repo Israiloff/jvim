@@ -92,4 +92,13 @@ function Utils.get_installed_servers_names()
 	return lspconfig.util.available_servers()
 end
 
+function Utils.already_installed_single(server_name)
+	if not reg_status then
+		log.error(logger_name, "'mason-registry' not found. Aborting already_installed_single.")
+		return false
+	end
+
+	return registry.is_installed(server_name)
+end
+
 return Utils
