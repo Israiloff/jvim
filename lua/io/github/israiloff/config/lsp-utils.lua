@@ -21,24 +21,23 @@ function Utils.install_package(package_name)
 	end
 
 	if not registry.has_package(package_name) then
-		vim.notify("Package " .. package_name .. " is not available in the Mason registry.", vim.log.levels.ERROR)
+		vim.notify("Package [" .. package_name .. "] is not available in the Mason registry.", vim.log.levels.ERROR)
 		return false
 	end
 
 	local pkg = registry.get_package(package_name)
 
 	if pkg.is_installed(pkg) then
-		log.warn(logger_name, "Package " .. package_name .. " is already installed.")
+		vim.notify("Package [" .. package_name .. "] is already installed.", vim.log.levels.INFO)
 		return true
 	end
 
-	log.info(logger_name, "Installing package '" .. package_name .. "'...")
+	vim.notify("Installing package [" .. package_name .. "]...", vim.log.levels.INFO)
 
 	local install_status, _ = pcall(function()
 		pkg.install(pkg)
 	end)
 
-	log.info(logger_name, "install_package finished for package '" .. package_name .. "'.")
 	return install_status
 end
 

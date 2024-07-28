@@ -94,6 +94,7 @@ vim.api.nvim_create_autocmd("BufReadPost", {
 		log.info(logger_name, "Available servers for '" .. filetype .. "' : " .. vim.inspect(availables))
 
 		if #availables == 0 or availables == nil then
+			vim.notify("No available servers for [" .. filetype .. "]", vim.log.levels.WARN)
 			log.warn(logger_name, "No available servers for " .. filetype)
 			return
 		end
@@ -102,6 +103,8 @@ vim.api.nvim_create_autocmd("BufReadPost", {
 			log.info(logger_name, "Server for '" .. filetype .. "' already installed")
 			return
 		end
+
+		vim.notify("Installing server for [" .. filetype .. "]...", vim.log.levels.INFO)
 
 		local primary_server = filetype .. "-language-server"
 
