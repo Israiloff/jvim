@@ -103,10 +103,6 @@ return {
 		version = "*",
 	},
 	{
-		"kevinhwang91/nvim-ufo",
-		dependencies = "kevinhwang91/promise-async",
-	},
-	{
 		"nvim-lualine/lualine.nvim",
 	},
 	{
