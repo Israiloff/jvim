@@ -202,6 +202,33 @@ function CREATE_WINBAR()
 	})
 end
 
+function SETUP_LANGUAGE_SERVERS()
+	local lsp_utils_status, lsp_utils = pcall(require, "io.github.israiloff.config.lsp-utils")
+
+	if not lsp_utils_status then
+		log.error(logger_name, "'io.github.israiloff.config.lsp-utils' not found. Auto-attach will not work.")
+		return
+	end
+
+	local lspconfig_status, lspconfig = pcall(require, "lspconfig")
+
+	if not lspconfig_status then
+		log.error(logger_name, "'lspconfig' not found. Auto-attach will not work.")
+		return
+	end
+
+	local language_servers = lsp_utils.get_installed_servers_names()
+
+	for _, ls in ipairs(language_servers) do
+		lspconfig[ls].setup({
+			on_attach = function(client, bufnr)
+				navic.attach(client, bufnr)
+			end,
+		})
+	end
+end
+
+---@diagnostic disable-next-line: duplicate-set-field
 function M.setup()
 	CREATE_WINBAR()
 
@@ -247,6 +274,8 @@ function M.setup()
 		depth_limit = 0,
 		depth_limit_indicator = "..",
 	})
+
+	SETUP_LANGUAGE_SERVERS()
 end
 
 return M

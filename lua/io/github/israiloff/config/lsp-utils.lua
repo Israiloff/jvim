@@ -81,4 +81,15 @@ function Utils.already_installed_all(available)
 	return false
 end
 
+local lspconfig_status, lspconfig = pcall(require, "lspconfig")
+
+function Utils.get_installed_servers_names()
+	if not lspconfig_status then
+		log.error(logger_name, "'lspconfig' not found. Aborting get_all_available_servers.")
+		return {}
+	end
+
+	return lspconfig.util.available_servers()
+end
+
 return Utils
