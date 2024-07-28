@@ -21,27 +21,27 @@ mason_lspconfig.setup({
 		"lua_ls",
 		"jdtls",
 	},
-	automatic_installation = {
-		enabled = true,
-		exclude = {
-			"lemminx",
-		},
-	},
-	handlers = {
-		function(server_name)
-			require("lspconfig")[server_name].setup({
-				on_attach = function(client, bufnr)
-					vim.api.nvim_buf_set_option(bufnr, "omnifunc", "v:lua.vim.lsp.omnifunc")
-					local navic_status, navic = pcall(require, "nvim-navic")
-					if navic_status then
-						navic.attach(client, bufnr)
-					end
-				end,
-				capabilities = require("cmp_nvim_lsp").default_capabilities(),
-				flags = { debounce_text_changes = 200 },
-			})
-		end,
-	},
+	automatic_installation = false,
+})
+
+mason_lspconfig.setup_handlers({
+	function(server_name)
+		if server_name == "jdtls" then
+			return
+		end
+
+		require("lspconfig")[server_name].setup({
+			on_attach = function(client, bufnr)
+				vim.api.nvim_buf_set_option(bufnr, "omnifunc", "v:lua.vim.lsp.omnifunc")
+				local navic_status, navic = pcall(require, "nvim-navic")
+				if navic_status then
+					navic.attach(client, bufnr)
+				end
+			end,
+			capabilities = require("cmp_nvim_lsp").default_capabilities(),
+			flags = { debounce_text_changes = 200 },
+		})
+	end,
 })
 
 local utils_status, utils = pcall(require, "io.github.israiloff.config.lsp-utils")
@@ -98,7 +98,7 @@ vim.api.nvim_create_autocmd("BufReadPost", {
 			return
 		end
 
-		if utils.already_installed(availables) then
+		if utils.already_installed_all(availables) then
 			log.info(logger_name, "Server for '" .. filetype .. "' already installed")
 			return
 		end

@@ -67,7 +67,7 @@ function Utils.get_available_servers(filter)
 	return supported_servers
 end
 
-function Utils.already_installed(available)
+function Utils.already_installed_all(available)
 	if not reg_status then
 		log.error(logger_name, "'mason-registry' not found. Aborting already_installed.")
 		return false
