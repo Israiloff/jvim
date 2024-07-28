@@ -46,7 +46,7 @@ require("nvim-tree").setup({
 			quit_on_focus_loss = true,
 			open_win_config = {
 				relative = "editor",
-				border = "rounded",
+				border = "single",
 				width = 30,
 				height = 30,
 				row = 1,
@@ -201,7 +201,7 @@ require("nvim-tree").setup({
 				col = 1,
 				row = 1,
 				relative = "cursor",
-				border = "shadow",
+				border = "single",
 				style = "minimal",
 			},
 		},
