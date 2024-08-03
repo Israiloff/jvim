@@ -142,6 +142,9 @@ return {
 	},
 	{
 		"mfussenegger/nvim-jdtls",
+		dependencies = {
+			"markwoodhall/vim-codelens",
+		},
 	},
 	{
 		"mfussenegger/nvim-dap-ui",

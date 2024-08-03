@@ -122,6 +122,9 @@ local config = {
 					vmArgs = "-Dspring.profiles.active=local",
 				},
 			})
+			if client.server_capabilities.codeLensProvider then
+				vim.lsp.codelens.refresh()
+			end
 		end
 	end,
 	settings = {
