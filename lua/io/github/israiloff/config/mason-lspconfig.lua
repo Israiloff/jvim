@@ -24,6 +24,12 @@ mason_lspconfig.setup({
 	automatic_installation = false,
 })
 
+vim.api.nvim_create_autocmd("User", {
+	pattern = "LspAttached",
+	once = true,
+	callback = vim.lsp.codelens.refresh,
+})
+
 mason_lspconfig.setup_handlers({
 	function(server_name)
 		if server_name == "jdtls" then
@@ -33,6 +39,13 @@ mason_lspconfig.setup_handlers({
 		require("lspconfig")[server_name].setup({
 			on_attach = function(client, bufnr)
 				vim.api.nvim_buf_set_option(bufnr, "omnifunc", "v:lua.vim.lsp.omnifunc")
+				vim.api.nvim_create_autocmd({ "TextChanged", "InsertLeave" }, {
+					buffer = bufnr,
+					callback = vim.lsp.codelens.refresh,
+				})
+				-- trigger codelens refresh
+				vim.api.nvim_exec_autocmds("User", { pattern = "LspAttached" })
+
 				local navic_status, navic = pcall(require, "nvim-navic")
 				if navic_status then
 					navic.attach(client, bufnr)
