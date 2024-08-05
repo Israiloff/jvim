@@ -20,6 +20,7 @@ mason_lspconfig.setup({
 	ensure_installed = {
 		"lua_ls",
 		"jdtls",
+        "marksman",
 	},
 	automatic_installation = false,
 })

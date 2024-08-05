@@ -4,18 +4,17 @@ if not prop_status or not properties.gui.transparent then
 	return
 end
 
-vim.cmd([[
-highlight Normal guibg=NONE ctermbg=NONE
-highlight NormalNC guibg=NONE ctermbg=NONE
-highlight NonText guibg=NONE ctermbg=NONE
-highlight LineNr guibg=NONE ctermbg=NONE
-highlight Folded guibg=NONE ctermbg=NONE
-highlight TelescopeBorder guibg=NONE ctermbg=NONE
-highlight NvimTreeNormal guibg=NONE ctermbg=NONE
-highlight NvimTreeEndOfBuffer guibg=NONE ctermbg=NONE
-highlight NvimTreeNormalNC guibg=NONE ctermbg=NONE
-highlight EndOfBuffer guibg=NONE ctermbg=NONE
-highlight MsgArea guibg=NONE ctermbg=NONE
-highlight SignColumn guibg=NONE ctermbg=NONE
-highlight WinBarNC guibg=NONE ctermbg=NONE
-]])
+local hl_groups_list = {
+	"Normal",
+	"SignColumn",
+	"NormalNC",
+	"TelescopeBorder",
+	"NvimTreeNormal",
+	"NvimTreeNormalNC",
+	"EndOfBuffer",
+	"MsgArea",
+}
+
+for _, group in ipairs(hl_groups_list) do
+	vim.cmd("highlight " .. group .. " guibg=NONE ctermbg=NONE")
+end
