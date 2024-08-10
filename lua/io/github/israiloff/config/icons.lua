@@ -136,6 +136,7 @@ return {
 		Notification = "",
 		Java = "",
         Vim = "",
+        Mason = "",
 	},
 	diagnostics = {
 		BoldError = "",

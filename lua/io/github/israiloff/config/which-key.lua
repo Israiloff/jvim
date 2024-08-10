@@ -201,7 +201,7 @@ which_key.register({
 	},
     m = {
         "<cmd>Mason<cr>",
-        icons.kind.Package .. " Mason",
+        icons.ui.Mason .. " Mason",
     },
 }, {
 	prefix = "<leader>",
