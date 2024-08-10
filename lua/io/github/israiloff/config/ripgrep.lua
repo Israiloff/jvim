@@ -1,11 +1,11 @@
 local log_status, log = pcall(require, "io.github.israiloff.config.logger")
 
 if not log_status then
-    print("Error: 'io.github.israiloff.config.logger' not found. Telescope Live Grep Args will not be configured.")
+    print("Error: 'io.github.israiloff.config.logger' not found. ripgrep will not be installed.")
     return
 end
 
-local logger_name = "io.github.israiloff.config.telescope-live-grep-args"
+local logger_name = "io.github.israiloff.config.ripgrep"
 
 -- Check if ripgrep is installed
 local handle = io.popen("command -v rg")
