@@ -242,7 +242,7 @@ which_key.register({
 	l = {
 		name = icons.diagnostics.Hint .. " Code Actions",
 		a = { "<cmd>lua vim.lsp.buf.code_action()<cr>", "Action" },
-		f = { "<cmd>Format<cr>", "Format" },
+		f = { "<cmd>CmFormat<cr>", "Format" },
 	},
 }, {
 	prefix = "<leader>",

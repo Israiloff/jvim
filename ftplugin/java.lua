@@ -36,7 +36,8 @@ if not registry_status then
 	return
 end
 
-local share_dir = os.getenv("HOME") .. "/.local/share"
+local home = os.getenv("HOME")
+local share_dir = home .. "/.local/share"
 local project_name = vim.fn.fnamemodify(vim.fn.getcwd(), ":p:h:t")
 local workspace_dir = share_dir .. "/nvim/java/" .. project_name
 
@@ -67,6 +68,10 @@ logger.debug(logger_name, "JAVA: jdtls path: " .. jdtls_path)
 
 local lombok = require("io.github.israiloff.config.java.lombok")
 lombok.setup()
+
+local java_format_file_path = "file://" .. home .. "/.config/nvim/lua/io/github/israiloff/config/java/java-style.xml"
+
+logger.debug(logger_name, "JAVA: formatter file path: " .. java_format_file_path)
 
 local config = {
 	cmd = {
@@ -113,18 +118,15 @@ local config = {
 		if navic_status then
 			navic.attach(client, bufnr)
 		end
-		if client.name == "jdtls" then
-			require("io.github.israiloff.config.java.keymap")
-			jdtls = require("jdtls")
-			jdtls.setup_dap({ hotcodereplace = "auto" })
-			require("jdtls.dap").setup_dap_main_class_configs({
-				config_overrides = {
-					vmArgs = "-Dspring.profiles.active=local",
-				},
-			})
-			if client.server_capabilities.codeLensProvider then
-				vim.lsp.codelens.refresh()
-			end
+		require("io.github.israiloff.config.java.keymap")
+		jdtls.setup_dap({ hotcodereplace = "auto" })
+		require("jdtls.dap").setup_dap_main_class_configs({
+			config_overrides = {
+				vmArgs = "-Dspring.profiles.active=local",
+			},
+		})
+		if client.server_capabilities.codeLensProvider then
+			vim.lsp.codelens.refresh()
 		end
 	end,
 	settings = {
@@ -156,6 +158,36 @@ local config = {
 			codeGeneration = {
 				toString = {
 					template = "${object.className}{${member.name()}=${member.value}, ${otherMembers}}",
+				},
+			},
+			eclipse = {
+				downloadSources = true,
+			},
+			configuration = {
+				updateBuildConfiguration = "interactive",
+			},
+			maven = {
+				downloadSources = true,
+			},
+			implementationsCodeLens = {
+				enabled = true,
+			},
+			referencesCodeLens = {
+				enabled = true,
+			},
+			references = {
+				includeDecompiledSources = true,
+			},
+			inlayHints = {
+				parameterNames = {
+					enabled = "all", -- literals, all, none
+				},
+			},
+			format = {
+				enabled = true,
+				settings = {
+					profile = "SpringStyle",
+					url = java_format_file_path,
 				},
 			},
 		},
