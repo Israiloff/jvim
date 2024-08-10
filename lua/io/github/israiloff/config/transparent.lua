@@ -13,6 +13,7 @@ local hl_groups_list = {
 	"NvimTreeNormalNC",
 	"EndOfBuffer",
 	"MsgArea",
+    "WinBarNC",
 }
 
 for _, group in ipairs(hl_groups_list) do
