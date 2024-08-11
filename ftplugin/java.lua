@@ -73,6 +73,13 @@ local java_format_file_path = "file://" .. home .. "/.config/nvim/lua/io/github/
 
 logger.debug(logger_name, "JAVA: formatter file path: " .. java_format_file_path)
 
+local lsp_utils_status, lsp_utils = pcall(require, "io.github.israiloff.config.lsp-utils")
+
+if not lsp_utils_status then
+    logger.debug(logger_name, "JAVA: io.github.israiloff.config.lsp-utils not found, please install it and try again")
+    return
+end
+
 local config = {
     cmd = {
         "java",
@@ -114,10 +121,7 @@ local config = {
     capabilities = jdtls.extendedClientCapabilities,
 
     on_attach = function(client, bufnr)
-        local navic_status, navic = pcall(require, "io.github.israiloff.config.nvim-navic")
-        if navic_status then
-            navic.attach(client, bufnr)
-        end
+        lsp_utils.global_on_attach(client, bufnr)
         require("io.github.israiloff.config.java.keymap")
         jdtls.setup_dap({ hotcodereplace = "auto" })
         require("jdtls.dap").setup_dap_main_class_configs({
@@ -125,9 +129,6 @@ local config = {
                 vmArgs = "-Dspring.profiles.active=local",
             },
         })
-        if client.server_capabilities.codeLensProvider then
-            vim.lsp.codelens.refresh()
-        end
         client.server_capabilities.semanticTokensProvider = nil
     end,
     settings = {
