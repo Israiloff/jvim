@@ -3,6 +3,7 @@ require("mason-tool-installer").setup({
 		"java-debug-adapter",
 		"java-test",
         "stylua",
+        "prettier",
 	},
 	auto_update = true,
 	run_on_start = true,
