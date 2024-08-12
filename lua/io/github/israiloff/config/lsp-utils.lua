@@ -101,7 +101,6 @@ function Utils.already_installed_single(server_name)
 end
 
 local function setup_codelens_refresh(client, bufnr)
-    vim.notify("Setting up codelens refresh for buffer " .. bufnr, vim.log.levels.INFO)
     local status_ok, codelens_supported = pcall(function()
         return client.supports_method("textDocument/codeLens")
     end)
@@ -133,7 +132,7 @@ local function setup_codelens_refresh(client, bufnr)
 end
 
 local function setup_navic(client, bufnr)
-    local navic_status, navic = pcall(require, "nvim-navic")
+    local navic_status, navic = pcall(require, "io.github.israiloff.config.nvim-navic")
 
     if not navic_status then
         return
