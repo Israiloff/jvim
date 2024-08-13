@@ -34,6 +34,7 @@ return {
         Unit = "",
         Value = "",
         Variable = "",
+        ColorBold = "",
     },
     git = {
         LineAdded = "",
@@ -149,6 +150,11 @@ return {
         Vim = "",
         Mason = "",
         ListUnordered = "",
+        Help = "󰋖",
+        Keymap = "󰨁",
+        Resume = "",
+        SearchList = "󱩾",
+        Registers = "󱃔",
     },
     diagnostics = {
         BoldError = "",
@@ -230,5 +236,8 @@ return {
     },
     lsp = {
         rename = "󰑕",
+    },
+    os = {
+        Linux = "",
     },
 }
