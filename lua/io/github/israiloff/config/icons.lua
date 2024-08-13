@@ -162,6 +162,8 @@ return {
         Hint = "󰌶",
         Debug = "",
         Trace = "✎",
+        ScanBold = "󱓇",
+        Scan = "󱓈",
     },
     misc = {
         Robot = "󰚩",
@@ -213,6 +215,8 @@ return {
         OptimizeCode = "󰚔",
         BugFix = "󰨯",
         Bug = "",
+        Format = "",
+        Refactor = "",
     },
     copilot = {
         Logo = "",
@@ -222,5 +226,8 @@ return {
         History = "",
         Log = "",
         Files = "",
+    },
+    lsp = {
+        rename = "󰑕",
     },
 }

@@ -113,12 +113,15 @@ which_key.register({
     },
     l = {
         name = icons.diagnostics.Hint .. " Code Actions",
-        d = { "<cmd>Telescope diagnostics bufnr=0 theme=get_ivy<cr>", "Buffer Diagnostics" },
-        w = { "<cmd>Telescope diagnostics<cr>", "Diagnostics" },
-        i = { "<cmd>LspInfo<cr>", "Info" },
-        j = { "<cmd>lua vim.diagnostic.goto_next()<cr>", "Next Diagnostic" },
-        k = { "<cmd>lua vim.diagnostic.goto_prev()<cr>", "Prev Diagnostic" },
-        r = { "<cmd>lua vim.lsp.buf.rename()<cr>", "Rename" },
+        d = {
+            "<cmd>Telescope diagnostics bufnr=0 theme=get_ivy<cr>",
+            icons.diagnostics.Scan .. " Document diagnostics",
+        },
+        w = { "<cmd>Telescope diagnostics<cr>", icons.diagnostics.ScanBold .. " Workspace diagnostics" },
+        i = { "<cmd>LspInfo<cr>", icons.diagnostics.Information .. " LSP client information" },
+        j = { "<cmd>lua vim.diagnostic.goto_next()<cr>", icons.ui.ArrowCircleDown .. " Next diagnostics" },
+        k = { "<cmd>lua vim.diagnostic.goto_prev()<cr>", icons.ui.ArrowCircleUp .. " Previous diagnostics" },
+        r = { "<cmd>lua vim.lsp.buf.rename()<cr>", icons.lsp.rename .. " Rename" },
     },
     F = {
         name = icons.kind.File .. " File",
@@ -247,8 +250,8 @@ which_key.register({
     },
     l = {
         name = icons.diagnostics.Hint .. " Code Actions",
-        a = { "<cmd>lua vim.lsp.buf.code_action()<cr>", "Action" },
-        f = { "<cmd>CmFormat<cr>", "Format" },
+        a = { "<cmd>lua vim.lsp.buf.code_action()<cr>", icons.code.Refactor .. " Action" },
+        f = { "<cmd>CmFormat<cr>", icons.code.Format .. " Format" },
     },
 }, {
     prefix = "<leader>",
