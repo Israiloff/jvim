@@ -240,4 +240,13 @@ return {
     os = {
         Linux = "",
     },
+    plugin = {
+        Install = "",
+        Update = "󰚰",
+        Sync = "",
+        Status = "󱔢",
+        Clean = "",
+        Profile = "",
+        Debug = "",
+    },
 }
