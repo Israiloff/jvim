@@ -170,7 +170,7 @@ which_key.register({
             icons.git.LineModifiedPreview .. " Prev Hunk",
         },
         l = { "<cmd>lua require 'gitsigns'.blame_line()<cr>", icons.git.Blame .. " Blame" },
-        L = { "<cmd>lua require 'gitsigns'.blame_line({full=true})<cr>", icons.git.BlameFull .. " Blame Line (full)" },
+        L = { "<cmd>lua require 'gitsigns'.blame_line({full=true})<cr>", icons.git.BlameFull .. " Blame full" },
         p = { "<cmd>lua require 'gitsigns'.preview_hunk()<cr>", icons.git.HunkPreview .. " Preview Hunk" },
         r = { "<cmd>lua require 'gitsigns'.reset_hunk()<cr>", icons.git.HunkReset .. " Reset Hunk" },
         R = { "<cmd>lua require 'gitsigns'.reset_buffer()<cr>", icons.git.BufferReset .. " Reset Buffer" },
