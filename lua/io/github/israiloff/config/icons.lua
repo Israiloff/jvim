@@ -209,7 +209,7 @@ return {
         Keyword = "",
     },
     code = {
-        Tests = "",
+        Tests = "󱖫",
         OptimizeCode = "󰚔",
         BugFix = "󰨯",
         Bug = "",
