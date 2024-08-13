@@ -93,7 +93,7 @@ which_key.setup({
 which_key.register({
     f = {
         "<cmd>Telescope find_files<cr>",
-        icons.ui.FindFile .. " Find Files",
+        icons.ui.FindFile .. " Find files",
     },
     u = {
         "<cmd>so<cr>",
@@ -112,7 +112,7 @@ which_key.register({
         icons.ui.EmptyFolderOpen .. " Explorer",
     },
     l = {
-        name = icons.diagnostics.Hint .. " Code Actions",
+        name = icons.diagnostics.Hint .. " Code actions",
         d = {
             "<cmd>Telescope diagnostics bufnr=0 theme=get_ivy<cr>",
             icons.diagnostics.Scan .. " Document diagnostics",
@@ -127,15 +127,15 @@ which_key.register({
         name = icons.kind.File .. " File",
         h = {
             "<cmd>Telescope file_history history<CR>",
-            icons.file.History .. " View the file’s history",
+            icons.file.History .. " History",
         },
         l = {
             "<cmd>Telescope file_history log<CR>",
-            icons.file.Log .. " View the file’s history incrementally",
+            icons.file.Log .. " Change log",
         },
         f = {
             "<cmd>Telescope file_history files<CR>",
-            icons.file.Files .. " View every file in the repo",
+            icons.file.Files .. " Browse history files",
         },
     },
     n = {
@@ -162,27 +162,26 @@ which_key.register({
     },
     g = {
         name = icons.git.Git .. " Git",
-        g = { "<cmd>lua require 'lvim.core.terminal'.lazygit_toggle()<cr>", icons.git.LazyGit .. " Lazygit" },
         j = {
             "<cmd>lua require 'gitsigns'.nav_hunk('next', {navigation_message = false})<cr>",
-            icons.git.LineModified .. " Next Hunk",
+            icons.git.LineModified .. " Hunk next",
         },
         k = {
             "<cmd>lua require 'gitsigns'.nav_hunk('prev', {navigation_message = false})<cr>",
-            icons.git.LineModifiedPreview .. " Prev Hunk",
+            icons.git.LineModifiedPreview .. " Hunk previous",
         },
         l = { "<cmd>lua require 'gitsigns'.blame_line()<cr>", icons.git.Blame .. " Blame line" },
         L = { "<cmd>lua require 'gitsigns'.blame_line({full=true})<cr>", icons.git.BlameFull .. " Blame full" },
-        p = { "<cmd>lua require 'gitsigns'.preview_hunk()<cr>", icons.git.HunkPreview .. " Preview Hunk" },
-        r = { "<cmd>lua require 'gitsigns'.reset_hunk()<cr>", icons.git.HunkReset .. " Reset Hunk" },
-        R = { "<cmd>lua require 'gitsigns'.reset_buffer()<cr>", icons.git.BufferReset .. " Reset Buffer" },
-        s = { "<cmd>lua require 'gitsigns'.stage_hunk()<cr>", icons.git.HunkStage .. " Stage Hunk" },
-        u = { "<cmd>lua require 'gitsigns'.undo_stage_hunk()<cr>", icons.git.HunkUnstage .. " Undo Stage Hunk" },
+        p = { "<cmd>lua require 'gitsigns'.preview_hunk()<cr>", icons.git.HunkPreview .. " Hunk preview" },
+        r = { "<cmd>lua require 'gitsigns'.reset_hunk()<cr>", icons.git.HunkReset .. " Hunk reset" },
+        R = { "<cmd>lua require 'gitsigns'.reset_buffer()<cr>", icons.git.BufferReset .. " Buffer reset" },
+        s = { "<cmd>lua require 'gitsigns'.stage_hunk()<cr>", icons.git.HunkStage .. " Hunk stage" },
+        u = { "<cmd>lua require 'gitsigns'.undo_stage_hunk()<cr>", icons.git.HunkUnstage .. " Hunk undo stage" },
         o = { "<cmd>Telescope git_status<cr>", icons.git.FileUnstaged .. " Open changed file" },
         b = { "<cmd>Telescope git_branches<cr>", icons.git.Branch .. " Checkout branch" },
         c = { "<cmd>Telescope git_commits<cr>", icons.git.Commits .. " Checkout commit" },
-        C = { "<cmd>Telescope git_bcommits<cr>", icons.git.Commit .. " Checkout commit(for current file)" },
-        d = { "<cmd>Gitsigns diffthis HEAD<cr>", icons.git.Diff .. " Git Diff" },
+        C = { "<cmd>Telescope git_bcommits<cr>", icons.git.Commit .. " Checkout commit of current file" },
+        d = { "<cmd>Gitsigns diffthis HEAD<cr>", icons.git.Diff .. " Git diff" },
     },
     ["/"] = {
         "<Plug>(comment_toggle_linewise_current)",
@@ -205,7 +204,7 @@ which_key.register({
     },
     r = {
         "<cmd>Telescope oldfiles<cr>",
-        icons.ui.Files .. " Recent Files",
+        icons.ui.Files .. " Recent files",
     },
     m = {
         "<cmd>Mason<cr>",
@@ -231,24 +230,24 @@ which_key.register({
         name = icons.misc.Robot .. " Open AI",
         c = { "<cmd>ChatGPT<CR>", icons.gpt.Chat .. " ChatGPT" },
         e = { "<cmd>ChatGPTEditWithInstruction<CR>", icons.text.Edit .. " Edit with instruction" },
-        g = { "<cmd>ChatGPTRun grammar_correction<CR>", icons.text.Correct .. " Grammar Correction" },
+        g = { "<cmd>ChatGPTRun grammar_correction<CR>", icons.text.Correct .. " Grammar correction" },
         t = { "<cmd>ChatGPTRun translate<CR>", icons.gpt.Translate .. " Translate" },
         k = { "<cmd>ChatGPTRun keywords<CR>", icons.text.Keyword .. " Keywords" },
         d = { "<cmd>ChatGPTRun docstring<CR>", icons.gpt.Docstring .. " Docstring" },
-        a = { "<cmd>ChatGPTRun add_tests<CR>", icons.code.Tests .. " Add Tests" },
-        o = { "<cmd>ChatGPTRun optimize_code<CR>", icons.code.OptimizeCode .. " Optimize Code" },
+        a = { "<cmd>ChatGPTRun add_tests<CR>", icons.code.Tests .. " Add tests" },
+        o = { "<cmd>ChatGPTRun optimize_code<CR>", icons.code.OptimizeCode .. " Optimize code" },
         s = { "<cmd>ChatGPTRun summarize<CR>", icons.gpt.Chat .. " Summarize" },
-        f = { "<cmd>ChatGPTRun fix_bugs<CR>", icons.code.BugFix .. " Fix Bugs" },
-        x = { "<cmd>ChatGPTRun explain_code<CR>", icons.gpt.ExplainCode .. " Explain Code" },
-        r = { "<cmd>ChatGPTRun roxygen_edit<CR>", icons.gpt.Edit .. " Roxygen Edit" },
-        l = { "<cmd>ChatGPTRun code_readability_analysis<CR>", icons.gpt.Readability .. " Code Readability Analysis" },
+        f = { "<cmd>ChatGPTRun fix_bugs<CR>", icons.code.BugFix .. " Fix bugs" },
+        x = { "<cmd>ChatGPTRun explain_code<CR>", icons.gpt.ExplainCode .. " Explain code" },
+        r = { "<cmd>ChatGPTRun roxygen_edit<CR>", icons.gpt.Edit .. " Roxygen edit" },
+        l = { "<cmd>ChatGPTRun code_readability_analysis<CR>", icons.gpt.Readability .. " Code readability analysis" },
     },
     A = {
         name = icons.copilot.Logo .. " Copilot",
-        p = { "<cmd>Copilot panel<CR>", icons.copilot.Panel .. " Open Copilot Panel" },
+        p = { "<cmd>Copilot panel<CR>", icons.copilot.Panel .. " Panel" },
     },
     l = {
-        name = icons.diagnostics.Hint .. " Code Actions",
+        name = icons.diagnostics.Hint .. " Code actions",
         a = { "<cmd>lua vim.lsp.buf.code_action()<cr>", icons.code.Refactor .. " Action" },
         f = { "<cmd>CmFormat<cr>", icons.code.Format .. " Format" },
     },
