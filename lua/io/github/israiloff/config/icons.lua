@@ -148,6 +148,7 @@ return {
         Java = "",
         Vim = "",
         Mason = "",
+        ListUnordered = "",
     },
     diagnostics = {
         BoldError = "",

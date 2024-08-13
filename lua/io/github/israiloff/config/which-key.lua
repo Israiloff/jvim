@@ -140,7 +140,7 @@ which_key.register({
     },
     n = {
         name = icons.ui.Notification .. " Notifications",
-        l = { "<cmd>mess<CR>", "Show notification log" },
+        l = { "<cmd>mess<CR>", icons.ui.ListUnordered .. " Log" },
     },
     s = {
         name = icons.ui.Search .. " Search",
