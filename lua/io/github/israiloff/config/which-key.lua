@@ -245,8 +245,8 @@ which_key.register({
         l = { "<cmd>ChatGPTRun code_readability_analysis<CR>", icons.gpt.Readability .. " Code Readability Analysis" },
     },
     A = {
-        name = icons.Copilot.Logo .. " Copilot",
-        p = { "<cmd>Copilot panel<CR>", icons.Copilot.Panel .. " Open Copilot Panel" },
+        name = icons.copilot.Logo .. " Copilot",
+        p = { "<cmd>Copilot panel<CR>", icons.copilot.Panel .. " Open Copilot Panel" },
     },
     l = {
         name = icons.diagnostics.Hint .. " Code Actions",

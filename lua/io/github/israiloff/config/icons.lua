@@ -203,7 +203,7 @@ return {
         BugFix = "󰨯",
         Bug = "",
     },
-    Copilot = {
+    copilot = {
         Logo = "",
         Panel = "󰮫",
     },
