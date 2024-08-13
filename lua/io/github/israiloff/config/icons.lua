@@ -207,4 +207,9 @@ return {
         Logo = "",
         Panel = "󰮫",
     },
+    file = {
+        History = "",
+        Log = "",
+        Files = "",
+    },
 }

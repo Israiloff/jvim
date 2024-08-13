@@ -122,9 +122,18 @@ which_key.register({
     },
     F = {
         name = icons.kind.File .. " File",
-        h = { "<cmd>Telescope file_history history<CR>", "View the file’s history", mode = { "n" } },
-        l = { "<cmd>Telescope file_history log<CR>", "View the file’s history incrementally", mode = { "n" } },
-        f = { "<cmd>Telescope file_history files<CR>", "View every file in the repo", mode = { "n" } },
+        h = {
+            "<cmd>Telescope file_history history<CR>",
+            icons.file.History .. " View the file’s history",
+        },
+        l = {
+            "<cmd>Telescope file_history log<CR>",
+            icons.file.Log .. " View the file’s history incrementally",
+        },
+        f = {
+            "<cmd>Telescope file_history files<CR>",
+            icons.file.Files .. " View every file in the repo",
+        },
     },
     n = {
         name = icons.ui.Notification .. " Notifications",
