@@ -183,7 +183,7 @@ local config = {
             format = {
                 enabled = true,
                 settings = {
-                    profile = "SpringStyle",
+                    profile = "GoogleStyle",
                     url = java_format_file_path,
                 },
             },
