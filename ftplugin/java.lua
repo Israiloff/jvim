@@ -137,17 +137,12 @@ local config = {
                 enabled = true,
             },
             saveActions = {
-                organizeImports = true,
+                organizeImports = false,
             },
             completion = {
                 maxResults = 20,
                 favoriteStaticMembers = {
-                    "org.hamcrest.MatcherAssert.assertThat",
-                    "org.hamcrest.Matchers.*",
-                    "org.hamcrest.CoreMatchers.*",
                     "org.junit.jupiter.api.Assertions.*",
-                    "java.util.Objects.requireNonNull",
-                    "java.util.Objects.requireNonNullElse",
                     "org.mockito.Mockito.*",
                 },
             },
