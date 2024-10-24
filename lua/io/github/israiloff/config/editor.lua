@@ -10,9 +10,6 @@ vim.o.wrap = false
 vim.o.sidescroll = 1
 vim.o.sidescrolloff = 10
 
--- disable mouse
-vim.opt.mouse = ""
-
 -- enable cursorline
 vim.opt.cursorline = true
 
