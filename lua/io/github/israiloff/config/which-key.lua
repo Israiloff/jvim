@@ -1,3 +1,4 @@
+require("io.github.israiloff.config.buffer-ops")
 local which_key = require("which-key")
 local icons = require("io.github.israiloff.config.icons")
 
@@ -99,11 +100,11 @@ which_key.register({
         "<cmd>so<cr>",
         icons.ui.Refresh .. " Update configs",
     },
-    C = {
+    c = {
         "<cmd>:CmCloseCurrentBuffer<cr>",
         icons.ui.Close .. " Close current buffer",
     },
-    c = {
+    C = {
         "<cmd>:CmCloseAllBuffers<cr>",
         icons.ui.CloseAll .. " Close other buffers",
     },
