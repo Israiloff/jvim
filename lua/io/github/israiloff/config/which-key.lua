@@ -100,7 +100,7 @@ which_key.register({
         icons.ui.Refresh .. " Update configs",
     },
     C = {
-        "<cmd>bd<cr>",
+        "<cmd>:CmCloseCurrentBuffer<cr>",
         icons.ui.Close .. " Close current buffer",
     },
     c = {
