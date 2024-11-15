@@ -104,7 +104,7 @@ which_key.register({
         icons.ui.Close .. " Close current buffer",
     },
     c = {
-        "<cmd>:%bd|e#<cr>",
+        "<cmd>:CmCloseAllBuffers<cr>",
         icons.ui.CloseAll .. " Close other buffers",
     },
     q = {
