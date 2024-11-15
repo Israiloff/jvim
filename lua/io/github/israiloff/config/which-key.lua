@@ -99,9 +99,13 @@ which_key.register({
         "<cmd>so<cr>",
         icons.ui.Refresh .. " Update configs",
     },
-    c = {
+    C = {
         "<cmd>bd<cr>",
-        icons.ui.Close .. " Close buffer",
+        icons.ui.Close .. " Close current buffer",
+    },
+    c = {
+        "<cmd>:%bd|e#<cr>",
+        icons.ui.CloseAll .. " Close other buffers",
     },
     q = {
         "<cmd>confirm q<CR>",

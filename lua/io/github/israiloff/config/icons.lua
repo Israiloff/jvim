@@ -94,6 +94,7 @@ return {
         ChevronShortUp = "",
         Circle = " ",
         Close = "󰅖",
+        CloseAll = "",
         CloudDownload = "",
         Code = "",
         Comment = "",
