@@ -206,6 +206,7 @@ cmp.setup({
 			end
 		end, { "i", "s" }),
 		["<C-Space>"] = cmp_mapping.complete(),
+		["<M-Space>"] = cmp_mapping.complete(),
 		["<C-e>"] = cmp_mapping.abort(),
 		["<CR>"] = cmp.mapping.confirm({ select = true }),
 	}),
