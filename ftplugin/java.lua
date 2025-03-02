@@ -180,12 +180,8 @@ local config = {
                     enabled = "all", -- literals, all, none
                 },
             },
-            format = {
-                enabled = true,
-                settings = {
-                    profile = "GoogleStyle",
-                    url = java_format_file_path,
-                },
+            trace = {
+                server = "verbose",
             },
         },
     },
