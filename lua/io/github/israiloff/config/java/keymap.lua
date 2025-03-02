@@ -11,6 +11,20 @@ vim.keymap.set("n", "<M-8>", "<Cmd>lua require('dap').step_over()<CR>", { desc =
 vim.keymap.set("n", "<M-9>", "<Cmd>lua require('dap').continue()<CR>", { desc = "Java debug continue" })
 vim.keymap.set("n", "<M-0>", "<Cmd>lua require('dap').disconnect()<CR>", { desc = "Java debug stop" })
 
+-- Same keymaps for MAC OS
+vim.keymap.set(
+    "n",
+    "∞",
+    "<cmd>TermExec cmd='mvn clean -U dependency:resolve' direction='horizontal' go_back=0<CR>",
+    {
+        desc = "Java refresh maven dependencies",
+    }
+)                                                                                                                                   -- Option + 5
+vim.keymap.set("n", "¶", "<Cmd>lua require('dapui').toggle({reset = true})<CR>", { desc = "Java toggle DAP UI" })                   -- Option + 7
+vim.keymap.set("n", "•", "<Cmd>lua require('dap').step_over()<CR>", { desc = "Java debug step over" })                              -- Option + 8
+vim.keymap.set("n", "ª", "<Cmd>lua require('dap').continue()<CR>", { desc = "Java debug continue" })                                -- Option + 9
+vim.keymap.set("n", "º", "<Cmd>lua require('dap').disconnect()<CR>", { desc = "Java debug stop" })                                  -- Option + 0
+
 local which_key_status, which_key = pcall(require, "which-key")
 if which_key_status then
     local icons = require("io.github.israiloff.config.icons")
