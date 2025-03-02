@@ -93,3 +93,44 @@ vim.api.nvim_set_keymap(
 	[[<C-\><C-n>:lua toggle_horizontal_term()<CR>]],
 	{ noremap = true, silent = true, desc = "Toggle horizontal terminal" }
 )
+
+-- Keymaps to toggle terminals with specific directions (Normal mode) for MAC OS
+vim.api.nvim_set_keymap(
+	"n",
+	"£",
+	":lua toggle_float_term()<CR>",
+	{ noremap = true, silent = true, desc = "Toggle floating terminal" }
+)
+
+vim.api.nvim_set_keymap(
+	"n",
+	"™",
+	":lua toggle_vertical_term()<CR>",
+	{ noremap = true, silent = true, desc = "Toggle vertical terminal" }
+)
+vim.api.nvim_set_keymap(
+	"n",
+	"¡",
+	":lua toggle_horizontal_term()<CR>",
+	{ noremap = true, silent = true, desc = "Toggle horizontal terminal" }
+)
+
+-- Terminal mode keymaps to toggle terminals (Terminal mode) for MAC OS
+vim.api.nvim_set_keymap(
+	"t",
+	"£",
+	[[<C-\><C-n>:lua toggle_float_term()<CR>]],
+	{ noremap = true, silent = true, desc = "Toggle floating terminal" }
+)
+vim.api.nvim_set_keymap(
+	"t",
+	"™",
+	[[<C-\><C-n>:lua toggle_vertical_term()<CR>]],
+	{ noremap = true, silent = true, desc = "Toggle vertical terminal" }
+)
+vim.api.nvim_set_keymap(
+	"t",
+	"¡",
+	[[<C-\><C-n>:lua toggle_horizontal_term()<CR>]],
+	{ noremap = true, silent = true, desc = "Toggle horizontal terminal" }
+)

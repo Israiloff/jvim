@@ -3,3 +3,9 @@ vim.api.nvim_set_keymap("i", "<M-l>", 'copilot#Accept("<CR>")', {
 	silent = true,
 	expr = true,
 })
+
+-- Keymap for MAC OS (Option + l)
+vim.api.nvim_set_keymap("i", "¬", 'copilot#Accept("<CR>")', {
+	silent = true,
+	expr = true,
+})
