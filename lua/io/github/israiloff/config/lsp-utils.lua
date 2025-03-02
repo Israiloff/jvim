@@ -88,7 +88,7 @@ function Utils.get_installed_servers_names()
         return {}
     end
 
-    return lspconfig.util._available_servers()
+    return lspconfig.util.available_servers()
 end
 
 function Utils.already_installed_single(server_name)
