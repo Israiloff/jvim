@@ -2,6 +2,8 @@
 
 [![Latest Release](https://img.shields.io/github/v/release/Israiloff/jvim)](https://github.com/Israiloff/jvim/releases/latest)
 
+## Introduction
+
 JVIM is a Neovim configuration tailored for Java development. This documentation describes the plugins used and key
 configurations.
 
@@ -14,6 +16,21 @@ To use JVIM effectively, ensure the following software is installed on your syst
 - **yarn**: A package manager that doubles down as a project manager.
 - **git**: Version control system for tracking changes in source code.
 - **curl**: A command-line tool for transferring data with URLs.
+- **unzip**: An unarchivation tool for multiple plugins.
+
+## Installation
+
+1. Clone [configurations](https://github.com/Israiloff/jvim) into the **$HOME/.config/nvim/** folder.
+
+```bash
+git clone https://github.com/Israiloff/jvim.git $HOME/.config/nvim/
+```
+
+2. Install yarn to enable markdown preview UI (if you need).
+
+```bash
+cd $HOME/.local/share/nvim/lazy/markdown-preview.nvim && yarn install
+```
 
 ## Plugins
 
