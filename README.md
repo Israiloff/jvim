@@ -7,6 +7,8 @@
 JVIM is a Neovim configuration tailored for Java development. This documentation describes the plugins used and key
 configurations.
 
+---
+
 ## Project Requirements
 
 To use JVIM effectively, ensure the following software is installed on your system:
@@ -17,6 +19,8 @@ To use JVIM effectively, ensure the following software is installed on your syst
 - **git**: Version control system for tracking changes in source code.
 - **curl**: A command-line tool for transferring data with URLs.
 - **unzip**: An unarchivation tool for multiple plugins.
+
+---
 
 ## Installation
 
@@ -32,24 +36,57 @@ git clone https://github.com/Israiloff/jvim.git $HOME/.config/nvim/
 cd $HOME/.local/share/nvim/lazy/markdown-preview.nvim && yarn install
 ```
 
+### Optional settings
+
+#### Copilot
+
+Copilot is a plugin for Neovim that uses OpenAI's Codex to provide code completions and suggestions.
+Completions `(alt+l)` are available in insert mode and suggestions are available in normal mode in which-key menu.
+
+To use it, follow these steps:
+
+- Run `:Copilot setup` and enter your Copilot account credentials.
+- Enable the plugin by running `:Copilot enable`
+
+#### Open AI. Chat GPT-4
+
+Chat GPT is a plugin for Neovim that uses OpenAI's GPT-4 to provide code completions and suggestions.
+
+To use it you need to have an [OpenAI API key](https://platform.openai.com/api-keys).
+Set the `OPENAI_API_KEY` environment variable in your shell and run `:ChatGPT enable` in Neovim.
+
+```shell
+echo "export OPENAI_API_KEY=YOUR_PERSONAL_OPENAI_API_KEY" >> $HOME/.zshrc
+```
+
+> All features are available in the `which-key` menu. Just press the `Space` key to open it.
+
+---
+
 ## Docker Container
-You can use the [Docker container](https://hub.docker.com/r/israiloff/jvim) configured in a separate 
+
+You can use the [Docker container](https://hub.docker.com/r/israiloff/jvim) configured in a separate
 [project](https://github.com/Israiloff/jvim-docker) in a few simple steps.
 
 - Pull the image
+
 ```bash
 docker pull israiloff/jvim:latest
 ```
 
 - Run the container with all ports exposed and with full access to your local docker
+
 ```bash
 docker run -it -d --network host --name jvim -v /var/run/docker.sock:/var/run/docker.sock -v /usr/local/bin/docker:/usr/local/bin/docker israiloff/jvim
 ```
 
 - Enter the container
+
 ```bash
 docker exec -it jvim /bin/zsh
 ```
+
+---
 
 ## Plugins
 
@@ -114,6 +151,8 @@ A plugin to preview Markdown files in a browser.
 
 A precompiled version of Eclipse's Lemminx plugin for XML support.
 
+---
+
 ## Key Configurations
 
 ### JDTLS Configuration (`java.lua`)
@@ -134,7 +173,7 @@ A precompiled version of Eclipse's Lemminx plugin for XML support.
 #### General Key Mappings
 
 | Key Combination | Description             |
-|-----------------|-------------------------|
+| --------------- | ----------------------- |
 | `<C-h>`         | Move to left window     |
 | `<C-j>`         | Move to lower window    |
 | `<C-k>`         | Move to upper window    |
@@ -151,7 +190,7 @@ A precompiled version of Eclipse's Lemminx plugin for XML support.
 #### LSP Mappings
 
 | Key Combination | Description           |
-|-----------------|-----------------------|
+| --------------- | --------------------- |
 | `gr`            | Goto references       |
 | `gD`            | Go to declaration     |
 | `gd`            | Go to definition      |
@@ -163,7 +202,7 @@ A precompiled version of Eclipse's Lemminx plugin for XML support.
 #### Java Mappings
 
 | Key Combination | Description                |
-|-----------------|----------------------------|
+| --------------- | -------------------------- |
 | `<M-5>`         | Refresh Maven dependencies |
 | `<M-7>`         | Toggle DAP UI              |
 | `<M-8>`         | Debug step over            |
@@ -175,7 +214,7 @@ A precompiled version of Eclipse's Lemminx plugin for XML support.
 Press `<Space>` to activate the which-key menu.
 
 | Key Combination | Description                           |
-|-----------------|---------------------------------------|
+| --------------- | ------------------------------------- |
 | `<Space>f`      | Find Files                            |
 | `<Space>u`      | Update configs                        |
 | `<Space>c`      | Close buffer                          |
@@ -247,7 +286,7 @@ Press `<Space>` to activate the which-key menu.
 ### Java which-key Mappings
 
 | Key Combination | Description                    |
-|-----------------|--------------------------------|
+| --------------- | ------------------------------ |
 | `<Space>j o`    | Organize Imports               |
 | `<Space>j v`    | Extract Variable               |
 | `<Space>j c`    | Extract Constant               |
@@ -272,19 +311,26 @@ Press `<Space>` to activate the which-key menu.
 | `<Space>j c`    | Extract Constant (Visual Mode) |
 | `<Space>j m`    | Extract Method (Visual Mode)   |
 
+---
+
 ## Gallery
 
 ### Welcome Screen
+
 ![Welcome](https://github.com/Israiloff/jvim-gallery/blob/master/welcome.png)
 
 ### Nvim-Tree
+
 ![Nvim-Tree](https://github.com/Israiloff/jvim-gallery/blob/master/nvim-tree_and_java_code.png)
 
 ### Which-Key Menu
+
 ![Which-Key](https://github.com/Israiloff/jvim-gallery/blob/master/which-key.png)
 
 ### File search with Telescope
+
 ![Telescope](https://github.com/Israiloff/jvim-gallery/blob/master/telescope.png)
 
 ### Built-in Terminal (horizontal)
+
 ![Terminal](https://github.com/Israiloff/jvim-gallery/blob/master/toggleterm_horizontal.png)
