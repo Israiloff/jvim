@@ -77,7 +77,7 @@ local ignored_filetypes = {
     "markdown",
 }
 
-mason_lspconfig.setup_handlers({
+mason_lspconfig.setup({
     function(server_name)
         if vim.tbl_contains(ignored_servers, server_name) then
             log.debug(logger_name, "Ignoring server '" .. server_name .. "'")
