@@ -1,4 +1,5 @@
 local logger_status, logger = pcall(require, "io.github.israiloff.config.logger")
+
 if not logger_status then
     print("JAVA: io.github.israiloff.config.logger not found, please install it and try again")
     return
@@ -76,7 +77,14 @@ if not lsp_utils_status then
     return
 end
 
+local properties            = require("io.github.israiloff.config.properties")
+
 local os_name = require("io.github.israiloff.config.os").get_current_os()
+
+if string.match(properties.architecture, "[Aa][Rr][Mm]") then
+    os_name = os_name .. "_arm"
+end
+
 logger.info(logger_name, "JAVA: current OS type : " .. os_name)
 
 local config = {
