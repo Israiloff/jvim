@@ -36,10 +36,10 @@ if not registry_status then
     return
 end
 
-local home = os.getenv("HOME")
-local share_dir = home .. "/.local/share"
+local config_dir = vim.fn.stdpath("config")
+local data_dir = vim.fn.stdpath("data")
 local project_name = vim.fn.fnamemodify(vim.fn.getcwd(), ":p:h:t")
-local workspace_dir = share_dir .. "/nvim/java/" .. project_name
+local workspace_dir = data_dir .. "/nvim/java/" .. project_name
 
 utils.create_dirs(workspace_dir)
 
@@ -47,8 +47,7 @@ logger.debug(logger_name, "JAVA: forming bundles...")
 
 local bundles = {
     vim.fn.glob(
-        mason_registry.get_package("java-debug-adapter"):get_install_path()
-        .. "/extension/server/com.microsoft.java.debug.plugin-*.jar"
+        vim.fn.expand("$MASON/packages/java-debug-adapter/extension/server/com.microsoft.java.debug.plugin-*.jar")
     ),
 }
 
@@ -57,19 +56,19 @@ logger.debug(logger_name, "JAVA: bundles formed: " .. table.concat(bundles, ", "
 vim.list_extend(
     bundles,
     vim.split(
-        vim.fn.glob(mason_registry.get_package("java-test"):get_install_path() .. "/extension/server/*.jar"),
+        vim.fn.expand("$MASON/packages/java-test/extension/server/.*jar"),
         "\n"
     )
 )
 
-local jdtls_path = mason_registry.get_package("jdtls"):get_install_path()
+local jdtls_path = vim.fn.expand("$MASON/packages/jdtls")
 
 logger.debug(logger_name, "JAVA: jdtls path: " .. jdtls_path)
 
 local lombok = require("io.github.israiloff.config.java.lombok")
 lombok.setup()
 
-local java_format_file_path = "file://" .. home .. "/.config/nvim/lua/io/github/israiloff/config/java/java-style.xml"
+local java_format_file_path = "file://" .. config_dir .. "/lua/io/github/israiloff/config/java/java-style.xml"
 
 logger.debug(logger_name, "JAVA: formatter file path: " .. java_format_file_path)
 
@@ -79,6 +78,22 @@ if not lsp_utils_status then
     logger.debug(logger_name, "JAVA: io.github.israiloff.config.lsp-utils not found, please install it and try again")
     return
 end
+
+local os_name
+local os_real_name = vim.fn.expand("$OS")
+
+logger.debug(logger_name, "JAVA: current OS type : " .. os_real_name)
+
+if string.match(os_real_name, "[Mm][Aa][Cc]") then
+    os_name = "mac"
+elseif string.match(os_real_name, "[Ww][Ii][Nn]") then
+    os_name = "win"
+elseif string.match(os_real_name, "[Ll][Ii][Nn][Uu][Xx]") then
+    os_name = "linux"
+else
+    logger.error(logger_name, "JAVA: OS '" .. os_real_name .. "' is not recognized as any known system")
+end
+
 
 local config = {
     cmd = {
@@ -99,7 +114,7 @@ local config = {
         "-jar",
         vim.fn.glob(jdtls_path .. "/plugins/org.eclipse.equinox.launcher_*.jar"),
         "-configuration",
-        jdtls_path .. "/config_linux",
+        jdtls_path .. "/config_" .. os_name,
         "-data",
         workspace_dir,
     },
