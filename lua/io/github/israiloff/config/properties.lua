@@ -13,4 +13,9 @@ return {
 	gui = {
 		transparent = true,
 	},
+    shell = {
+        WINDOWS = "pwsh.exe",
+        LINUX = "zsh",
+        MACOS = "zsh"
+    }
 }

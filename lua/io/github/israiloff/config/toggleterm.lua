@@ -1,3 +1,4 @@
+local shell = require("io.github.israiloff.config.shell").get_shell()
 require("toggleterm").setup({
 	size = function(term)
 		if term.direction == "horizontal" then
@@ -16,7 +17,7 @@ require("toggleterm").setup({
 	persist_size = true,
 	direction = "float",
 	close_on_exit = true,
-	shell = vim.o.shell,
+	shell = shell,
 	float_opts = {
 		border = "single",
 		winblend = 0,
