@@ -29,7 +29,7 @@ if not utils_status then
     return
 end
 
-local registry_status, mason_registry = pcall(require, "mason-registry")
+local registry_status, _ = pcall(require, "mason-registry")
 
 if not registry_status then
     logger.debug(logger_name, "JAVA: mason.registry not found, please install it and try again")
@@ -43,23 +43,20 @@ local workspace_dir = data_dir .. "/nvim/java/" .. project_name
 
 utils.create_dirs(workspace_dir)
 
-logger.debug(logger_name, "JAVA: forming bundles...")
+logger.info(logger_name, "JAVA: forming bundles...")
 
 local bundles = {
     vim.fn.glob(
-        vim.fn.expand("$MASON/packages/java-debug-adapter/extension/server/com.microsoft.java.debug.plugin-*.jar")
+        vim.fn.expand("$MASON/packages/java-debug-adapter/extension/server") .. "/com.microsoft.java.debug.plugin-*.jar"
     ),
 }
 
-logger.debug(logger_name, "JAVA: bundles formed: " .. table.concat(bundles, ", "))
-
 vim.list_extend(
     bundles,
-    vim.split(
-        vim.fn.expand("$MASON/packages/java-test/extension/server/.*jar"),
-        "\n"
-    )
+    vim.split(vim.fn.glob(vim.fn.expand("$MASON/packages/java-test/extension/server") .. "/*.jar"), "\n")
 )
+
+logger.info(logger_name, "JAVA: additional bundles formed: " .. table.concat(bundles, "\n"))
 
 local jdtls_path = vim.fn.expand("$MASON/packages/jdtls")
 
@@ -81,7 +78,6 @@ end
 
 local os_name = require("io.github.israiloff.config.os").get_current_os()
 logger.info(logger_name, "JAVA: current OS type : " .. os_name)
-
 
 local config = {
     cmd = {
