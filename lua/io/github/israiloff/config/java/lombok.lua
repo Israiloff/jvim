@@ -1,6 +1,7 @@
 M = {}
 
-M.lombok_path = os.getenv("HOME") .. "/.local/share/nvim/java/lombok.jar"
+M.lombok_path = vim.fn.stdpath("data") .. "/lombok.jar"
+
 local lombok_url = "https://projectlombok.org/downloads/lombok.jar"
 local utils = require("io.github.israiloff.config.utils")
 
