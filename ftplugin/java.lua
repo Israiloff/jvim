@@ -79,20 +79,8 @@ if not lsp_utils_status then
     return
 end
 
-local os_name
-local os_real_name = vim.fn.expand("$OS")
-
-logger.debug(logger_name, "JAVA: current OS type : " .. os_real_name)
-
-if string.match(os_real_name, "[Mm][Aa][Cc]") then
-    os_name = "mac"
-elseif string.match(os_real_name, "[Ww][Ii][Nn]") then
-    os_name = "win"
-elseif string.match(os_real_name, "[Ll][Ii][Nn][Uu][Xx]") then
-    os_name = "linux"
-else
-    logger.error(logger_name, "JAVA: OS '" .. os_real_name .. "' is not recognized as any known system")
-end
+local os_name = require("io.github.israiloff.config.os").get_current_os()
+logger.info(logger_name, "JAVA: current OS type : " .. os_name)
 
 
 local config = {

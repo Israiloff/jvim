@@ -21,13 +21,6 @@ local lemminx_path =
 
 log.debug(logger_name, "Lemminx path resolved: " .. lemminx_path)
 
-local utils_status, utils = pcall(require, "io.github.israiloff.config.utils")
-
-if not utils_status then
-    log.error(logger_name, "'io.github.israiloff.config.utils' not found. lemminx will not be configured.")
-    return
-end
-
 local lsp_utils_status, lsp_utils = pcall(require, "io.github.israiloff.config.lsp-utils")
 
 if not lsp_utils_status then
@@ -42,11 +35,9 @@ if not cmp_status then
     return
 end
 
-local java_path = utils.get_java_path()
-
 lsp_config.lemminx.setup({
     cmd = {
-        java_path,
+        "java",
         "-jar",
         lemminx_path,
     },
