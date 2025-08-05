@@ -231,22 +231,6 @@ which_key.register({
 })
 
 which_key.register({
-    a = {
-        name = icons.misc.Robot .. " Open AI",
-        c = { "<cmd>ChatGPT<CR>", icons.gpt.Chat .. " ChatGPT" },
-        e = { "<cmd>ChatGPTEditWithInstruction<CR>", icons.text.Edit .. " Edit with instruction" },
-        g = { "<cmd>ChatGPTRun grammar_correction<CR>", icons.text.Correct .. " Grammar correction" },
-        t = { "<cmd>ChatGPTRun translate<CR>", icons.gpt.Translate .. " Translate" },
-        k = { "<cmd>ChatGPTRun keywords<CR>", icons.text.Keyword .. " Keywords" },
-        d = { "<cmd>ChatGPTRun docstring<CR>", icons.gpt.Docstring .. " Docstring" },
-        a = { "<cmd>ChatGPTRun add_tests<CR>", icons.code.Tests .. " Add tests" },
-        o = { "<cmd>ChatGPTRun optimize_code<CR>", icons.code.OptimizeCode .. " Optimize code" },
-        s = { "<cmd>ChatGPTRun summarize<CR>", icons.gpt.Chat .. " Summarize" },
-        f = { "<cmd>ChatGPTRun fix_bugs<CR>", icons.code.BugFix .. " Fix bugs" },
-        x = { "<cmd>ChatGPTRun explain_code<CR>", icons.gpt.ExplainCode .. " Explain code" },
-        r = { "<cmd>ChatGPTRun roxygen_edit<CR>", icons.gpt.Edit .. " Roxygen edit" },
-        l = { "<cmd>ChatGPTRun code_readability_analysis<CR>", icons.gpt.Readability .. " Code readability analysis" },
-    },
     A = {
         name = icons.copilot.Logo .. " Copilot",
         p = { "<cmd>Copilot panel<CR>", icons.copilot.Panel .. " Panel" },
