@@ -77,7 +77,7 @@ if not lsp_utils_status then
     return
 end
 
-local properties            = require("io.github.israiloff.config.properties")
+local properties = require("io.github.israiloff.config.properties")
 
 local os_name = require("io.github.israiloff.config.os").get_current_os()
 
