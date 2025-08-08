@@ -7,32 +7,82 @@ end
 
 local logger_name = "io.github.israiloff.config.os"
 
+---@class OS
+---@field WINDOWS string Operating System name for Windows
+---@field LINUX string Operating System name for Linux
+---@field MAC string Operating System name for macOS
+----- This module provides functions to determine the current operating system
+------@field get_current_os fun(): string Returns the current operating system as a constant
+------@field get_current_os_name fun(): string Returns the real name of the current operating system
+------@field is_windows fun(os_real_name?: string): boolean Checks if the current operating system is Windows
+------@field is_linux fun(os_real_name?: string): boolean Checks if the current operating system is Linux
+------@field is_mac fun(os_real_name?: string): boolean Checks if the current operating system is macOS
 OS = {
     WINDOWS = "win",
     LINUX = "linux",
     MAC = "mac",
 }
 
+
+-- Returns the current operating system
+-- -- This function checks the real name of the operating system and returns a constant
+-- -- representing the operating system type.
+-- -- @return string The constant representing the current operating system
 function OS.get_current_os()
     logger.debug(logger_name, "OS: determining current operating system...")
 
-    local os_real_name = vim.fn.expand("$OS")
+    local os_real_name = OS.get_current_os_name()
 
     logger.debug(logger_name, "OS: real name is '" .. os_real_name .. "'")
 
-    if string.match(os_real_name, "[Mm][Aa][Cc]") then
+    if OS.is_mac(os_real_name) then
         logger.debug(logger_name, "OS: detected macOS")
         return OS.MAC
-    elseif string.match(os_real_name, "[Ww][Ii][Nn]") then
+    elseif OS.is_windows(os_real_name) then
         logger.debug(logger_name, "OS: detected Windows")
         return OS.WINDOWS
-    elseif string.match(os_real_name, "[Ll][Ii][Nn][Uu][Xx]") then
+    elseif OS.is_linux(os_real_name) then
         logger.debug(logger_name, "OS: detected Linux")
         return OS.LINUX
     else
         logger.error(logger_name, "OS: unknown operating system '" .. os_real_name .. "'")
         return nil
     end
+end
+
+-- Returns the real name of the operating system
+-- -- This function retrieves the real name of the current operating system
+-- -- using the `$OS` environment variable.
+-- -- @return string The real name of the current operating system
+function OS.get_current_os_name()
+    return vim.fn.expand("$OS")
+end
+
+-- Check if the current operating system is Windows
+-- -- @param os_real_name (optional) the real name of the operating system (default is obtained from `OS.get_current_os_name()`)
+-- -- This function checks if the current operating system is Windows
+-- -- by matching the real name against common Windows identifiers.
+-- -- @return boolean True if the current operating system is Windows, false otherwise
+function OS.is_windows(os_real_name)
+    return string.match(os_real_name, "[Ww][Ii][Nn]") or vim.fn.has("win32") or vim.fn.has("win64")
+end
+
+-- Check if the current operating system is Linux
+-- -- @param os_real_name (optional) the real name of the operating system (default is obtained from `OS.get_current_os_name()`)
+-- -- This function checks if the current operating system is Linux
+-- -- by matching the real name against common Linux identifiers.
+-- -- @return boolean True if the current operating system is Linux, false otherwise
+function OS.is_linux(os_real_name)
+    return string.match(os_real_name, "[Ll][Ii][Nn][Uu][Xx]") or vim.fn.has("unix") or vim.fn.has("linux")
+end
+
+-- Check if the current operating system is macOS
+-- -- @param os_real_name (optional) the real name of the operating system (default is obtained from `OS.get_current_os_name()`)
+-- -- This function checks if the current operating system is macOS
+-- -- by matching the real name against common macOS identifiers.
+-- -- @return boolean True if the current operating system is macOS, false otherwise
+function OS.is_mac(os_real_name)
+    return string.match(os_real_name, "[Mm][Aa][Cc]") or vim.fn.has("macunix")
 end
 
 return OS
