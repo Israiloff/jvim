@@ -7,7 +7,7 @@ end
 
 local logger_name = "ftplugin.xml"
 
-local lsp_status, lsp_config = pcall(require, "lspconfig")
+local lsp_status, _ = pcall(require, "lspconfig")
 
 if not lsp_status then
     log.error(logger_name, "'lspconfig' not found. LSP will not be configured.")
