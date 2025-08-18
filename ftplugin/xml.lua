@@ -16,8 +16,7 @@ end
 
 log.debug(logger_name, "Resolving Lemminx path...")
 
-local lemminx_path =
-    vim.fn.glob(vim.env.HOME .. "/.local/share/nvim/lazy/lemminx-compiled/org.eclipse.lemminx-uber.jar")
+local lemminx_path = vim.fn.glob(vim.fn.stdpath("data") .. "/lazy/lemminx-compiled/org.eclipse.lemminx-uber.jar")
 
 log.debug(logger_name, "Lemminx path resolved: " .. lemminx_path)
 
@@ -35,7 +34,7 @@ if not cmp_status then
     return
 end
 
-lsp_config.lemminx.setup({
+vim.lsp.config("lemminx", {
     cmd = {
         "java",
         "-jar",
