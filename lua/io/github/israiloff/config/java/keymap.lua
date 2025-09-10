@@ -12,18 +12,13 @@ vim.keymap.set("n", "<M-9>", "<Cmd>lua require('dap').continue()<CR>", { desc = 
 vim.keymap.set("n", "<M-0>", "<Cmd>lua require('dap').disconnect()<CR>", { desc = "Java debug stop" })
 
 -- Same keymaps for MAC OS
-vim.keymap.set(
-    "n",
-    "∞",
-    "<cmd>TermExec cmd='mvn clean -U dependency:resolve' direction='horizontal' go_back=0<CR>",
-    {
-        desc = "Java refresh maven dependencies",
-    }
-)                                                                                                                                   -- Option + 5
-vim.keymap.set("n", "¶", "<Cmd>lua require('dapui').toggle({reset = true})<CR>", { desc = "Java toggle DAP UI" })                   -- Option + 7
-vim.keymap.set("n", "•", "<Cmd>lua require('dap').step_over()<CR>", { desc = "Java debug step over" })                              -- Option + 8
-vim.keymap.set("n", "ª", "<Cmd>lua require('dap').continue()<CR>", { desc = "Java debug continue" })                                -- Option + 9
-vim.keymap.set("n", "º", "<Cmd>lua require('dap').disconnect()<CR>", { desc = "Java debug stop" })                                  -- Option + 0
+vim.keymap.set("n", "∞", "<cmd>TermExec cmd='mvn clean -U dependency:resolve' direction='horizontal' go_back=0<CR>", {
+    desc = "Java refresh maven dependencies",
+}) -- Option + 5
+vim.keymap.set("n", "¶", "<Cmd>lua require('dapui').toggle({reset = true})<CR>", { desc = "Java toggle DAP UI" }) -- Option + 7
+vim.keymap.set("n", "•", "<Cmd>lua require('dap').step_over()<CR>", { desc = "Java debug step over" }) -- Option + 8
+vim.keymap.set("n", "ª", "<Cmd>lua require('dap').continue()<CR>", { desc = "Java debug continue" }) -- Option + 9
+vim.keymap.set("n", "º", "<Cmd>lua require('dap').disconnect()<CR>", { desc = "Java debug stop" }) -- Option + 0
 
 local which_key_status, which_key = pcall(require, "which-key")
 if which_key_status then
@@ -34,8 +29,6 @@ if which_key_status then
             o = { "<Cmd>lua require('jdtls').organize_imports()<CR>", icons.java.OptimizeCode .. " Organize imports" },
             v = { "<Cmd>lua require('jdtls').extract_variable()<CR>", icons.java.Variable .. " Extract variable" },
             c = { "<Cmd>lua require('jdtls').extract_constant()<CR>", icons.java.Constant .. " Extract constant" },
-            t = { "<Cmd>lua require('jdtls').test_nearest_method()<CR>", icons.java.MethodTest .. " Run test method" },
-            T = { "<Cmd>lua require('jdtls').test_class()<CR>", icons.java.ClassTest .. " Run test class" },
             u = { "<Cmd>lua require('jdtls').update_project_config()<CR>", icons.java.UpdateConfig .. " Update config" },
             d = {
                 name = icons.ui.DebugConsole .. " Debug",
@@ -53,6 +46,41 @@ if which_key_status then
                 s = { "<cmd>lua require'dap'.continue()<cr>", icons.java.Start .. " Start" },
                 q = { "<cmd>lua require'dap'.close()<cr>", icons.java.Close .. " Quit" },
                 U = { "<cmd>lua require'dapui'.toggle({reset = true})<cr>", icons.java.BugFix .. " Toggle DAP UI" },
+            },
+            t = {
+                name = icons.code.Tests .. " Test",
+                m = {
+                    "<Cmd>lua require('jdtls').test_nearest_method()<CR>",
+                    icons.java.MethodTest .. " Run test method",
+                },
+                c = { "<Cmd>lua require('jdtls').test_class()<CR>", icons.java.ClassTest .. " Run test class" },
+            },
+            m = {
+                name = icons.maven.Logo .. " Maven",
+                r = {
+                    "<cmd>lua exec_in_terminal_horizontal('mvn clean -U dependency:resolve')<CR>",
+                    icons.maven.Refresh .. " Refresh dependencies",
+                },
+                p = {
+                    "<cmd>lua exec_in_terminal_horizontal('mvn clean package')<CR>",
+                    icons.maven.Package .. " Package",
+                },
+                i = {
+                    "<cmd>lua exec_in_terminal_horizontal('mvn clean install')<CR>",
+                    icons.maven.Install .. " Install",
+                },
+                d = {
+                    "<cmd>lua exec_in_terminal_horizontal('mvn clean deploy')<CR>",
+                    icons.maven.Deploy .. " Deploy",
+                },
+                t = {
+                    "<cmd>lua exec_in_terminal_horizontal('mvn clean test')<CR>",
+                    icons.maven.Test .. " Test",
+                },
+                e = {
+                    "<cmd>lua exec_in_terminal_horizontal('mvn dependency:purge-local-repository')<CR>",
+                    icons.maven.Purge .. " Purge local repository",
+                },
             },
         },
     }, {

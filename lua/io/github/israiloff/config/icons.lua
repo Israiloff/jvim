@@ -275,4 +275,13 @@ return {
         ToggleRepl = "",
         Close = "󰅖",
     },
+    maven = {
+        Refresh = "",
+        Install = "󰏖",
+        Test = "󱖫",
+        Logo = "",
+        Package = "",
+        Deploy = "",
+        Purge = "󰃢",
+    },
 }
