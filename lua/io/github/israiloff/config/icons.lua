@@ -277,7 +277,7 @@ return {
     },
     maven = {
         Refresh = "",
-        Install = "󰏖",
+        Install = "",
         Test = "󱖫",
         Logo = "",
         Package = "",
