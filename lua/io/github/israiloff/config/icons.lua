@@ -280,8 +280,9 @@ return {
         Install = "",
         Test = "󱖫",
         Logo = "",
-        Package = "",
+        Package = "󰏗",
         Deploy = "",
         Purge = "󰃢",
+        PackageSkipTests = "󱧔",
     },
 }

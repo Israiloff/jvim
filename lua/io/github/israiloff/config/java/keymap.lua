@@ -74,6 +74,10 @@ which_key.register({
                 "<cmd>lua exec_in_terminal_horizontal('mvn dependency:purge-local-repository')<CR>",
                 icons.maven.Purge .. " Purge local repository",
             },
+            P = {
+                "<cmd>lua exec_in_terminal_horizontal('mvn clean package -DskipTests')<CR>",
+                icons.maven.PackageSkipTests .. " Package (skip tests)",
+            },
         },
     },
 }, {
