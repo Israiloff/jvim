@@ -47,6 +47,7 @@ which_key.register({
                 icons.java.MethodTest .. " Run test method",
             },
             c = { "<Cmd>lua require('jdtls').test_class()<CR>", icons.java.ClassTest .. " Run test class" },
+            u = { "<Cmd>lua require('dapui').toggle({reset = true})<CR>", icons.java.DebugUI .. " Toggle DAP UI" },
         },
         m = {
             name = icons.maven.Logo .. " Maven",

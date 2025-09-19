@@ -274,6 +274,7 @@ return {
         GetSession = "󰚰",
         ToggleRepl = "",
         Close = "󰅖",
+        DebugUI = "",
     },
     maven = {
         Refresh = "",
