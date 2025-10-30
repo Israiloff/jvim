@@ -100,13 +100,24 @@ which_key.register({
         "<cmd>so<cr>",
         icons.ui.Refresh .. " Update configs",
     },
-    c = {
-        "<cmd>:CmCloseCurrentBuffer<cr>",
-        icons.ui.Close .. " Close current buffer",
-    },
-    C = {
-        "<cmd>:CmCloseAllBuffers<cr>",
-        icons.ui.CloseAll .. " Close other buffers",
+    b = {
+        name = icons.kind.Buffer .. " Buffer",
+        c = {
+            "<cmd>:CmCloseCurrentBuffer<cr>",
+            icons.ui.Close .. " Close current buffer",
+        },
+        C = {
+            "<cmd>:CmCloseCurrentBuffer!<cr>",
+            icons.ui.CloseForce .. " Force close current buffer",
+        },
+        o = {
+            "<cmd>:CmCloseOtherBuffers<cr>",
+            icons.ui.CloseOthers .. " Close other buffers",
+        },
+        O = {
+            "<cmd>:CmCloseOtherBuffers!<cr>",
+            icons.ui.CloseOthersForce .. " Force close other buffers",
+        },
     },
     q = {
         "<cmd>confirm q<CR>",

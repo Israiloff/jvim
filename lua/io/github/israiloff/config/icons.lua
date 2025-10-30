@@ -2,6 +2,7 @@ return {
     kind = {
         Array = "",
         Boolean = "",
+        Buffer = "",
         Class = "",
         Color = "",
         Constant = "",
@@ -94,7 +95,9 @@ return {
         ChevronShortUp = "",
         Circle = " ",
         Close = "󰅖",
-        CloseAll = "",
+        CloseForce = "!󰅖",
+        CloseOthers = "",
+        CloseOthersForce = "!",
         CloudDownload = "",
         Code = "",
         Comment = "",
