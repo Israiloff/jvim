@@ -93,8 +93,65 @@ which_key.setup({
 
 which_key.register({
     f = {
-        "<cmd>Telescope find_files<cr>",
-        icons.ui.FindFile .. " Find files",
+        name = icons.ui.FindFile .. " Find/Replace",
+        f = {
+            "<cmd>Telescope find_files<cr>",
+            icons.ui.FindFile .. " Find file",
+        },
+        u = {
+            function()
+                require("grug-far").open({
+                    transient = true,
+                })
+            end,
+            "Open Grug-Far",
+        },
+        w = {
+            function()
+                require("grug-far").open({
+                    prefills = {
+                        paths = vim.fn.expand("%"),
+                        search = vim.fn.expand("<cword>"),
+                    },
+                    transient = true,
+                })
+            end,
+            "Search word under cursor in current file",
+        },
+        W = {
+            function()
+                require("grug-far").open({
+                    prefills = {
+                        search = vim.fn.expand("<cword>"),
+                    },
+                    transient = true,
+                })
+            end,
+            "Search word under cursor",
+        },
+        r = {
+            function()
+                require("grug-far").open({
+                    prefills = {
+                        paths = vim.fn.expand("%"),
+                        search = vim.fn.expand("<cword>"),
+                    },
+                    transient = true,
+                    replace = "",
+                })
+            end,
+            "Replace word under cursor in current file",
+        },
+        R = {
+            function()
+                require("grug-far").open({
+                    prefills = { search = vim.fn.expand("<cword>") },
+                    transient = true,
+                    replace = "",
+                })
+            end,
+            "Replace word under cursor",
+        },
     },
     u = {
         "<cmd>so<cr>",
@@ -236,6 +293,26 @@ which_key.register({
         "<Plug>(comment_toggle_linewise_visual)",
         icons.ui.CommentCode .. " Comment",
     },
+    f = {
+        name = icons.ui.FindFile .. " Find/Replace",
+        s = {
+            function()
+                require("grug-far").with_visual_selection({
+                    prefills = { paths = vim.fn.expand("%") },
+                    transient = true,
+                })
+            end,
+            "Search selection in current file",
+        },
+        S = {
+            function()
+                require("grug-far").with_visual_selection({
+                    transient = true,
+                })
+            end,
+            "Search selection globally",
+        },
+    },
 }, {
     prefix = "<leader>",
     mode = { "v" },
@@ -253,5 +330,5 @@ which_key.register({
     },
 }, {
     prefix = "<leader>",
-    mode = { "n", "v" },
+    e = { "n", "v" },
 })
