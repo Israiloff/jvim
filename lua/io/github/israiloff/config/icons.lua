@@ -289,4 +289,11 @@ return {
         Purge = "󰃢",
         PackageSkipTests = "󱧔",
     },
+    search = {
+        Gui = "󱦞",
+        SearchCurrent = "",
+        SearchGlobal = "󰥩",
+        ReplaceCurrent = "",
+        ReplaceGlobal = "",
+    },
 }

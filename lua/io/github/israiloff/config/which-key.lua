@@ -93,65 +93,8 @@ which_key.setup({
 
 which_key.register({
     f = {
-        name = icons.ui.FindFile .. " Find/Replace",
-        f = {
-            "<cmd>Telescope find_files<cr>",
-            icons.ui.FindFile .. " Find file",
-        },
-        u = {
-            function()
-                require("grug-far").open({
-                    transient = true,
-                })
-            end,
-            "Open Grug-Far",
-        },
-        w = {
-            function()
-                require("grug-far").open({
-                    prefills = {
-                        paths = vim.fn.expand("%"),
-                        search = vim.fn.expand("<cword>"),
-                    },
-                    transient = true,
-                })
-            end,
-            "Search word under cursor in current file",
-        },
-        W = {
-            function()
-                require("grug-far").open({
-                    prefills = {
-                        search = vim.fn.expand("<cword>"),
-                    },
-                    transient = true,
-                })
-            end,
-            "Search word under cursor",
-        },
-        r = {
-            function()
-                require("grug-far").open({
-                    prefills = {
-                        paths = vim.fn.expand("%"),
-                        search = vim.fn.expand("<cword>"),
-                    },
-                    transient = true,
-                    replace = "",
-                })
-            end,
-            "Replace word under cursor in current file",
-        },
-        R = {
-            function()
-                require("grug-far").open({
-                    prefills = { search = vim.fn.expand("<cword>") },
-                    transient = true,
-                    replace = "",
-                })
-            end,
-            "Replace word under cursor",
-        },
+        "<cmd>Telescope find_files<cr>",
+        icons.ui.FindFile .. " Find file",
     },
     u = {
         "<cmd>so<cr>",
@@ -222,8 +165,7 @@ which_key.register({
         h = { "<cmd>Telescope help_tags<cr>", icons.ui.Help .. " Find help" },
         H = { "<cmd>Telescope highlights<cr>", icons.ui.SearchList .. " Find highlight groups" },
         M = { "<cmd>Telescope man_pages<cr>", icons.os.Linux .. " Man pages" },
-        r = { "<cmd>Telescope oldfiles<cr>", icons.kind.File .. " Open recent file" },
-        R = { "<cmd>Telescope registers<cr>", icons.ui.Registers .. " Registers" },
+        ["]"] = { "<cmd>Telescope registers<cr>", icons.ui.Registers .. " Registers" },
         t = { "<cmd>Telescope live_grep<cr>", icons.kind.Text .. " Text" },
         k = { "<cmd>Telescope keymaps<cr>", icons.ui.Keymap .. " Keymaps" },
         C = { "<cmd>Telescope commands<cr>", icons.ui.List .. " Commands" },
@@ -231,6 +173,60 @@ which_key.register({
         p = {
             "<cmd>lua require('telescope.builtin').colorscheme({enable_preview = true})<cr>",
             icons.kind.ColorBold .. " Colorscheme with preview",
+        },
+        u = {
+            function()
+                require("grug-far").open({
+                    transient = true,
+                })
+            end,
+            icons.search.Gui .. " Open grug UI",
+        },
+        w = {
+            function()
+                require("grug-far").open({
+                    prefills = {
+                        paths = vim.fn.expand("%"),
+                        search = vim.fn.expand("<cword>"),
+                    },
+                    transient = true,
+                })
+            end,
+            icons.search.SearchCurrent .. " Search word under cursor in current file",
+        },
+        W = {
+            function()
+                require("grug-far").open({
+                    prefills = {
+                        search = vim.fn.expand("<cword>"),
+                    },
+                    transient = true,
+                })
+            end,
+            icons.search.SearchGlobal .. " Search word under cursor",
+        },
+        r = {
+            function()
+                require("grug-far").open({
+                    prefills = {
+                        paths = vim.fn.expand("%"),
+                        search = vim.fn.expand("<cword>"),
+                    },
+                    transient = true,
+                    replace = "",
+                })
+            end,
+            icons.search.ReplaceCurrent .. " Replace word under cursor in current file",
+        },
+        R = {
+            function()
+                require("grug-far").open({
+                    prefills = { search = vim.fn.expand("<cword>") },
+                    transient = true,
+                    replace = "",
+                })
+            end,
+            icons.search.ReplaceGlobal .. " Replace word under cursor",
         },
     },
     g = {
