@@ -326,5 +326,5 @@ which_key.register({
     },
 }, {
     prefix = "<leader>",
-    e = { "n", "v" },
+    mode = { "n", "v" },
 })

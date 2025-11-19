@@ -1,6 +1,6 @@
 return {
     -- Version of the JVIM IDE.
-    version = "0.24.47",
+    version = "0.24.48",
     -- Logging configuration.
     -- This is used to determine the logging level and whether logging is enabled.
     logger = {
