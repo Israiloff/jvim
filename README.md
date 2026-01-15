@@ -3,6 +3,21 @@
 [![Latest Release](https://img.shields.io/github/v/release/Israiloff/jvim)](https://github.com/Israiloff/jvim/releases/latest)
 [![License](https://img.shields.io/github/license/Israiloff/jvim)](https://github.com/Israiloff/jvim/blob/master/LICENSE)
 
+## Table of Contents
+
+- [Introduction](#introduction)
+- [Requirements](#requirements)
+- [Installation](#installation)
+- [Docker Container](#docker-container)
+- [Core Plugins](#core-plugins)
+- [Configuration](#configuration)
+- [Key Mappings](#key-mappings)
+- [Features in Detail](#features-in-detail)
+- [Troubleshooting](#troubleshooting)
+- [Gallery](#gallery)
+- [Contributing](#contributing)
+- [License](#license)
+
 ## Introduction
 
 **JVIM** is a comprehensive, production-ready Neovim configuration specifically optimized for Java development. Built with modern development workflows in mind, it provides a complete IDE experience with advanced LSP support, debugging capabilities, intelligent code completion, and a rich plugin ecosystem.
