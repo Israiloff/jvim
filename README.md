@@ -141,6 +141,9 @@ ChatGPT integration enables AI-powered code assistance, refactoring, and more.
    # or for bash:
    echo 'export OPENAI_API_KEY=YOUR_PERSONAL_OPENAI_API_KEY' >> ~/.bashrc
    ```
+   
+   > ⚠️ **Security Note**: Never commit your API key to version control. Consider using a separate `.env` file or a secrets manager for production environments.
+
 3. Reload your shell configuration
 
 **Usage:**
@@ -174,6 +177,12 @@ docker run -it -d \
   -v /usr/local/bin/docker:/usr/local/bin/docker \
   israiloff/jvim
 ```
+
+> ⚠️ **Security Considerations**:
+> - `--network host` removes network isolation between container and host
+> - Mounting the Docker socket provides full access to the Docker daemon
+> - These settings are intended for development environments only
+> - For production or sensitive environments, use proper network isolation and avoid mounting the Docker socket
 
 **Access the container:**
 ```bash
