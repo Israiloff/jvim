@@ -1,6 +1,5 @@
 _G.cmp = require("cmp")
 local luasnip = require("luasnip")
-local cmp_window = require("cmp.config.window")
 local cmp_mapping = require("cmp.config.mapping")
 local cmp_types = require("cmp.types.cmp")
 local ConfirmBehavior = cmp_types.ConfirmBehavior
@@ -102,11 +101,14 @@ cmp.setup({
 	formatting = {
 		format = lspkind.cmp_format({
 			mode = "symbol",
-			maxwidth = 50,
+			maxwidth = {
+				menu = 50,
+				abbr = 50,
+			},
 			ellipsis_char = "...",
 			show_labelDetails = true,
 		}),
-		fields = { "kind", "abbr", "menu" },
+		fields = { "icon", "abbr", "menu" },
 		expandable_indicator = true,
 	},
 	snippet = {
@@ -115,8 +117,12 @@ cmp.setup({
 		end,
 	},
 	window = {
-		completion = cmp_window.bordered(),
-		documentation = cmp_window.bordered(),
+		completion = cmp.config.window.bordered({
+			border = "single",
+		}),
+		documentation = cmp.config.window.bordered({
+			border = "single",
+		}),
 	},
 	sources = {
 		{
@@ -207,7 +213,7 @@ cmp.setup({
 		end, { "i", "s" }),
 		["<C-Space>"] = cmp_mapping.complete(),
 		["<M-Space>"] = cmp_mapping.complete(),
-		["<D-L>"] = cmp_mapping.complete(),                         -- Option + Space
+		["<D-L>"] = cmp_mapping.complete(), -- Option + Space
 		["<C-e>"] = cmp_mapping.abort(),
 		["<CR>"] = cmp.mapping.confirm({ select = true }),
 	}),
