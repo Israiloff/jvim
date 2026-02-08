@@ -4,7 +4,7 @@ return {
 	-- Logging configuration.
 	-- This is used to determine the logging level and whether logging is enabled.
 	logger = {
-		enabled = true,
+		enabled = false,
 		level = {
 			debug = true,
 			info = true,
