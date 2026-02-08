@@ -77,12 +77,11 @@ if not lsp_utils_status then
 	return
 end
 
-local properties = require("io.github.israiloff.config.properties")
-
 local os_name = require("io.github.israiloff.config.os").get_current_os()
+local arch = require("io.github.israiloff.config.arch")
 
-if string.match(properties.architecture, "[Aa][Rr][Mm]") then
-	os_name = os_name .. "_arm"
+if string.match(arch.get_architecture(), arch.ARM) then
+	os_name = os_name .. "_" .. arch.ARM
 end
 
 logger.info(logger_name, "JAVA: current OS type : " .. os_name)
