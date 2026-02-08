@@ -30,8 +30,7 @@ OS = {
 function OS.get_current_os()
 	logger.debug(logger_name, "OS: determining current operating system...")
 
-	local uname = vim.uv.os_uname()
-	local os_real_name = uname.sysname
+	local os_real_name = OS.get_current_os_name()
 
 	logger.debug(logger_name, "OS: real name is '" .. os_real_name .. "'")
 
@@ -55,7 +54,7 @@ end
 -- -- using the `$OS` environment variable.
 -- -- @return string The real name of the current operating system
 function OS.get_current_os_name()
-	return vim.fn.expand("$OS")
+	return string.lower(vim.uv.os_uname().sysname)
 end
 
 -- Check if the current operating system is Windows
@@ -64,7 +63,7 @@ end
 -- -- by matching the real name against common Windows identifiers.
 -- -- @return boolean True if the current operating system is Windows, false otherwise
 function OS.is_windows(os_real_name)
-	return string.match(os_real_name, "[Ww][Ii][Nn]") or vim.fn.has("win32") or vim.fn.has("win64")
+	return string.match(os_real_name, "win")
 end
 
 -- Check if the current operating system is Linux
@@ -73,7 +72,7 @@ end
 -- -- by matching the real name against common Linux identifiers.
 -- -- @return boolean True if the current operating system is Linux, false otherwise
 function OS.is_linux(os_real_name)
-	return string.match(os_real_name, "[Ll][Ii][Nn][Uu][Xx]") or vim.fn.has("unix") or vim.fn.has("linux")
+	return string.match(os_real_name, "linux") or string.match(os_real_name, "unix")
 end
 
 -- Check if the current operating system is macOS
@@ -82,9 +81,7 @@ end
 -- -- by matching the real name against common macOS identifiers.
 -- -- @return boolean True if the current operating system is macOS, false otherwise
 function OS.is_mac(os_real_name)
-	return string.match(os_real_name, "[Mm][Aa][Cc]")
-		or vim.fn.has("macunix")
-		or string.match(vim.uv.os_uname().sysname, "[Dd][Aa][Rr][Ww][Ii][Nn]")
+	return string.match(os_real_name, "mac") or string.match(os_real_name, "darwin")
 end
 
 return OS
