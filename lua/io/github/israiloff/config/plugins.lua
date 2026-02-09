@@ -3,6 +3,7 @@ return {
         "nvim-treesitter/nvim-treesitter",
         lazy = false,
         run = ":TSUpdate",
+        branch = "master"
     },
     {
         "nvim-lua/plenary.nvim",
