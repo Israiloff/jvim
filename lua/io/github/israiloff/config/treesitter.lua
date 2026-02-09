@@ -1,4 +1,5 @@
-require("nvim-treesitter").setup({
+require("nvim-treesitter")
+require("nvim-treesitter.configs").setup({
 	ensure_installed = {
 		"bash",
 		"json",
@@ -25,4 +26,6 @@ require("nvim-treesitter").setup({
 			node_decremental = "grm",
 		},
 	},
+	modules = {},
+	ignore_install = {},
 })
