@@ -31,22 +31,18 @@ function OS.get_current_os()
 	logger.debug(logger_name, "OS: determining current operating system...")
 
 	local os_real_name = OS.get_current_os_name()
-
 	logger.debug(logger_name, "OS: real name is '" .. os_real_name .. "'")
 
 	if OS.is_mac(os_real_name) then
-		logger.debug(logger_name, "OS: detected macOS")
 		return OS.MAC
 	elseif OS.is_windows(os_real_name) then
-		logger.debug(logger_name, "OS: detected Windows")
 		return OS.WINDOWS
 	elseif OS.is_linux(os_real_name) then
-		logger.debug(logger_name, "OS: detected Linux")
 		return OS.LINUX
-	else
-		logger.error(logger_name, "OS: unknown operating system '" .. os_real_name .. "'")
-		return nil
 	end
+
+	logger.error(logger_name, "OS: unknown operating system '" .. os_real_name .. "', defaulting to linux")
+	return OS.LINUX
 end
 
 -- Returns the real name of the operating system
@@ -54,7 +50,7 @@ end
 -- -- using the `$OS` environment variable.
 -- -- @return string The real name of the current operating system
 function OS.get_current_os_name()
-	return string.lower(vim.uv.os_uname().sysname)
+	return string.lower((vim.uv or vim.loop).os_uname().sysname)
 end
 
 -- Check if the current operating system is Windows
