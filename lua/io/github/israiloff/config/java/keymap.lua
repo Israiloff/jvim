@@ -66,6 +66,8 @@ which_key.register({
 				"<cmd>lua exec_in_terminal_horizontal('mvn clean package -DskipTests')<CR>",
 				icons.maven.PackageSkipTests .. " Package (skip tests)",
 			},
+			c = { "<cmd>lua exec_in_terminal_horizontal('mvn clean compile')<CR>", icons.maven.Compile .. " Compile" },
+			C = { "<cmd>lua exec_in_terminal_horizontal('mvn clean')<CR>", icons.maven.Clean .. " Clean" },
 		},
 
 		g = {

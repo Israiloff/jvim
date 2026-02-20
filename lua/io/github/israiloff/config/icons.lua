@@ -287,8 +287,10 @@ return {
 		Logo = "",
 		Package = "󰏗",
 		Deploy = "",
-		Purge = "󰃢",
+		Purge = "",
+		Clean = "󰃢",
 		PackageSkipTests = "󱧔",
+		Compile = "",
 	},
 	gradle = {
 		Build = "",
