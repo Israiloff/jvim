@@ -106,9 +106,17 @@ if not launcher_jar or launcher_jar == "" then
 	return
 end
 
--- OS config directory (NO arch suffix)
+-- OS config directory
 local os_name = require("io.github.israiloff.config.os").get_current_os()
-local config_path = jdtls_path .. "/config_" .. os_name
+local config_name = "config_" .. os_name
+local arch = require("io.github.israiloff.config.arch")
+
+if arch.get_architecture() == arch.ARM then
+    config_name = config_name .. "_" .. arch.ARM
+end
+
+local config_path = jdtls_path .. "/" .. config_name
+
 if not uv.fs_stat(config_path) then
 	logger.error(logger_name, "JAVA: JDTLS config dir not found: " .. config_path)
 	logger.error(
