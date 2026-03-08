@@ -80,8 +80,8 @@ function Utils.already_installed_all(available)
     return false
 end
 
-function Utils.get_installed_servers_names()
-    return vim.lsp.config.util.available_servers()
+function Utils.get_installed_servers()
+    return vim.lsp._enabled_configs
 end
 
 function Utils.already_installed_single(server_name)
@@ -160,7 +160,7 @@ function Utils.get_root_dir()
         ".settings",
         "grade.lock",
         "gradle.lockfile",
-        "build.gradle",
+        "build.gradle"
     )
 end
 

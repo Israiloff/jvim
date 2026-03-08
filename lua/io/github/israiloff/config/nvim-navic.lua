@@ -210,17 +210,10 @@ function SETUP_LANGUAGE_SERVERS()
 		return
 	end
 
-	local lspconfig_status, lspconfig = pcall(require, "lspconfig")
-
-	if not lspconfig_status then
-		log.error(logger_name, "'lspconfig' not found. Auto-attach will not work.")
-		return
-	end
-
-	local language_servers = lsp_utils.get_installed_servers_names()
+	local language_servers = lsp_utils.get_installed_servers()
 
 	for _, ls in ipairs(language_servers) do
-		lspconfig[ls].setup({
+		ls.setup({
 			on_attach = function(client, bufnr)
 				navic.attach(client, bufnr)
 			end,
