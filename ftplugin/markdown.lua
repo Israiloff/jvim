@@ -21,7 +21,7 @@ if not cmp_nvim_lsp_status then
     return
 end
 
-vim.lsp.config.marksman.setup({
+vim.lsp.config("marksman", {
     root_dir = lsp_utils.get_root_dir(),
     on_attach = lsp_utils.global_on_attach,
     capabilities = cmp_nvim_lsp.default_capabilities(),

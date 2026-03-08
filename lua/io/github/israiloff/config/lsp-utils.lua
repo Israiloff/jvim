@@ -7,6 +7,13 @@ end
 
 local logger_name = "io.github.israiloff.config.lsp-utils"
 
+local workspace_utils_status, workspace_utils = pcall(require, "io.github.israiloff.config.workspace-utils")
+
+if not workspace_utils_status then
+    log.error(logger_name, "'workspace-utils' not found. LSP will not be configured.")
+    return
+end
+
 Utils = {}
 
 local reg_status, registry = pcall(require, "mason-registry")
@@ -148,20 +155,7 @@ function Utils.global_on_attach(client, bufnr)
 end
 
 function Utils.get_root_dir()
-    return vim.lsp.config.util.root_pattern(
-        ".git",
-        ".marksman.toml",
-        "package.json",
-        "pom.xml",
-        ".settings",
-        "biome.json",
-        "biome.jsonc",
-        ".marksman.toml",
-        ".settings",
-        "grade.lock",
-        "gradle.lockfile",
-        "build.gradle"
-    )
+    return workspace_utils.find_java_root()
 end
 
 return Utils
