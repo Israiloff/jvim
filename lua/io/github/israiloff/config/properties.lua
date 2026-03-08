@@ -27,6 +27,10 @@ return {
 		LINUX = "zsh",
 		MACOS = "zsh",
 	},
+    -- The default configuration for the Java Development Tools Language Server (JDTLS).
+    -- This is used to determine the JVM options for the JDTLS.
+    -- It is set to a minimum heap size of 256M and a maximum heap size of 1G.
+    -- It can be overridden by setting the environment variables or by modifying this configuration.
 	jdtls = {
 		jvm = {
 			xms = "256M",
