@@ -151,7 +151,6 @@ return {
 		Refresh = "",
 		Notification = "",
 		Java = "",
-		Vim = "",
 		Mason = "",
 		ListUnordered = "",
 		Help = "󰋖",
@@ -159,6 +158,7 @@ return {
 		Resume = "",
 		SearchList = "󱩾",
 		Registers = "󱃔",
+        Neovim = "",
 	},
 	diagnostics = {
 		BoldError = "",
@@ -240,6 +240,16 @@ return {
 	},
 	lsp = {
 		rename = "󰑕",
+        jdtls = "",
+        lua_ls = "",
+        jsonls = "",
+        marksman = "",
+        yamlls = "󰈙",
+        stylua = "󰬚󰬓",
+        prettier = "",
+        lemminx = "󰗀",
+        dockerls = "",
+        shfmt = "",
 	},
 	os = {
 		Linux = "",

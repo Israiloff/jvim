@@ -49,7 +49,7 @@ require("lualine").setup({
 			right = "",
 		},
 		disabled_filetypes = {
-			--"NvimTree",
+			"NvimTree",
 			"TelescopePrompt",
 			"packer",
 			"toggleterm",
@@ -62,7 +62,7 @@ require("lualine").setup({
 			nvim_tree_shift,
 			{
 				function()
-					return " " .. icons.ui.Vim .. " "
+					return " " .. icons.ui.Neovim .. " "
 				end,
 				padding = { left = 0, right = 0 },
 			},
@@ -131,8 +131,14 @@ require("lualine").setup({
 					vim.list_extend(buf_client_names, get_providers(buf_ft)[null_ls.methods.FORMATTING] or {})
 					vim.list_extend(buf_client_names, get_registered_linters(buf_ft))
 
-					local unique_client_names = table.concat(buf_client_names, ", ")
-					local language_servers = string.format("[%s]", unique_client_names)
+					for i, name in ipairs(buf_client_names) do
+						if icons.lsp[name] then
+							buf_client_names[i] = icons.lsp[name]
+						end
+					end
+
+					local unique_client_names = table.concat(buf_client_names, " ")
+					local language_servers = string.format("[ %s ]", unique_client_names)
 
 					if copilot_active then
 						language_servers = language_servers .. "%#SLCopilot#" .. " " .. icons.ui.Copilot .. "%*"
