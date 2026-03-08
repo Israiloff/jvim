@@ -7,13 +7,6 @@ end
 
 local logger_name = "ftplugin.markdown"
 
-local lspconfig_status, lspconfig = pcall(require, "lspconfig")
-
-if not lspconfig_status then
-    log.error(logger_name, "'lspconfig' not found. Marksman LSP will not be configured.")
-    return
-end
-
 local lsp_utils_status, lsp_utils = pcall(require, "io.github.israiloff.config.lsp-utils")
 
 if not lsp_utils_status then
@@ -28,7 +21,7 @@ if not cmp_nvim_lsp_status then
     return
 end
 
-lspconfig.marksman.setup({
+vim.lsp.config.marksman.setup({
     root_dir = lsp_utils.get_root_dir(),
     on_attach = lsp_utils.global_on_attach,
     capabilities = cmp_nvim_lsp.default_capabilities(),
