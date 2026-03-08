@@ -1,6 +1,6 @@
 return {
 	-- Version of the JVIM IDE.
-	version = "0.26.56",
+	version = "0.26.57",
 	-- Logging configuration.
 	-- This is used to determine the logging level and whether logging is enabled.
 	logger = {
@@ -26,5 +26,11 @@ return {
 		WINDOWS = "pwsh.exe",
 		LINUX = "zsh",
 		MACOS = "zsh",
+	},
+	jdtls = {
+		jvm = {
+			xms = "256M",
+			xmx = "1G",
+		},
 	},
 }
