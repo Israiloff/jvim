@@ -203,22 +203,11 @@ function CREATE_WINBAR()
 end
 
 function SETUP_LANGUAGE_SERVERS()
-	local lsp_utils_status, lsp_utils = pcall(require, "io.github.israiloff.config.lsp-utils")
-
-	if not lsp_utils_status then
-		log.error(logger_name, "'io.github.israiloff.config.lsp-utils' not found. Auto-attach will not work.")
-		return
-	end
-
-	local language_servers = lsp_utils.get_installed_servers()
-
-	for _, ls in ipairs(language_servers) do
-		ls.setup({
-			on_attach = function(client, bufnr)
-				navic.attach(client, bufnr)
-			end,
-		})
-	end
+    vim.lsp.config("*", {
+        on_attach = function(client, bufnr)
+            navic.attach(client, bufnr)
+        end,
+    })
 end
 
 ---@diagnostic disable-next-line: duplicate-set-field
