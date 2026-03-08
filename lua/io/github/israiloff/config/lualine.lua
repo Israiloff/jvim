@@ -5,10 +5,10 @@ local null_ls_sources = require("null-ls.sources")
 ---@diagnostic disable: param-type-mismatch
 local nvim_tree_shift = {
 	function()
-		len = vim.api.nvim_win_get_width(require("nvim-tree.view").get_winnr()) - 1
-		title = "Nvim-Tree"
-		left = (len - #title) / 2
-		right = len - left - #title
+		local len = vim.api.nvim_win_get_width(require("nvim-tree.view").get_winnr()) - 1
+		local title = "Nvim-Tree"
+		local left = (len - #title) / 2
+		local right = len - left - #title
 		return string.rep(" ", left) .. title .. string.rep(" ", right)
 	end,
 	cond = require("nvim-tree.view").is_visible,
@@ -28,13 +28,13 @@ local function get_providers(filetype)
 end
 
 local function get_registered_linters(filetype)
-	return vim.tbl_flatten(vim.tbl_map(function(m)
+	return vim.iter(vim.tbl_map(function(m)
 		return get_providers(filetype)[m] or {}
 	end, {
 		null_ls.methods.DIAGNOSTICS,
 		null_ls.methods.DIAGNOSTICS_ON_OPEN,
 		null_ls.methods.DIAGNOSTICS_ON_SAVE,
-	}))
+	})):flatten():totable()
 end
 
 require("lualine").setup({
