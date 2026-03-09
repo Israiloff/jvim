@@ -1,0 +1,5 @@
+vim.api.nvim_set_hl(0, "SLNvimIcon", { fg = "#39FF14", bold = true })
+vim.api.nvim_set_hl(0, "SLGitIcon", { fg = "#F1502F", bold = true })
+vim.api.nvim_set_hl(0, "SLGitBranchName", { fg = "#E5C07B", bold = true })
+vim.api.nvim_set_hl(0, "SLCopilotIcon", { fg = "#199FD7", bold = true })
+vim.api.nvim_set_hl(0, "SLClock", { fg = "#E5C07B", bold = true })

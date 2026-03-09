@@ -34,7 +34,9 @@ local function get_registered_linters(filetype)
 		null_ls.methods.DIAGNOSTICS,
 		null_ls.methods.DIAGNOSTICS_ON_OPEN,
 		null_ls.methods.DIAGNOSTICS_ON_SAVE,
-	})):flatten():totable()
+	}))
+		:flatten()
+		:totable()
 end
 
 require("lualine").setup({
@@ -62,16 +64,21 @@ require("lualine").setup({
 			nvim_tree_shift,
 			{
 				function()
-					return " " .. icons.ui.Neovim .. " "
+					return "%#SLNvimIcon#" .. icons.ui.Neovim .. "%*"
 				end,
-				padding = { left = 0, right = 0 },
+				padding = { left = 2, right = 2 },
 			},
 		},
 		lualine_b = {
 			{
-				"b:gitsigns_head",
-				icon = "%#SLGitIcon#" .. icons.git.Branch .. "%*%#SLBranchName#",
-				color = { gui = "bold" },
+				function()
+					local branch = vim.b.gitsigns_head
+					if not branch or branch == "" then
+						return ""
+					end
+					return "%#SLGitIcon#" .. icons.git.Branch .. " " .. "%#SLGitBranchName#" .. branch .. "%*"
+				end,
+				padding = { left = 1, right = 1 },
 			},
 		},
 		lualine_c = {
@@ -141,7 +148,7 @@ require("lualine").setup({
 					local language_servers = string.format("[ %s ]", unique_client_names)
 
 					if copilot_active then
-						language_servers = language_servers .. "%#SLCopilot#" .. " " .. icons.ui.Copilot .. "%*"
+						language_servers = language_servers .. "%#SLCopilotIcon#" .. " " .. icons.ui.Copilot .. "%*"
 					end
 
 					return language_servers
@@ -157,9 +164,8 @@ require("lualine").setup({
 		lualine_y = { "location" },
 		lualine_z = {
 			function()
-				return icons.ui.Clock
+				return "%#SLClock#" .. icons.ui.Clock .. " " .. os.date("%H:%M:%S") .. "%*"
 			end,
-			"ctime",
 		},
 	},
 	inactive_sections = {
