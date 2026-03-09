@@ -203,11 +203,13 @@ function CREATE_WINBAR()
 end
 
 function SETUP_LANGUAGE_SERVERS()
-    vim.lsp.config("*", {
-        on_attach = function(client, bufnr)
-            navic.attach(client, bufnr)
-        end,
-    })
+	vim.lsp.config("*", {
+		on_attach = function(client, bufnr)
+			if client.server_capabilities.documentSymbolProvider then
+				navic.attach(client, bufnr)
+			end
+		end,
+	})
 end
 
 ---@diagnostic disable-next-line: duplicate-set-field
