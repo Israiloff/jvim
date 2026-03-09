@@ -167,7 +167,7 @@ return {
         stylua = "󰬚󰬓",
         prettier = "",
         lemminx = "󰗀",
-        dockerls = "",
+        dockerls = "",
         shfmt = "",
 	},
 	os = {

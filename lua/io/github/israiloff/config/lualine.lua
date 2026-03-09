@@ -140,20 +140,20 @@ require("lualine").setup({
 
 					for i, name in ipairs(buf_client_names) do
 						if icons.lsp[name] then
-							buf_client_names[i] = icons.lsp[name]
+							buf_client_names[i] = "%#SLIcon_" .. name .. "#" .. icons.lsp[name] .. "%*"
 						end
 					end
 
 					local unique_client_names = table.concat(buf_client_names, " ")
-					local language_servers = string.format("[ %s ]", unique_client_names)
+					local language_servers = string.format("%s", unique_client_names)
 
 					if copilot_active then
-						language_servers = language_servers .. "%#SLCopilotIcon#" .. " " .. icons.ui.Copilot .. "%*"
+						language_servers = language_servers .. " " .. "%#SLCopilotIcon#" .. icons.ui.Copilot .. "%*"
 					end
 
 					return language_servers
 				end,
-				color = { gui = "bold" },
+				color = nil,
 				cond = function()
 					return vim.o.columns > 100
 				end,
