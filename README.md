@@ -163,10 +163,17 @@ All ChatGPT features are accessible via the which-key menu (`Space + a`):
 
 For a containerized development environment, use the official JVIM Docker image.
 
-**Pull the image:**
+**Pull the latest image:**
 ```bash
 docker pull israiloff/jvim:latest
 ```
+
+**Pull a specific version:**
+```bash
+docker pull israiloff/jvim:0.4.14
+```
+
+> Available tags can be found on [Docker Hub](https://hub.docker.com/r/israiloff/jvim/tags).
 
 **Run the container:**
 ```bash
@@ -175,7 +182,7 @@ docker run -it -d \
   --name jvim \
   -v /var/run/docker.sock:/var/run/docker.sock \
   -v /usr/local/bin/docker:/usr/local/bin/docker \
-  israiloff/jvim
+  israiloff/jvim:0.4.14
 ```
 
 > ⚠️ **Security Considerations**:
