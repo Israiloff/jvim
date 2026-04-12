@@ -206,6 +206,8 @@ return {
 		Close = "󰅖",
 		DebugUI = "",
 		Attach = "",
+		Compile = "",
+		Build = "",
 	},
 	maven = {
 		Refresh = "",
