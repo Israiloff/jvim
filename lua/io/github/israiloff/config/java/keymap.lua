@@ -18,10 +18,12 @@ which_key.register({
 	j = {
 		name = icons.ui.Java .. " Java",
 		o = { "<Cmd>lua require('jdtls').organize_imports()<CR>", icons.java.OptimizeCode .. " Organize imports" },
-		v = { "<Cmd>lua require('jdtls').extract_variable()<CR>", icons.java.Variable .. " Extract variable" },
-		c = { "<Cmd>lua require('jdtls').extract_constant()<CR>", icons.java.Constant .. " Extract constant" },
-		u = { "<Cmd>lua require('jdtls').update_project_config()<CR>", icons.java.UpdateConfig .. " Update config" },
-
+		V = { "<Cmd>lua require('jdtls').extract_variable_all()<CR>", icons.java.Variable .. " Extract variable" },
+		C = { "<Cmd>lua require('jdtls').extract_constant()<CR>", icons.java.Constant .. " Extract constant" },
+		M = { "<Cmd>lua require('jdtls').extract_method(true)<CR>", icons.java.Method .. " Extract method" },
+		u = { "<Cmd>lua require('jdtls').update_projects_config()<CR>", icons.java.UpdateConfig .. " Update config" },
+		c = { "<Cmd>lua require('jdtls').compile()<CR>", icons.java.Compile .. " Compile" },
+		r = { "<Cmd>lua require('jdtls').build_projects()<CR>", icons.java.Build .. " Rebuild" },
 		d = {
 			name = icons.ui.DebugConsole .. " Debug",
 			t = { "<cmd>lua require'dap'.toggle_breakpoint()<cr>", icons.java.Bug .. " Toggle breakpoint" },
@@ -54,20 +56,38 @@ which_key.register({
 				"<cmd>lua exec_in_terminal_horizontal('mvn clean -U dependency:resolve')<CR>",
 				icons.maven.Refresh .. " Refresh dependencies",
 			},
-			p = { "<cmd>lua exec_in_terminal_horizontal('mvn clean package')<CR>", icons.maven.Package .. " Package" },
-			i = { "<cmd>lua exec_in_terminal_horizontal('mvn clean install')<CR>", icons.maven.Install .. " Install" },
-			d = { "<cmd>lua exec_in_terminal_horizontal('mvn clean deploy')<CR>", icons.maven.Deploy .. " Deploy" },
-			t = { "<cmd>lua exec_in_terminal_horizontal('mvn clean test')<CR>", icons.maven.Test .. " Test" },
+			p = {
+				"<cmd>lua vim.cmd('silent !rm -rf target') vim.cmd('lua exec_in_terminal_horizontal(\"mvn package\")')<CR>",
+				icons.maven.Package .. " Package",
+			},
+			i = {
+				"<cmd>lua vim.cmd('silent !rm -rf target') vim.cmd('lua exec_in_terminal_horizontal(\"mvn install\")')<CR>",
+				icons.maven.Install .. " Install",
+			},
+			d = {
+				"<cmd>lua vim.cmd('silent !rm -rf target') vim.cmd('lua exec_in_terminal_horizontal(\"mvn deploy\")')<CR>",
+				icons.maven.Deploy .. " Deploy",
+			},
+			t = {
+				"<cmd>lua vim.cmd('silent !rm -rf target') vim.cmd('lua exec_in_terminal_horizontal(\"mvn test\")')<CR>",
+				icons.maven.Test .. " Test",
+			},
 			e = {
 				"<cmd>lua exec_in_terminal_horizontal('mvn dependency:purge-local-repository')<CR>",
 				icons.maven.Purge .. " Purge local repository",
 			},
 			P = {
-				"<cmd>lua exec_in_terminal_horizontal('mvn clean package -DskipTests')<CR>",
+				"<cmd>lua vim.cmd('silent !rm -rf target') vim.cmd('lua exec_in_terminal_horizontal(\"mvn package -DskipTests\")')<CR>",
 				icons.maven.PackageSkipTests .. " Package (skip tests)",
 			},
-			c = { "<cmd>lua exec_in_terminal_horizontal('mvn clean compile')<CR>", icons.maven.Compile .. " Compile" },
-			C = { "<cmd>lua exec_in_terminal_horizontal('mvn clean')<CR>", icons.maven.Clean .. " Clean" },
+			c = {
+				"<cmd>lua vim.cmd('silent !rm -rf target') vim.cmd('lua exec_in_terminal_horizontal(\"mvn compile\")')<CR>",
+				icons.maven.Compile .. " Compile",
+			},
+			C = {
+				"<cmd>lua exec_in_terminal_horizontal('mvn clean')<CR>",
+				icons.maven.Clean .. " Clean",
+			},
 		},
 
 		g = {
@@ -86,8 +106,8 @@ which_key.register({
 which_key.register({
 	j = {
 		name = icons.ui.Java .. " Java",
-		v = { "<Esc><Cmd>lua require('jdtls').extract_variable(true)<CR>", icons.java.Variable .. " Extract variable" },
-		c = { "<Esc><Cmd>lua require('jdtls').extract_constant(true)<CR>", icons.java.Constant .. " Extract constant" },
-		m = { "<Esc><Cmd>lua require('jdtls').extract_method(true)<CR>", icons.java.Method .. " Extract method" },
+		V = { "<Esc><Cmd>lua require('jdtls').extract_variable(true)<CR>", icons.java.Variable .. " Extract variable" },
+		C = { "<Esc><Cmd>lua require('jdtls').extract_constant(true)<CR>", icons.java.Constant .. " Extract constant" },
+		M = { "<Esc><Cmd>lua require('jdtls').extract_method(true)<CR>", icons.java.Method .. " Extract method" },
 	},
 }, { prefix = "<leader>", mode = "v" })

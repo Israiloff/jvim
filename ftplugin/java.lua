@@ -82,6 +82,11 @@ local properties = safe_require(
 	"JAVA: io.github.israiloff.config.properties not found, please install it and try again"
 )
 
+local copilot_utils = safe_require(
+	"io.github.israiloff.config.copilot-utils",
+	"JAVA: io.github.israiloff.config.copilot-utils not found, please install it if you use Copilot and want to ensure workspace folder is registered"
+)
+
 local jdtls_jvm_config = properties and properties.jdtls and properties.jdtls.jvm or { xms = "256M", xmx = "1G" }
 
 local uv = vim.uv or vim.loop
@@ -107,6 +112,14 @@ utils.create_dirs(workspace_dir)
 
 logger.info(logger_name, "JAVA: root_dir      : " .. root_dir)
 logger.info(logger_name, "JAVA: workspace_dir : " .. workspace_dir)
+
+-- ----------------------------------------------------------------------------
+-- Copilot setup
+-- ----------------------------------------------------------------------------
+if copilot_utils then
+    logger.debug(logger_name, "Ensuring Copilot workspace folder is set for: " .. root_dir)
+	copilot_utils.ensure_copilot_workspace_folder(root_dir)
+end
 
 -- ---------------------------------------------------------------------------
 -- Cache
