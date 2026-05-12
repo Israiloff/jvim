@@ -270,8 +270,4 @@ require("nvim-tree").setup({
 			watcher = false,
 		},
 	},
-	system_open = {
-		cmd = nil,
-		args = {},
-	},
 })
