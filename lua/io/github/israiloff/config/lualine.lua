@@ -1,4 +1,5 @@
 local icons = require("io.github.israiloff.config.icons")
+local ai = require("io.github.israiloff.config.ai")
 local null_ls = require("null-ls")
 local null_ls_sources = require("null-ls.sources")
 
@@ -124,14 +125,17 @@ require("lualine").setup({
 					local buf_ft = vim.bo.filetype
 					local buf_client_names = {}
 					local copilot_active = false
+					local tabby_active = false
 
 					for _, client in pairs(buf_clients) do
-						if client.name ~= "null-ls" and client.name ~= "GitHub Copilot" then
+						if client.name ~= "null-ls" and client.name ~= "GitHub Copilot" and client.name ~= "tabby" then
 							table.insert(buf_client_names, client.name)
 						end
 
 						if client.name == "GitHub Copilot" then
 							copilot_active = true
+						elseif client.name == "tabby" then
+							tabby_active = true
 						end
 					end
 
@@ -144,14 +148,20 @@ require("lualine").setup({
 						end
 					end
 
+					local language_servers = {}
 					local unique_client_names = table.concat(buf_client_names, " ")
-					local language_servers = string.format("%s", unique_client_names)
 
-					if copilot_active then
-						language_servers = language_servers .. " " .. "%#SLCopilotIcon#" .. icons.ui.Copilot .. "%*"
+					if unique_client_names ~= "" then
+						table.insert(language_servers, unique_client_names)
 					end
 
-					return language_servers
+					if copilot_active and ai.is(ai.providers.COPILOT) then
+						table.insert(language_servers, "%#SLCopilotIcon#" .. icons.ui.Copilot .. "%*")
+					elseif tabby_active and ai.is(ai.providers.TABBY) then
+						table.insert(language_servers, "%#SLTabbyIcon#TB%*")
+					end
+
+					return table.concat(language_servers, " ")
 				end,
 				color = nil,
 				cond = function()

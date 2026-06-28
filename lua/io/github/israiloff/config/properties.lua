@@ -1,6 +1,34 @@
-return {
+local function load_local_properties()
+	local local_properties_path = vim.fn.stdpath("config") .. "/lua/io/github/israiloff/config/properties-local.lua"
+	local uv = vim.uv or vim.loop
+
+	if not uv.fs_stat(local_properties_path) then
+		return {}
+	end
+
+	local chunk, load_err = loadfile(local_properties_path)
+	if not chunk then
+		vim.notify("Failed to load local properties: " .. load_err, vim.log.levels.ERROR)
+		return {}
+	end
+
+	local ok, local_properties = pcall(chunk)
+	if not ok then
+		vim.notify("Failed to evaluate local properties: " .. local_properties, vim.log.levels.ERROR)
+		return {}
+	end
+
+	if type(local_properties) ~= "table" then
+		vim.notify("Local properties must return a table: " .. local_properties_path, vim.log.levels.ERROR)
+		return {}
+	end
+
+	return local_properties
+end
+
+local base_properties = {
 	-- Version of the JVIM IDE.
-	version = "0.30.62",
+	version = "0.32.62",
 	-- Logging configuration.
 	-- This is used to determine the logging level and whether logging is enabled.
 	logger = {
@@ -27,10 +55,19 @@ return {
 		LINUX = "zsh",
 		MACOS = "zsh",
 	},
-    -- The default configuration for the Java Development Tools Language Server (JDTLS).
-    -- This is used to determine the JVM options for the JDTLS.
-    -- It is set to a minimum heap size of 256M and a maximum heap size of 1G.
-    -- It can be overridden by setting the environment variables or by modifying this configuration.
+	-- AI provider configuration.
+	-- provider: "copilot" | "tabby" | "none"
+	ai = {
+		provider = "copilot",
+		tabby = {
+			agent_start_command = { "npx", "tabby-agent", "--stdio" },
+			inline_completion_trigger = "auto",
+		},
+	},
+	-- The default configuration for the Java Development Tools Language Server (JDTLS).
+	-- This is used to determine the JVM options for the JDTLS.
+	-- It is set to a minimum heap size of 256M and a maximum heap size of 1G.
+	-- It can be overridden by setting the environment variables or by modifying this configuration.
 	jdtls = {
 		jvm = {
 			xms = "256M",
@@ -38,3 +75,5 @@ return {
 		},
 	},
 }
+
+return vim.tbl_deep_extend("force", base_properties, load_local_properties())

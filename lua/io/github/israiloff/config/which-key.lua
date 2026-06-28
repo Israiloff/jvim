@@ -1,5 +1,6 @@
 require("io.github.israiloff.config.buffer-ops")
 local which_key = require("which-key")
+local ai = require("io.github.israiloff.config.ai")
 local icons = require("io.github.israiloff.config.icons")
 
 which_key.setup({
@@ -363,11 +364,36 @@ which_key.register({
 	mode = { "v" },
 })
 
-which_key.register({
-	A = {
-		name = icons.copilot.Logo .. " Copilot",
-		p = { "<cmd>Copilot panel<CR>", icons.copilot.Panel .. " Panel" },
+local ai_mappings = {
+	name = "AI [" .. ai.get_provider_label(ai.get_runtime_provider()) .. "]",
+	s = { ai.show_status, "Status" },
+	e = { ai.edit_local_properties, "Edit local properties" },
+	c = {
+		function()
+			ai.select_provider(ai.providers.COPILOT)
+		end,
+		"Use Copilot on next start",
 	},
+	t = {
+		function()
+			ai.select_provider(ai.providers.TABBY)
+		end,
+		"Use Tabby on next start",
+	},
+	d = {
+		function()
+			ai.select_provider(ai.providers.NONE)
+		end,
+		"Disable AI on next start",
+	},
+}
+
+if ai.is(ai.providers.COPILOT) then
+	ai_mappings.p = { "<cmd>Copilot panel<CR>", icons.copilot.Panel .. " Panel" }
+end
+
+which_key.register({
+	A = ai_mappings,
 	l = {
 		name = icons.diagnostics.Hint .. " Code actions",
 		a = { "<cmd>lua vim.lsp.buf.code_action()<cr>", icons.code.Refactor .. " Action" },

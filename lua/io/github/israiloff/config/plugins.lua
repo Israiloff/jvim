@@ -1,3 +1,5 @@
+local ai = require("io.github.israiloff.config.ai")
+
 return {
 	{
 		"nvim-treesitter/nvim-treesitter",
@@ -29,6 +31,16 @@ return {
 	},
 	{
 		"github/copilot.vim",
+		enabled = function()
+			return ai.is(ai.providers.COPILOT)
+		end,
+		init = function()
+			vim.g.copilot_no_tab_map = true
+			vim.g.copilot_assume_mapped = true
+		end,
+		config = function()
+			require("io.github.israiloff.config.copilot")
+		end,
 	},
 	{
 		"dawsers/telescope-file-history.nvim",
@@ -184,8 +196,19 @@ return {
 	{
 		"TabbyML/vim-tabby",
 		lazy = false,
+		enabled = function()
+			return ai.is(ai.providers.TABBY)
+		end,
 		dependencies = {
 			"neovim/nvim-lspconfig",
 		},
+		init = function()
+			vim.g.tabby_agent_start_command = ai.get_tabby_agent_start_command()
+			vim.g.tabby_inline_completion_trigger = ai.get_tabby_inline_completion_trigger()
+			vim.g.tabby_inline_completion_keybinding_accept = ""
+		end,
+		config = function()
+			require("io.github.israiloff.config.tabby")
+		end,
 	},
 }

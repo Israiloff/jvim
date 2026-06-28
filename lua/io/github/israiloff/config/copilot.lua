@@ -1,13 +1,15 @@
-vim.g.copilot_no_tab_map = true
-vim.g.copilot_assume_mapped = true
-
-vim.api.nvim_set_keymap("i", "<M-l>", 'copilot#Accept("<CR>")', {
-    silent = true,
-    expr = true,
+vim.keymap.set("i", "<M-l>", function()
+	return vim.fn["copilot#Accept"]("<CR>")
+end, {
+	silent = true,
+	expr = true,
+	desc = "Accept Copilot suggestion",
 })
 
--- Keymap for MAC OS (Option + l)
-vim.api.nvim_set_keymap("i", "¬", 'copilot#Accept("<CR>")', {
-    silent = true,
-    expr = true,
+vim.keymap.set("i", "¬", function()
+	return vim.fn["copilot#Accept"]("<CR>")
+end, {
+	silent = true,
+	expr = true,
+	desc = "Accept Copilot suggestion",
 })
