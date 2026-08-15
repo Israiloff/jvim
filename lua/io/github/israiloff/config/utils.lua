@@ -86,15 +86,4 @@ function M.get_java_path()
 	return nil
 end
 
-function M.get_ftplugin_filetypes()
-	local ftplugin_filetypes = {}
-	local ftplugin_dir = vim.fn.stdpath("config") .. "/ftplugin"
-	local ftplugin_files = vim.fn.glob(ftplugin_dir .. "/*.lua", false, true)
-	for _, file in ipairs(ftplugin_files) do
-		local filetype = vim.fn.fnamemodify(file, ":t:r")
-		table.insert(ftplugin_filetypes, filetype)
-	end
-	return ftplugin_filetypes
-end
-
 return M

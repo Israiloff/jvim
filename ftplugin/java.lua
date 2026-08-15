@@ -89,6 +89,26 @@ local ai = safe_require(
 
 local jdtls_jvm_config = properties and properties.jdtls and properties.jdtls.jvm or { xms = "256M", xmx = "1G" }
 
+-- LSP client capabilities advertised to jdtls.
+--
+-- These must be *protocol* capabilities. `jdtls.extendedClientCapabilities` is a
+-- jdtls-specific extension table and belongs in `init_options`, not here; putting
+-- it in `capabilities` used to silently drop nvim-cmp's completion capabilities
+-- (snippetSupport, resolveSupport, labelDetails, ...).
+--
+-- Neovim force-merges this on top of `vim.lsp.protocol.make_client_capabilities()`,
+-- so returning only the cmp overrides is enough.
+local cmp_nvim_lsp = safe_require(
+	"cmp_nvim_lsp",
+	"JAVA: cmp_nvim_lsp not found, falling back to default LSP client capabilities"
+)
+
+local capabilities = cmp_nvim_lsp and cmp_nvim_lsp.default_capabilities()
+	or vim.lsp.protocol.make_client_capabilities()
+
+local extended_client_capabilities = jdtls.extendedClientCapabilities
+extended_client_capabilities.resolveAdditionalTextEditsSupport = true
+
 local copilot_utils = nil
 if ai and ai.is(ai.providers.COPILOT) then
 	copilot_utils = safe_require(
@@ -132,8 +152,13 @@ end
 -- ---------------------------------------------------------------------------
 -- Cache
 -- ---------------------------------------------------------------------------
-vim.g.jdtls_cache = vim.g.jdtls_cache or {}
-local cache = vim.g.jdtls_cache
+local cache = safe_require(
+	"io.github.israiloff.config.java.cache",
+	"JAVA: io.github.israiloff.config.java.cache not found, please install it and try again"
+)
+if not cache then
+	return
+end
 
 local function path_exists(path)
 	return path and path ~= "" and uv.fs_stat(path) ~= nil
@@ -353,9 +378,10 @@ local config = {
 
 	init_options = {
 		bundles = get_bundles(),
+		extendedClientCapabilities = extended_client_capabilities,
 	},
 
-	capabilities = jdtls.extendedClientCapabilities,
+	capabilities = capabilities,
 
 	on_attach = function(client, bufnr)
 		lsp_utils.global_on_attach(client, bufnr)

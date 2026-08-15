@@ -14,6 +14,34 @@ if not lsp_status then
     return
 end
 
+local utils_status, utils = pcall(require, "io.github.israiloff.config.lsp-utils")
+
+if not utils_status then
+    log.error(logger_name, "'io.github.israiloff.config.lsp-utils' not found. LSP on_attach will not be configured.")
+    return
+end
+
+local cmp_status, cmp = pcall(require, "cmp_nvim_lsp")
+
+if not cmp_status then
+    log.error(logger_name, "'cmp_nvim_lsp' not found. LSP completion capabilities will not be advertised.")
+    return
+end
+
+-- Servers we start ourselves; mason-lspconfig must not `vim.lsp.enable()` them,
+-- otherwise a second client is spawned alongside the hand-rolled one.
+--
+--   jdtls   -> started by nvim-jdtls in ftplugin/java.lua
+--   lemminx -> started from the `lemminx-compiled` jar in config/lsp-servers.lua
+--   stylua  -> nvim-lspconfig ships a `stylua --lsp` config and mason-lspconfig
+--              maps the stylua *formatter* package onto it; the client dies on
+--              startup and formatting already goes through none-ls.
+local self_managed_servers = {
+    "jdtls",
+    "lemminx",
+    "stylua",
+}
+
 log.info(logger_name, "Setting up Mason LSPConfig")
 
 mason_lspconfig.setup({
@@ -22,131 +50,26 @@ mason_lspconfig.setup({
         "jdtls",
         "marksman",
         "jsonls",
+        "yamlls",
+        "dockerls",
     },
-    automatic_installation = false,
+    automatic_enable = {
+        exclude = self_managed_servers,
+    },
 })
 
-local utils_status, utils = pcall(require, "io.github.israiloff.config.lsp-utils")
-
-if not utils_status then
-    log.error(
-        logger_name,
-        "'io.github.israiloff.config.lsp-utils' not found. Filetype auto resolve will not be configured."
-    )
-    return
-end
-
-local lspconfig_status, lspconfig = pcall(require, "lspconfig")
-
-if not lspconfig_status then
-    log.error(logger_name, "'lspconfig' not found. LSP auto installation will not be configured.")
-    return
-end
-
-local cmp_status, cmp = pcall(require, "cmp_nvim_lsp")
-
-if not cmp_status then
-    log.error(logger_name, "'cmp_nvim_lsp' not found. LSP auto installation will not be configured.")
-    return
-end
-
-local c_utils_status, c_utils = pcall(require, "io.github.israiloff.config.utils")
-
-if not c_utils_status then
-    log.error(
-        logger_name,
-        "'io.github.israiloff.config.utils' not found. Filetype auto resolve will not be configured."
-    )
-    return
-end
-
-local ignored_servers = {
-    "jdtls",
-    "marksman",
-    "lemminx",
-}
-
-local ignored_filetypes = {
-    "TelescopePrompt",
-    "packer",
-    "toggleterm",
-    "lua",
-    "json",
-    "java",
-    "xml",
-    "markdown",
-}
-
-mason_lspconfig.setup({
-    function(server_name)
-        if vim.tbl_contains(ignored_servers, server_name) then
-            log.debug(logger_name, "Ignoring server '" .. server_name .. "'")
-            return
-        end
-
-        lspconfig[server_name].setup({
-            on_attach = function(client, bufnr)
-                vim.notify("LSP: " .. server_name .. " attached", vim.log.levels.INFO)
-                utils.global_on_attach(client, bufnr)
-            end,
-            capabilities = cmp.default_capabilities(),
-            flags = { debounce_text_changes = 200 },
-            root_dir = utils.get_root_dir(),
-        })
-    end,
+-- Defaults shared by every server that Neovim starts through `vim.lsp.enable()`.
+--
+-- mason-lspconfig v2 dropped `setup_handlers`, so this is the only supported hook
+-- point for cross-server defaults. Server-specific configs (`vim.lsp.config("x", ..)`)
+-- are deep-merged on top of this one, so per-server overrides still win.
+--
+-- Note: `root_dir` is deliberately not set here. It used to be resolved once at
+-- startup, which pinned every server to whatever directory Neovim happened to
+-- start in; nvim-lspconfig's per-server root markers do a better job.
+vim.lsp.config("*", {
+    capabilities = cmp.default_capabilities(),
+    on_attach = utils.global_on_attach,
 })
 
-vim.list_extend(ignored_filetypes, c_utils.get_ftplugin_filetypes())
-
-log.info(logger_name, "Setting up Mason LSPConfig filetype auto resolve")
-
-vim.api.nvim_create_augroup("LSPAutoInstall", {
-    clear = false,
-})
-
-vim.api.nvim_create_autocmd("BufReadPost", {
-    group = "LSPAutoInstall",
-    callback = function()
-        local filetype = vim.bo.filetype
-
-        if c_utils.isempty(filetype) or vim.tbl_contains(ignored_filetypes, filetype) then
-            log.warn(logger_name, "Ignoring filetype '" .. filetype .. "'")
-            return
-        end
-
-        local availables = utils.get_available_servers({ filetype = filetype })
-
-        log.info(logger_name, "Available servers for '" .. filetype .. "' : " .. vim.inspect(availables))
-
-        if #availables == 0 or availables == nil then
-            vim.notify("No available servers for [" .. filetype .. "]", vim.log.levels.WARN)
-            log.warn(logger_name, "No available servers for " .. filetype)
-            return
-        end
-
-        if utils.already_installed_all(availables) then
-            log.info(logger_name, "Server for '" .. filetype .. "' already installed")
-            return
-        end
-
-        local primary_server = filetype .. "-language-server"
-
-        if utils.already_installed_single(primary_server) then
-            log.info(logger_name, "Server for '" .. filetype .. "' already installed")
-            return
-        end
-
-        if utils.install_package(primary_server) then
-            log.info(logger_name, "Server for '" .. filetype .. "' installed successfully")
-            return
-        end
-
-        for _, server in ipairs(availables) do
-            log.info(logger_name, "Server: " .. vim.inspect(server))
-            if utils.install_package(server) then
-                log.info(logger_name, "Server for '" .. filetype .. "' installed successfully")
-                break
-            end
-        end
-    end,
-})
+log.info(logger_name, "Mason LSPConfig configured")
