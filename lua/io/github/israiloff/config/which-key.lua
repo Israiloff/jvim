@@ -4,15 +4,19 @@ local ai = require("io.github.israiloff.config.ai")
 local icons = require("io.github.israiloff.config.icons")
 
 which_key.setup({
+	-- Bottom-anchored list, the same layout v2 produced with `window.position`.
+	preset = "classic",
+	-- v2 relied on 'timeoutlen'; v3 has its own popup delay, set to match.
+	delay = 300,
 	plugins = {
 		marks = true, -- shows a list of your marks on ' and `
 		registers = true, -- shows your registers on " in NORMAL or <C-r> in INSERT mode
-		-- the presets plugin, adds help for a bunch of default keybindings in Neovim
-		-- No actual key bindings are created
 		spelling = {
 			enabled = false, -- enabling this will show WhichKey when pressing z= to select spelling suggestions
 			suggestions = 20, -- how many suggestions should be shown in the list?
 		},
+		-- The presets plugin adds help for a bunch of default Neovim keybindings.
+		-- No actual key bindings are created.
 		presets = {
 			operators = false, -- adds help for operators like d, y, ...
 			motions = false, -- adds help for motions
@@ -23,383 +27,255 @@ which_key.setup({
 			g = false, -- bindings for prefixed with g
 		},
 	},
-	-- add operators that will trigger motion and text object completion
-	-- to enable all native operators, set the preset / operators plugin above
-	operators = { gc = "Comments" },
-	key_labels = {
-		-- override the label used to display some keys. It doesn't effect WK in any other way.
-		-- For example:
-		-- ["<space>"] = "SPC",
-		-- ["<cr>"] = "RET",
-		-- ["<tab>"] = "TAB",
-	},
-	motions = {
-		count = true,
-	},
 	icons = {
 		breadcrumb = icons.ui.DoubleChevronRight, -- symbol used in the command line area that shows your active key combo
 		separator = icons.ui.ArrowRightSimple, -- symbol used between a key and it's label
 		group = icons.ui.TriangleShortArrowRight .. " ", -- symbol prepended to a group
+		-- Every mapping below carries its own glyph at the start of `desc`, so
+		-- which-key's built-in icon rules would render a second, duplicate icon.
+		mappings = false,
 	},
-	popup_mappings = {
+	keys = {
 		scroll_down = "<c-d>", -- binding to scroll down inside the popup
 		scroll_up = "<c-u>", -- binding to scroll up inside the popup
 	},
-	window = {
-		border = "single", -- none, single, double, shadow
-		position = "bottom", -- bottom, top
-		margin = { 1, 0, 1, 0 }, -- extra window margin [top, right, bottom, left]. When between 0 and 1, will be treated as a percentage of the screen size.
-		padding = { 1, 2, 1, 2 }, -- extra window padding [top, right, bottom, left]
-		winblend = 0, -- value between 0-100 0 for fully opaque and 100 for fully transparent
-		zindex = 1000, -- positive value to position WhichKey above other floating windows.
+	win = {
+		border = "single",
+		padding = { 1, 2 }, -- extra window padding [top/bottom, right/left]
+		zindex = 1000, -- positive value to position WhichKey above other floating windows
+		wo = {
+			winblend = 0, -- value between 0-100, 0 for fully opaque and 100 for fully transparent
+		},
 	},
 	layout = {
-		height = { min = 4, max = 25 }, -- min and max height of the columns
-		width = { min = 20, max = 50 }, -- min and max width of the columns
+		width = { min = 20 }, -- min width of the columns
 		spacing = 3, -- spacing between columns
-		align = "left", -- align columns left, center or right
 	},
-	ignore_missing = false, -- enable this to hide mappings for which you didn't specify a label
-	hidden = { "<silent>", "<cmd>", "<Cmd>", "<CR>", "^:", "^ ", "^call ", "^lua " }, -- hide mapping boilerplate
 	show_help = true, -- show a help message in the command line for using WhichKey
 	show_keys = true, -- show the currently pressed key and its label as a message in the command line
-	triggers = "auto", -- automatically setup triggers
-	-- triggers = {"<leader>"} -- or specify a list manually
-	-- list of triggers, where WhichKey should not wait for timeoutlen and show immediately
-	triggers_nowait = {
-		-- marks
-		"`",
-		"'",
-		"g`",
-		"g'",
-		-- registers
-		'"',
-		"<c-r>",
-		-- spelling
-		"z=",
-	},
-	triggers_blacklist = {
-		-- list of mode / prefixes that should never be hooked by WhichKey
-		-- this is mostly relevant for keymaps that start with a native binding
-		i = { "j", "k" },
-		v = { "j", "k" },
-	},
-	-- disable the WhichKey popup for certain buf types and file types.
-	-- Disabled by default for Telescope
+	-- disable WhichKey for certain buffer types and file types
 	disable = {
-		buftypes = {},
-		filetypes = {},
+		bt = {},
+		ft = {},
 	},
 })
 
-which_key.register({
-	f = {
-		"<cmd>Telescope find_files<cr>",
-		icons.ui.FindFile .. " Find file",
+-- ---------------------------------------------------------------------------
+-- grug-far helpers
+--
+-- The prefills have to be resolved when the mapping fires, not when the spec is
+-- built, so each of these returns a closure.
+-- ---------------------------------------------------------------------------
+
+---@param scope "file"|"global" limit the search to the current file or search everywhere
+---@param replace boolean open in replace mode
+local function grug_word(scope, replace)
+	return function()
+		local prefills = { search = vim.fn.expand("<cword>") }
+
+		if scope == "file" then
+			prefills.paths = vim.fn.expand("%")
+		end
+
+		require("grug-far").open({
+			prefills = prefills,
+			transient = true,
+			replace = replace and "" or nil,
+		})
+	end
+end
+
+---@param scope "file"|"global"
+local function grug_selection(scope)
+	return function()
+		require("grug-far").with_visual_selection({
+			prefills = scope == "file" and { paths = vim.fn.expand("%") } or nil,
+			transient = true,
+		})
+	end
+end
+
+local function grug_ui()
+	require("grug-far").open({ transient = true })
+end
+
+-- ---------------------------------------------------------------------------
+-- Normal mode
+-- ---------------------------------------------------------------------------
+which_key.add({
+	{ "<leader>/", "<Plug>(comment_toggle_linewise_current)", desc = icons.ui.CommentCode .. " Comment current line" },
+	{ "<leader>e", "<cmd>NvimTreeToggle<CR>", desc = icons.ui.EmptyFolderOpen .. " Explorer" },
+	{ "<leader>f", "<cmd>Telescope find_files<cr>", desc = icons.ui.FindFile .. " Find file" },
+	{ "<leader>m", "<cmd>Mason<cr>", desc = icons.ui.Mason .. " Mason" },
+	{ "<leader>p", "<cmd>Telescope projects<cr>", desc = icons.ui.Project .. " Projects" },
+	{ "<leader>q", "<cmd>confirm q<CR>", desc = icons.ui.SignOut .. " Quit" },
+	{ "<leader>r", "<cmd>Telescope oldfiles<cr>", desc = icons.ui.Files .. " Recent files" },
+	{ "<leader>u", "<cmd>so<cr>", desc = icons.ui.Refresh .. " Update configs" },
+
+	{ "<leader>b", group = icons.kind.Buffer .. " Buffer" },
+	{ "<leader>bc", "<cmd>CmCloseCurrentBuffer<cr>", desc = icons.ui.Close .. " Close current buffer" },
+	{ "<leader>bC", "<cmd>CmCloseCurrentBuffer!<cr>", desc = icons.ui.CloseForce .. " Force close current buffer" },
+	{ "<leader>bo", "<cmd>CmCloseOtherBuffers<cr>", desc = icons.ui.CloseOthers .. " Close other buffers" },
+	{ "<leader>bO", "<cmd>CmCloseOtherBuffers!<cr>", desc = icons.ui.CloseOthersForce .. " Force close other buffers" },
+
+	{ "<leader>F", group = icons.kind.File .. " File" },
+	{ "<leader>Ff", "<cmd>Telescope file_history files<CR>", desc = icons.file.Files .. " Browse history files" },
+	{ "<leader>Fh", "<cmd>Telescope file_history history<CR>", desc = icons.file.History .. " History" },
+	{ "<leader>Fl", "<cmd>Telescope file_history log<CR>", desc = icons.file.Log .. " Change log" },
+
+	{ "<leader>g", group = icons.git.Git .. " Git" },
+	{ "<leader>gb", "<cmd>Telescope git_branches<cr>", desc = icons.git.Branch .. " Checkout branch" },
+	{ "<leader>gc", "<cmd>Telescope git_commits<cr>", desc = icons.git.Commits .. " Checkout commit" },
+	{ "<leader>gC", "<cmd>Telescope git_bcommits<cr>", desc = icons.git.Commit .. " Checkout commit of current file" },
+	{ "<leader>gd", "<cmd>Gitsigns diffthis HEAD<cr>", desc = icons.git.Diff .. " Git diff" },
+	{
+		"<leader>gj",
+		"<cmd>lua require 'gitsigns'.nav_hunk('next', {navigation_message = false})<cr>",
+		desc = icons.git.LineModified .. " Hunk next",
 	},
-	u = {
-		"<cmd>so<cr>",
-		icons.ui.Refresh .. " Update configs",
+	{
+		"<leader>gk",
+		"<cmd>lua require 'gitsigns'.nav_hunk('prev', {navigation_message = false})<cr>",
+		desc = icons.git.LineModifiedPreview .. " Hunk previous",
 	},
-	b = {
-		name = icons.kind.Buffer .. " Buffer",
-		c = {
-			"<cmd>:CmCloseCurrentBuffer<cr>",
-			icons.ui.Close .. " Close current buffer",
-		},
-		C = {
-			"<cmd>:CmCloseCurrentBuffer!<cr>",
-			icons.ui.CloseForce .. " Force close current buffer",
-		},
-		o = {
-			"<cmd>:CmCloseOtherBuffers<cr>",
-			icons.ui.CloseOthers .. " Close other buffers",
-		},
-		O = {
-			"<cmd>:CmCloseOtherBuffers!<cr>",
-			icons.ui.CloseOthersForce .. " Force close other buffers",
-		},
+	{ "<leader>gl", "<cmd>lua require 'gitsigns'.blame_line()<cr>", desc = icons.git.Blame .. " Blame line" },
+	{
+		"<leader>gL",
+		"<cmd>lua require 'gitsigns'.blame_line({full=true})<cr>",
+		desc = icons.git.BlameFull .. " Blame full",
 	},
-	q = {
-		"<cmd>confirm q<CR>",
-		icons.ui.SignOut .. " Quit",
+	{ "<leader>go", "<cmd>Telescope git_status<cr>", desc = icons.git.FileUnstaged .. " Open changed file" },
+	{ "<leader>gp", "<cmd>lua require 'gitsigns'.preview_hunk()<cr>", desc = icons.git.HunkPreview .. " Hunk preview" },
+	{ "<leader>gr", "<cmd>lua require 'gitsigns'.reset_hunk()<cr>", desc = icons.git.HunkReset .. " Hunk reset" },
+	{ "<leader>gR", "<cmd>lua require 'gitsigns'.reset_buffer()<cr>", desc = icons.git.BufferReset .. " Buffer reset" },
+	{ "<leader>gs", "<cmd>lua require 'gitsigns'.stage_hunk()<cr>", desc = icons.git.HunkStage .. " Hunk stage" },
+	{
+		"<leader>gu",
+		"<cmd>lua require 'gitsigns'.undo_stage_hunk()<cr>",
+		desc = icons.git.HunkUnstage .. " Hunk undo stage",
 	},
-	e = {
-		"<cmd>NvimTreeToggle<CR>",
-		icons.ui.EmptyFolderOpen .. " Explorer",
+
+	{ "<leader>l", group = icons.diagnostics.Hint .. " Code actions" },
+	{
+		"<leader>ld",
+		"<cmd>Telescope diagnostics bufnr=0 theme=get_ivy<cr>",
+		desc = icons.diagnostics.Scan .. " Document diagnostics",
 	},
-	l = {
-		name = icons.diagnostics.Hint .. " Code actions",
-		d = {
-			"<cmd>Telescope diagnostics bufnr=0 theme=get_ivy<cr>",
-			icons.diagnostics.Scan .. " Document diagnostics",
-		},
-		w = { "<cmd>Telescope diagnostics<cr>", icons.diagnostics.ScanBold .. " Workspace diagnostics" },
-		i = { "<cmd>LspInfo<cr>", icons.diagnostics.Information .. " LSP client information" },
-		j = { "<cmd>lua vim.diagnostic.goto_next()<cr>", icons.ui.ArrowCircleDown .. " Next diagnostics" },
-		k = { "<cmd>lua vim.diagnostic.goto_prev()<cr>", icons.ui.ArrowCircleUp .. " Previous diagnostics" },
-		r = { "<cmd>lua vim.lsp.buf.rename()<cr>", icons.lsp.rename .. " Rename" },
+	{ "<leader>li", "<cmd>LspInfo<cr>", desc = icons.diagnostics.Information .. " LSP client information" },
+	{ "<leader>lj", "<cmd>lua vim.diagnostic.goto_next()<cr>", desc = icons.ui.ArrowCircleDown .. " Next diagnostics" },
+	{
+		"<leader>lk",
+		"<cmd>lua vim.diagnostic.goto_prev()<cr>",
+		desc = icons.ui.ArrowCircleUp .. " Previous diagnostics",
 	},
-	F = {
-		name = icons.kind.File .. " File",
-		h = {
-			"<cmd>Telescope file_history history<CR>",
-			icons.file.History .. " History",
-		},
-		l = {
-			"<cmd>Telescope file_history log<CR>",
-			icons.file.Log .. " Change log",
-		},
-		f = {
-			"<cmd>Telescope file_history files<CR>",
-			icons.file.Files .. " Browse history files",
-		},
+	{ "<leader>lr", "<cmd>lua vim.lsp.buf.rename()<cr>", desc = icons.lsp.rename .. " Rename" },
+	{ "<leader>lw", "<cmd>Telescope diagnostics<cr>", desc = icons.diagnostics.ScanBold .. " Workspace diagnostics" },
+
+	{ "<leader>n", group = icons.ui.Notification .. " Notifications" },
+	{ "<leader>nl", "<cmd>mess<CR>", desc = icons.ui.ListUnordered .. " Log" },
+
+	{ "<leader>P", group = icons.kind.Module .. " Plugins" },
+	{ "<leader>Pc", "<cmd>Lazy clean<cr>", desc = icons.plugin.Clean .. " Clean" },
+	{ "<leader>Pd", "<cmd>Lazy debug<cr>", desc = icons.plugin.Debug .. " Debug" },
+	{ "<leader>Pi", "<cmd>Lazy install<cr>", desc = icons.plugin.Install .. " Install" },
+	{ "<leader>Pl", "<cmd>Lazy log<cr>", desc = icons.ui.List .. " Log" },
+	{ "<leader>Pp", "<cmd>Lazy profile<cr>", desc = icons.plugin.Profile .. " Profile" },
+	{ "<leader>Ps", "<cmd>Lazy sync<cr>", desc = icons.plugin.Sync .. " Sync" },
+	{ "<leader>PS", "<cmd>Lazy clear<cr>", desc = icons.plugin.Status .. " Status" },
+	{ "<leader>Pu", "<cmd>Lazy update<cr>", desc = icons.plugin.Update .. " Update" },
+
+	{ "<leader>s", group = icons.ui.Search .. " Search" },
+	{ "<leader>sc", "<cmd>Telescope colorscheme<cr>", desc = icons.kind.Color .. " Colorscheme" },
+	{ "<leader>sC", "<cmd>Telescope commands<cr>", desc = icons.ui.List .. " Commands" },
+	{ "<leader>sf", "<cmd>Telescope find_files<cr>", desc = icons.ui.Search .. " Find file" },
+	{ "<leader>sh", "<cmd>Telescope help_tags<cr>", desc = icons.ui.Help .. " Find help" },
+	{ "<leader>sH", "<cmd>Telescope highlights<cr>", desc = icons.ui.SearchList .. " Find highlight groups" },
+	{ "<leader>sk", "<cmd>Telescope keymaps<cr>", desc = icons.ui.Keymap .. " Keymaps" },
+	{ "<leader>sl", "<cmd>Telescope resume<cr>", desc = icons.ui.Resume .. " Resume last search" },
+	{ "<leader>sM", "<cmd>Telescope man_pages<cr>", desc = icons.os.Linux .. " Man pages" },
+	{
+		"<leader>sp",
+		"<cmd>lua require('telescope.builtin').colorscheme({enable_preview = true})<cr>",
+		desc = icons.kind.ColorBold .. " Colorscheme with preview",
 	},
-	n = {
-		name = icons.ui.Notification .. " Notifications",
-		l = { "<cmd>mess<CR>", icons.ui.ListUnordered .. " Log" },
-	},
-	s = {
-		name = icons.ui.Search .. " Search",
-		c = { "<cmd>Telescope colorscheme<cr>", icons.kind.Color .. " Colorscheme" },
-		f = { "<cmd>Telescope find_files<cr>", icons.ui.Search .. " Find file" },
-		h = { "<cmd>Telescope help_tags<cr>", icons.ui.Help .. " Find help" },
-		H = { "<cmd>Telescope highlights<cr>", icons.ui.SearchList .. " Find highlight groups" },
-		M = { "<cmd>Telescope man_pages<cr>", icons.os.Linux .. " Man pages" },
-		["]"] = { "<cmd>Telescope registers<cr>", icons.ui.Registers .. " Registers" },
-		t = { "<cmd>Telescope live_grep<cr>", icons.kind.Text .. " Text" },
-		k = { "<cmd>Telescope keymaps<cr>", icons.ui.Keymap .. " Keymaps" },
-		C = { "<cmd>Telescope commands<cr>", icons.ui.List .. " Commands" },
-		l = { "<cmd>Telescope resume<cr>", icons.ui.Resume .. " Resume last search" },
-		p = {
-			"<cmd>lua require('telescope.builtin').colorscheme({enable_preview = true})<cr>",
-			icons.kind.ColorBold .. " Colorscheme with preview",
-		},
-		u = {
-			function()
-				require("grug-far").open({
-					transient = true,
-				})
-			end,
-			icons.search.Gui .. " Open grug UI",
-		},
-		w = {
-			function()
-				require("grug-far").open({
-					prefills = {
-						paths = vim.fn.expand("%"),
-						search = vim.fn.expand("<cword>"),
-					},
-					transient = true,
-				})
-			end,
-			icons.search.SearchCurrent .. " Search word under cursor in current file",
-		},
-		W = {
-			function()
-				require("grug-far").open({
-					prefills = {
-						search = vim.fn.expand("<cword>"),
-					},
-					transient = true,
-				})
-			end,
-			icons.search.SearchGlobal .. " Search word under cursor",
-		},
-		r = {
-			function()
-				require("grug-far").open({
-					prefills = {
-						paths = vim.fn.expand("%"),
-						search = vim.fn.expand("<cword>"),
-					},
-					transient = true,
-					replace = "",
-				})
-			end,
-			icons.search.ReplaceCurrent .. " Replace word under cursor in current file",
-		},
-		R = {
-			function()
-				require("grug-far").open({
-					prefills = { search = vim.fn.expand("<cword>") },
-					transient = true,
-					replace = "",
-				})
-			end,
-			icons.search.ReplaceGlobal .. " Replace word under cursor",
-		},
-	},
-	g = {
-		name = icons.git.Git .. " Git",
-		j = {
-			"<cmd>lua require 'gitsigns'.nav_hunk('next', {navigation_message = false})<cr>",
-			icons.git.LineModified .. " Hunk next",
-		},
-		k = {
-			"<cmd>lua require 'gitsigns'.nav_hunk('prev', {navigation_message = false})<cr>",
-			icons.git.LineModifiedPreview .. " Hunk previous",
-		},
-		l = { "<cmd>lua require 'gitsigns'.blame_line()<cr>", icons.git.Blame .. " Blame line" },
-		L = { "<cmd>lua require 'gitsigns'.blame_line({full=true})<cr>", icons.git.BlameFull .. " Blame full" },
-		p = { "<cmd>lua require 'gitsigns'.preview_hunk()<cr>", icons.git.HunkPreview .. " Hunk preview" },
-		r = { "<cmd>lua require 'gitsigns'.reset_hunk()<cr>", icons.git.HunkReset .. " Hunk reset" },
-		R = { "<cmd>lua require 'gitsigns'.reset_buffer()<cr>", icons.git.BufferReset .. " Buffer reset" },
-		s = { "<cmd>lua require 'gitsigns'.stage_hunk()<cr>", icons.git.HunkStage .. " Hunk stage" },
-		u = { "<cmd>lua require 'gitsigns'.undo_stage_hunk()<cr>", icons.git.HunkUnstage .. " Hunk undo stage" },
-		o = { "<cmd>Telescope git_status<cr>", icons.git.FileUnstaged .. " Open changed file" },
-		b = { "<cmd>Telescope git_branches<cr>", icons.git.Branch .. " Checkout branch" },
-		c = { "<cmd>Telescope git_commits<cr>", icons.git.Commits .. " Checkout commit" },
-		C = { "<cmd>Telescope git_bcommits<cr>", icons.git.Commit .. " Checkout commit of current file" },
-		d = { "<cmd>Gitsigns diffthis HEAD<cr>", icons.git.Diff .. " Git diff" },
-	},
-	["/"] = {
-		"<Plug>(comment_toggle_linewise_current)",
-		icons.ui.CommentCode .. " Comment current line",
-	},
-	P = {
-		name = icons.kind.Module .. " Plugins",
-		i = { "<cmd>Lazy install<cr>", icons.plugin.Install .. " Install" },
-		s = { "<cmd>Lazy sync<cr>", icons.plugin.Sync .. " Sync" },
-		S = { "<cmd>Lazy clear<cr>", icons.plugin.Status .. " Status" },
-		c = { "<cmd>Lazy clean<cr>", icons.plugin.Clean .. " Clean" },
-		u = { "<cmd>Lazy update<cr>", icons.plugin.Update .. " Update" },
-		p = { "<cmd>Lazy profile<cr>", icons.plugin.Profile .. " Profile" },
-		l = { "<cmd>Lazy log<cr>", icons.ui.List .. " Log" },
-		d = { "<cmd>Lazy debug<cr>", icons.plugin.Debug .. " Debug" },
-	},
-	p = {
-		"<cmd>Telescope projects<cr>",
-		icons.ui.Project .. " Projects",
-	},
-	r = {
-		"<cmd>Telescope oldfiles<cr>",
-		icons.ui.Files .. " Recent files",
-	},
-	m = {
-		"<cmd>Mason<cr>",
-		icons.ui.Mason .. " Mason",
-	},
-}, {
-	prefix = "<leader>",
-	mode = "n",
+	{ "<leader>st", "<cmd>Telescope live_grep<cr>", desc = icons.kind.Text .. " Text" },
+	{ "<leader>su", grug_ui, desc = icons.search.Gui .. " Open grug UI" },
+	{ "<leader>s]", "<cmd>Telescope registers<cr>", desc = icons.ui.Registers .. " Registers" },
 })
 
-which_key.register({
-	["/"] = {
-		"<Plug>(comment_toggle_linewise_visual)",
-		icons.ui.CommentCode .. " Comment",
+-- ---------------------------------------------------------------------------
+-- grug-far search/replace, identical keys in normal and visual mode
+-- ---------------------------------------------------------------------------
+which_key.add({
+	mode = { "n", "v" },
+	{ "<leader>s", group = icons.ui.Search .. " Search" },
+	{
+		"<leader>sr",
+		grug_word("file", true),
+		desc = icons.search.ReplaceCurrent .. " Replace word under cursor in current file",
 	},
-	f = {
-		name = icons.ui.FindFile .. " Find/Replace",
-		s = {
-			function()
-				require("grug-far").with_visual_selection({
-					prefills = { paths = vim.fn.expand("%") },
-					transient = true,
-				})
-			end,
-			"Search selection in current file",
-		},
-		S = {
-			function()
-				require("grug-far").with_visual_selection({
-					transient = true,
-				})
-			end,
-			"Search selection globally",
-		},
+	{ "<leader>sR", grug_word("global", true), desc = icons.search.ReplaceGlobal .. " Replace word under cursor" },
+	{
+		"<leader>sw",
+		grug_word("file", false),
+		desc = icons.search.SearchCurrent .. " Search word under cursor in current file",
 	},
-	s = {
-		name = icons.ui.Search .. " Search",
-		w = {
-			function()
-				require("grug-far").open({
-					prefills = {
-						paths = vim.fn.expand("%"),
-						search = vim.fn.expand("<cword>"),
-					},
-					transient = true,
-				})
-			end,
-			icons.search.SearchCurrent .. " Search word under cursor in current file",
-		},
-		W = {
-			function()
-				require("grug-far").open({
-					prefills = {
-						search = vim.fn.expand("<cword>"),
-					},
-					transient = true,
-				})
-			end,
-			icons.search.SearchGlobal .. " Search word under cursor",
-		},
-		r = {
-			function()
-				require("grug-far").open({
-					prefills = {
-						paths = vim.fn.expand("%"),
-						search = vim.fn.expand("<cword>"),
-					},
-					transient = true,
-					replace = "",
-				})
-			end,
-			icons.search.ReplaceCurrent .. " Replace word under cursor in current file",
-		},
-		R = {
-			function()
-				require("grug-far").open({
-					prefills = { search = vim.fn.expand("<cword>") },
-					transient = true,
-					replace = "",
-				})
-			end,
-			icons.search.ReplaceGlobal .. " Replace word under cursor",
-		},
-	},
-}, {
-	prefix = "<leader>",
-	mode = { "v" },
+	{ "<leader>sW", grug_word("global", false), desc = icons.search.SearchGlobal .. " Search word under cursor" },
 })
 
-local ai_mappings = {
-	name = "AI [" .. ai.get_provider_label(ai.get_runtime_provider()) .. "]",
-	s = { ai.show_status, "Status" },
-	e = { ai.edit_local_properties, "Edit local properties" },
-	c = {
+-- ---------------------------------------------------------------------------
+-- Visual mode
+-- ---------------------------------------------------------------------------
+which_key.add({
+	mode = "v",
+	{ "<leader>/", "<Plug>(comment_toggle_linewise_visual)", desc = icons.ui.CommentCode .. " Comment" },
+	{ "<leader>f", group = icons.ui.FindFile .. " Find/Replace" },
+	{ "<leader>fs", grug_selection("file"), desc = "Search selection in current file" },
+	{ "<leader>fS", grug_selection("global"), desc = "Search selection globally" },
+})
+
+-- ---------------------------------------------------------------------------
+-- Shared between normal and visual mode
+-- ---------------------------------------------------------------------------
+which_key.add({
+	mode = { "n", "v" },
+	{ "<leader>l", group = icons.diagnostics.Hint .. " Code actions" },
+	{ "<leader>la", "<cmd>lua vim.lsp.buf.code_action()<cr>", desc = icons.code.Refactor .. " Action" },
+	{ "<leader>lf", "<cmd>CmFormat<cr>", desc = icons.code.Format .. " Format" },
+
+	-- The group label reports the provider that is live in this session.
+	{ "<leader>A", group = "AI [" .. ai.get_provider_label(ai.get_runtime_provider()) .. "]" },
+	{
+		"<leader>Ac",
 		function()
 			ai.select_provider(ai.providers.COPILOT)
 		end,
-		"Use Copilot on next start",
+		desc = "Use Copilot on next start",
 	},
-	t = {
-		function()
-			ai.select_provider(ai.providers.TABBY)
-		end,
-		"Use Tabby on next start",
-	},
-	d = {
+	{
+		"<leader>Ad",
 		function()
 			ai.select_provider(ai.providers.NONE)
 		end,
-		"Disable AI on next start",
+		desc = "Disable AI on next start",
 	},
-}
-
-if ai.is(ai.providers.COPILOT) then
-	ai_mappings.p = { "<cmd>Copilot panel<CR>", icons.copilot.Panel .. " Panel" }
-end
-
-which_key.register({
-	A = ai_mappings,
-	l = {
-		name = icons.diagnostics.Hint .. " Code actions",
-		a = { "<cmd>lua vim.lsp.buf.code_action()<cr>", icons.code.Refactor .. " Action" },
-		f = { "<cmd>CmFormat<cr>", icons.code.Format .. " Format" },
+	{ "<leader>Ae", ai.edit_local_properties, desc = "Edit local properties" },
+	{ "<leader>As", ai.show_status, desc = "Status" },
+	{
+		"<leader>At",
+		function()
+			ai.select_provider(ai.providers.TABBY)
+		end,
+		desc = "Use Tabby on next start",
 	},
-}, {
-	prefix = "<leader>",
-	mode = { "n", "v" },
+	-- v2 built this entry conditionally at load time; `cond` lets which-key
+	-- re-evaluate it instead, so the entry follows the active provider.
+	{
+		"<leader>Ap",
+		"<cmd>Copilot panel<CR>",
+		desc = icons.copilot.Panel .. " Panel",
+		cond = function()
+			return ai.is(ai.providers.COPILOT)
+		end,
+	},
 })

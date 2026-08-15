@@ -269,7 +269,7 @@ return {
 	{
 		"folke/which-key.nvim",
 		event = "VeryLazy",
-		version = "v2.1.0",
+		version = "^3",
 		init = function()
 			vim.o.timeout = true
 			vim.o.timeoutlen = 300

@@ -14,100 +14,142 @@ end
 
 local icons = require("io.github.israiloff.config.icons")
 
-which_key.register({
-	j = {
-		name = icons.ui.Java .. " Java",
-		o = { "<Cmd>lua require('jdtls').organize_imports()<CR>", icons.java.OptimizeCode .. " Organize imports" },
-		V = { "<Cmd>lua require('jdtls').extract_variable_all()<CR>", icons.java.Variable .. " Extract variable" },
-		C = { "<Cmd>lua require('jdtls').extract_constant()<CR>", icons.java.Constant .. " Extract constant" },
-		M = { "<Cmd>lua require('jdtls').extract_method(true)<CR>", icons.java.Method .. " Extract method" },
-		u = { "<Cmd>lua require('jdtls').update_projects_config()<CR>", icons.java.UpdateConfig .. " Update config" },
-		c = { "<Cmd>lua require('jdtls').compile()<CR>", icons.java.Compile .. " Compile" },
-		r = { "<Cmd>lua require('jdtls').build_projects()<CR>", icons.java.Build .. " Rebuild" },
-		d = {
-			name = icons.ui.DebugConsole .. " Debug",
-			t = { "<cmd>lua require'dap'.toggle_breakpoint()<cr>", icons.java.Bug .. " Toggle breakpoint" },
-			b = { "<cmd>lua require'dap'.step_back()<cr>", icons.java.StepBack .. " Step back" },
-			c = { "<cmd>lua require'dap'.continue()<cr>", icons.java.Continue .. " Continue" },
-			a = { "<cmd>lua require'dap'.continue()<cr>", icons.java.Attach .. " Attach (select config)" },
-			C = { "<cmd>lua require'dap'.run_to_cursor()<cr>", icons.java.RunToCursor .. " Run to cursor" },
-			d = { "<cmd>lua require'dap'.disconnect()<cr>", icons.java.Disconnect .. " Disconnect" },
-			g = { "<cmd>lua require'dap'.session()<cr>", icons.java.GetSession .. " Get session" },
-			i = { "<cmd>lua require'dap'.step_into()<cr>", icons.java.StepInto .. " Step into" },
-			o = { "<cmd>lua require'dap'.step_over()<cr>", icons.java.StepOver .. " Step over" },
-			u = { "<cmd>lua require'dap'.step_out()<cr>", icons.java.StepOut .. " Step out" },
-			p = { "<cmd>lua require'dap'.pause()<cr>", icons.java.Pause .. " Pause" },
-			r = { "<cmd>lua require'dap'.repl.toggle()<cr>", icons.java.ToggleRepl .. " Toggle repl" },
-			s = { "<cmd>lua require'dap'.continue()<cr>", icons.java.Start .. " Start" },
-			q = { "<cmd>lua require'dap'.close()<cr>", icons.java.Close .. " Quit" },
-			U = { "<cmd>lua require'dapui'.toggle({reset = true})<cr>", icons.java.BugFix .. " Toggle DAP UI" },
-		},
-
-		t = {
-			name = icons.code.Tests .. " Test",
-			m = { "<Cmd>lua require('jdtls').test_nearest_method()<CR>", icons.java.MethodTest .. " Run test method" },
-			c = { "<Cmd>lua require('jdtls').test_class()<CR>", icons.java.ClassTest .. " Run test class" },
-			u = { "<Cmd>lua require('dapui').toggle({reset = true})<CR>", icons.java.DebugUI .. " Toggle DAP UI" },
-		},
-
-		m = {
-			name = icons.maven.Logo .. " Maven",
-			r = {
-				"<cmd>lua exec_in_terminal_horizontal('mvn clean -U dependency:resolve')<CR>",
-				icons.maven.Refresh .. " Refresh dependencies",
-			},
-			p = {
-				"<cmd>lua vim.cmd('silent !rm -rf target') vim.cmd('lua exec_in_terminal_horizontal(\"mvn package\")')<CR>",
-				icons.maven.Package .. " Package",
-			},
-			i = {
-				"<cmd>lua vim.cmd('silent !rm -rf target') vim.cmd('lua exec_in_terminal_horizontal(\"mvn install\")')<CR>",
-				icons.maven.Install .. " Install",
-			},
-			d = {
-				"<cmd>lua vim.cmd('silent !rm -rf target') vim.cmd('lua exec_in_terminal_horizontal(\"mvn deploy\")')<CR>",
-				icons.maven.Deploy .. " Deploy",
-			},
-			t = {
-				"<cmd>lua vim.cmd('silent !rm -rf target') vim.cmd('lua exec_in_terminal_horizontal(\"mvn test\")')<CR>",
-				icons.maven.Test .. " Test",
-			},
-			e = {
-				"<cmd>lua exec_in_terminal_horizontal('mvn dependency:purge-local-repository')<CR>",
-				icons.maven.Purge .. " Purge local repository",
-			},
-			P = {
-				"<cmd>lua vim.cmd('silent !rm -rf target') vim.cmd('lua exec_in_terminal_horizontal(\"mvn package -DskipTests\")')<CR>",
-				icons.maven.PackageSkipTests .. " Package (skip tests)",
-			},
-			c = {
-				"<cmd>lua vim.cmd('silent !rm -rf target') vim.cmd('lua exec_in_terminal_horizontal(\"mvn compile\")')<CR>",
-				icons.maven.Compile .. " Compile",
-			},
-			C = {
-				"<cmd>lua exec_in_terminal_horizontal('mvn clean')<CR>",
-				icons.maven.Clean .. " Clean",
-			},
-		},
-
-		g = {
-			name = icons.gradle.Logo .. " Gradle",
-			t = { "<cmd>lua exec_in_terminal_horizontal('./gradlew test')<CR>", icons.gradle.Test .. " Test" },
-			b = { "<cmd>lua exec_in_terminal_horizontal('./gradlew build')<CR>", icons.gradle.Build .. " Build" },
-			c = { "<cmd>lua exec_in_terminal_horizontal('./gradlew clean')<CR>", icons.gradle.Clean .. " Clean" },
-			r = {
-				"<cmd>lua exec_in_terminal_horizontal('./gradlew --refresh-dependencies')<CR>",
-				icons.gradle.Refresh .. " Refresh deps",
-			},
-		},
+-- ---------------------------------------------------------------------------
+-- Normal mode
+-- ---------------------------------------------------------------------------
+which_key.add({
+	{ "<leader>j", group = icons.ui.Java .. " Java" },
+	{ "<leader>jc", "<Cmd>lua require('jdtls').compile()<CR>", desc = icons.java.Compile .. " Compile" },
+	{ "<leader>jC", "<Cmd>lua require('jdtls').extract_constant()<CR>", desc = icons.java.Constant .. " Extract constant" },
+	{ "<leader>jM", "<Cmd>lua require('jdtls').extract_method(true)<CR>", desc = icons.java.Method .. " Extract method" },
+	{ "<leader>jo", "<Cmd>lua require('jdtls').organize_imports()<CR>", desc = icons.java.OptimizeCode .. " Organize imports" },
+	{ "<leader>jr", "<Cmd>lua require('jdtls').build_projects()<CR>", desc = icons.java.Build .. " Rebuild" },
+	{ "<leader>ju", "<Cmd>lua require('jdtls').update_projects_config()<CR>", desc = icons.java.UpdateConfig .. " Update config" },
+	{
+		"<leader>jV",
+		"<Cmd>lua require('jdtls').extract_variable_all()<CR>",
+		desc = icons.java.Variable .. " Extract variable",
 	},
-}, { prefix = "<leader>", mode = "n" })
 
-which_key.register({
-	j = {
-		name = icons.ui.Java .. " Java",
-		V = { "<Esc><Cmd>lua require('jdtls').extract_variable(true)<CR>", icons.java.Variable .. " Extract variable" },
-		C = { "<Esc><Cmd>lua require('jdtls').extract_constant(true)<CR>", icons.java.Constant .. " Extract constant" },
-		M = { "<Esc><Cmd>lua require('jdtls').extract_method(true)<CR>", icons.java.Method .. " Extract method" },
+	{ "<leader>jd", group = icons.ui.DebugConsole .. " Debug" },
+	{ "<leader>jda", "<cmd>lua require'dap'.continue()<cr>", desc = icons.java.Attach .. " Attach (select config)" },
+	{ "<leader>jdb", "<cmd>lua require'dap'.step_back()<cr>", desc = icons.java.StepBack .. " Step back" },
+	{ "<leader>jdc", "<cmd>lua require'dap'.continue()<cr>", desc = icons.java.Continue .. " Continue" },
+	{ "<leader>jdC", "<cmd>lua require'dap'.run_to_cursor()<cr>", desc = icons.java.RunToCursor .. " Run to cursor" },
+	{ "<leader>jdd", "<cmd>lua require'dap'.disconnect()<cr>", desc = icons.java.Disconnect .. " Disconnect" },
+	{ "<leader>jdg", "<cmd>lua require'dap'.session()<cr>", desc = icons.java.GetSession .. " Get session" },
+	{ "<leader>jdi", "<cmd>lua require'dap'.step_into()<cr>", desc = icons.java.StepInto .. " Step into" },
+	{ "<leader>jdo", "<cmd>lua require'dap'.step_over()<cr>", desc = icons.java.StepOver .. " Step over" },
+	{ "<leader>jdp", "<cmd>lua require'dap'.pause()<cr>", desc = icons.java.Pause .. " Pause" },
+	{ "<leader>jdq", "<cmd>lua require'dap'.close()<cr>", desc = icons.java.Close .. " Quit" },
+	{ "<leader>jdr", "<cmd>lua require'dap'.repl.toggle()<cr>", desc = icons.java.ToggleRepl .. " Toggle repl" },
+	{ "<leader>jds", "<cmd>lua require'dap'.continue()<cr>", desc = icons.java.Start .. " Start" },
+	{ "<leader>jdt", "<cmd>lua require'dap'.toggle_breakpoint()<cr>", desc = icons.java.Bug .. " Toggle breakpoint" },
+	{ "<leader>jdu", "<cmd>lua require'dap'.step_out()<cr>", desc = icons.java.StepOut .. " Step out" },
+	{
+		"<leader>jdU",
+		"<cmd>lua require'dapui'.toggle({reset = true})<cr>",
+		desc = icons.java.BugFix .. " Toggle DAP UI",
 	},
-}, { prefix = "<leader>", mode = "v" })
+
+	{ "<leader>jt", group = icons.code.Tests .. " Test" },
+	{ "<leader>jtc", "<Cmd>lua require('jdtls').test_class()<CR>", desc = icons.java.ClassTest .. " Run test class" },
+	{
+		"<leader>jtm",
+		"<Cmd>lua require('jdtls').test_nearest_method()<CR>",
+		desc = icons.java.MethodTest .. " Run test method",
+	},
+	{
+		"<leader>jtu",
+		"<Cmd>lua require('dapui').toggle({reset = true})<CR>",
+		desc = icons.java.DebugUI .. " Toggle DAP UI",
+	},
+
+	{ "<leader>jm", group = icons.maven.Logo .. " Maven" },
+	{ "<leader>jmC", "<cmd>lua exec_in_terminal_horizontal('mvn clean')<CR>", desc = icons.maven.Clean .. " Clean" },
+	{
+		"<leader>jmc",
+		"<cmd>lua vim.cmd('silent !rm -rf target') vim.cmd('lua exec_in_terminal_horizontal(\"mvn compile\")')<CR>",
+		desc = icons.maven.Compile .. " Compile",
+	},
+	{
+		"<leader>jmd",
+		"<cmd>lua vim.cmd('silent !rm -rf target') vim.cmd('lua exec_in_terminal_horizontal(\"mvn deploy\")')<CR>",
+		desc = icons.maven.Deploy .. " Deploy",
+	},
+	{
+		"<leader>jme",
+		"<cmd>lua exec_in_terminal_horizontal('mvn dependency:purge-local-repository')<CR>",
+		desc = icons.maven.Purge .. " Purge local repository",
+	},
+	{
+		"<leader>jmi",
+		"<cmd>lua vim.cmd('silent !rm -rf target') vim.cmd('lua exec_in_terminal_horizontal(\"mvn install\")')<CR>",
+		desc = icons.maven.Install .. " Install",
+	},
+	{
+		"<leader>jmp",
+		"<cmd>lua vim.cmd('silent !rm -rf target') vim.cmd('lua exec_in_terminal_horizontal(\"mvn package\")')<CR>",
+		desc = icons.maven.Package .. " Package",
+	},
+	{
+		"<leader>jmP",
+		"<cmd>lua vim.cmd('silent !rm -rf target') vim.cmd('lua exec_in_terminal_horizontal(\"mvn package -DskipTests\")')<CR>",
+		desc = icons.maven.PackageSkipTests .. " Package (skip tests)",
+	},
+	{
+		"<leader>jmr",
+		"<cmd>lua exec_in_terminal_horizontal('mvn clean -U dependency:resolve')<CR>",
+		desc = icons.maven.Refresh .. " Refresh dependencies",
+	},
+	{
+		"<leader>jmt",
+		"<cmd>lua vim.cmd('silent !rm -rf target') vim.cmd('lua exec_in_terminal_horizontal(\"mvn test\")')<CR>",
+		desc = icons.maven.Test .. " Test",
+	},
+
+	{ "<leader>jg", group = icons.gradle.Logo .. " Gradle" },
+	{
+		"<leader>jgb",
+		"<cmd>lua exec_in_terminal_horizontal('./gradlew build')<CR>",
+		desc = icons.gradle.Build .. " Build",
+	},
+	{
+		"<leader>jgc",
+		"<cmd>lua exec_in_terminal_horizontal('./gradlew clean')<CR>",
+		desc = icons.gradle.Clean .. " Clean",
+	},
+	{
+		"<leader>jgr",
+		"<cmd>lua exec_in_terminal_horizontal('./gradlew --refresh-dependencies')<CR>",
+		desc = icons.gradle.Refresh .. " Refresh deps",
+	},
+	{
+		"<leader>jgt",
+		"<cmd>lua exec_in_terminal_horizontal('./gradlew test')<CR>",
+		desc = icons.gradle.Test .. " Test",
+	},
+})
+
+-- ---------------------------------------------------------------------------
+-- Visual mode
+-- ---------------------------------------------------------------------------
+which_key.add({
+	mode = "v",
+	{ "<leader>j", group = icons.ui.Java .. " Java" },
+	{
+		"<leader>jC",
+		"<Esc><Cmd>lua require('jdtls').extract_constant(true)<CR>",
+		desc = icons.java.Constant .. " Extract constant",
+	},
+	{
+		"<leader>jM",
+		"<Esc><Cmd>lua require('jdtls').extract_method(true)<CR>",
+		desc = icons.java.Method .. " Extract method",
+	},
+	{
+		"<leader>jV",
+		"<Esc><Cmd>lua require('jdtls').extract_variable(true)<CR>",
+		desc = icons.java.Variable .. " Extract variable",
+	},
+})
