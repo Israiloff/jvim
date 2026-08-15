@@ -56,10 +56,17 @@ local winbar_filetype_exclude = {
 	"",
 }
 
-M = {}
+local M = {}
 
 function M.attach(client, bufnr)
 	navic.attach(client, bufnr)
+end
+
+-- The winbar is rebuilt on every CursorHold, so the `Winbar` highlight is derived
+-- once here (and again whenever the colorscheme changes) instead of on every redraw.
+local function sync_winbar_highlight()
+	local normal_hl = vim.api.nvim_get_hl(0, { name = "Normal" })
+	vim.api.nvim_set_hl(0, "Winbar", { fg = normal_hl.fg })
 end
 
 local function get_filename()
@@ -100,9 +107,6 @@ local function get_filename()
 		if buf_ft == "dapui_watches" then
 			file_icon = icons.ui.Watches
 		end
-
-		local navic_text_hl = vim.api.nvim_get_hl(0, { name = "Normal" })
-		vim.api.nvim_set_hl(0, "Winbar", { fg = navic_text_hl.fg })
 
 		return " " .. "%#" .. hl_group .. "#" .. file_icon .. "%*" .. " " .. "%#Winbar#" .. filename .. "%*"
 	end
@@ -180,8 +184,15 @@ local function get_winbar()
 	log.debug(logger_name, "winbar successfully set")
 end
 
-function CREATE_WINBAR()
+local function create_winbar()
 	vim.api.nvim_create_augroup("_winbar", {})
+
+	sync_winbar_highlight()
+	vim.api.nvim_create_autocmd("ColorScheme", {
+		group = "_winbar",
+		callback = sync_winbar_highlight,
+	})
+
 	vim.api.nvim_create_autocmd({
 		"CursorHoldI",
 		"CursorHold",
@@ -202,19 +213,14 @@ function CREATE_WINBAR()
 	})
 end
 
-function SETUP_LANGUAGE_SERVERS()
-	vim.lsp.config("*", {
-		on_attach = function(client, bufnr)
-			if client.server_capabilities.documentSymbolProvider then
-				navic.attach(client, bufnr)
-			end
-		end,
-	})
-end
+-- NOTE: navic is attached from `lsp-utils.global_on_attach`, which is wired into
+-- `vim.lsp.config("*")` in `config/mason-lspconfig.lua`. This module used to install
+-- a second `vim.lsp.config("*", { on_attach = ... })`; since Neovim force-merges
+-- wildcard configs, whichever ran last silently replaced the other one's on_attach.
 
 ---@diagnostic disable-next-line: duplicate-set-field
 function M.setup()
-	CREATE_WINBAR()
+	create_winbar()
 
 	navic.setup({
 		icons = {
@@ -225,7 +231,7 @@ function M.setup()
 			Constant = icons.kind.Constant .. " ",
 			Constructor = icons.kind.Constructor .. " ",
 			Enum = icons.kind.Enum .. " ",
-			Enummber = icons.kind.EnumMember .. " ",
+			EnumMember = icons.kind.EnumMember .. " ",
 			Event = icons.kind.Event .. " ",
 			Field = icons.kind.Field .. " ",
 			File = icons.kind.File .. " ",
@@ -234,8 +240,8 @@ function M.setup()
 			Interface = icons.kind.Interface .. " ",
 			Key = icons.kind.Key .. " ",
 			Keyword = icons.kind.Keyword .. " ",
-			thod = icons.kind.Method .. " ",
-			dule = icons.kind.Module .. " ",
+			Method = icons.kind.Method .. " ",
+			Module = icons.kind.Module .. " ",
 			Namespace = icons.kind.Namespace .. " ",
 			Null = icons.kind.Null .. " ",
 			Number = icons.kind.Number .. " ",
@@ -258,8 +264,6 @@ function M.setup()
 		depth_limit = 0,
 		depth_limit_indicator = "..",
 	})
-
-	SETUP_LANGUAGE_SERVERS()
 end
 
 return M

@@ -8,6 +8,6 @@ end
 local dap_status, _ = pcall(require, "dap")
 
 if not dap_status then
-	log.error("'nvim.dap' not found")
+	log.error("io.github.israiloff.config.nvim-dap", "'nvim-dap' not found")
 	return
 end

@@ -1,22 +1,43 @@
 local icons = require("io.github.israiloff.config.icons")
 local ai = require("io.github.israiloff.config.ai")
-local null_ls = require("null-ls")
-local null_ls_sources = require("null-ls.sources")
+
+-- nvim-tree and none-ls are resolved lazily: requiring them at the top level made
+-- loading the statusline pull both plugins in at startup, which defeats their own
+-- lazy-loading triggers.
+--
+-- `package.loaded` is checked first on purpose — under lazy.nvim even a
+-- `pcall(require, ...)` triggers the plugin's loader, so probing with `require`
+-- alone would still force nvim-tree to load just to draw the statusline.
+local function nvim_tree_view()
+	return package.loaded["nvim-tree.view"]
+end
 
 ---@diagnostic disable: param-type-mismatch
 local nvim_tree_shift = {
 	function()
-		local len = vim.api.nvim_win_get_width(require("nvim-tree.view").get_winnr()) - 1
+		local view = nvim_tree_view()
+		if not view then
+			return ""
+		end
+		local len = vim.api.nvim_win_get_width(view.get_winnr()) - 1
 		local title = "Nvim-Tree"
 		local left = (len - #title) / 2
 		local right = len - left - #title
 		return string.rep(" ", left) .. title .. string.rep(" ", right)
 	end,
-	cond = require("nvim-tree.view").is_visible,
+	cond = function()
+		local view = nvim_tree_view()
+		return view ~= nil and view.is_visible()
+	end,
 	color = "Normal",
 }
 
 local function get_providers(filetype)
+	local null_ls_sources = package.loaded["null-ls.sources"]
+	if not null_ls_sources then
+		return {}
+	end
+
 	local available_sources = null_ls_sources.get_available(filetype)
 	local registered = {}
 	for _, source in ipairs(available_sources) do
@@ -28,7 +49,21 @@ local function get_providers(filetype)
 	return registered
 end
 
+local function get_registered_formatters(filetype)
+	local null_ls = package.loaded["null-ls"]
+	if not null_ls then
+		return {}
+	end
+
+	return get_providers(filetype)[null_ls.methods.FORMATTING] or {}
+end
+
 local function get_registered_linters(filetype)
+	local null_ls = package.loaded["null-ls"]
+	if not null_ls then
+		return {}
+	end
+
 	return vim.iter(vim.tbl_map(function(m)
 		return get_providers(filetype)[m] or {}
 	end, {
@@ -139,7 +174,7 @@ require("lualine").setup({
 						end
 					end
 
-					vim.list_extend(buf_client_names, get_providers(buf_ft)[null_ls.methods.FORMATTING] or {})
+					vim.list_extend(buf_client_names, get_registered_formatters(buf_ft))
 					vim.list_extend(buf_client_names, get_registered_linters(buf_ft))
 
 					for i, name in ipairs(buf_client_names) do

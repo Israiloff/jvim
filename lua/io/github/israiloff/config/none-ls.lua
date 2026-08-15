@@ -30,11 +30,13 @@ null_ls.setup({
         formatting.prettier.with({
             extra_args = function(params)
                 if params.filetype == "ruby" then
-                    return { "--config", "--plugin=@prettier/plugin-ruby" }
+                    return { "--plugin=@prettier/plugin-ruby" }
                 end
 
+                -- NOTE: `--config` takes a path argument. It used to be passed with
+                -- `--arrow-parens` as its value, which made prettier either bail out
+                -- or silently ignore the flags that followed.
                 return {
-                    "--config",
                     "--arrow-parens",
                     "avoid",
                 }

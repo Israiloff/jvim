@@ -1,5 +1,5 @@
--- common
-vim.g.mapleader = " "
+-- NOTE: `mapleader` is set in config/startup.lua so that it is in place before
+-- lazy.nvim loads any plugin that defines <leader> mappings.
 
 -- window
 vim.keymap.set("n", "<C-h>", "<C-w>h")
@@ -14,7 +14,10 @@ vim.keymap.set("n", "<M-h>", "<Cmd>BufferLineCyclePrev<CR>", { desc = "Previous 
 vim.keymap.set("n", "˙", "<Cmd>BufferLineCyclePrev<CR>", { desc = "Previous buffer" })                          -- Option + h
 
 -- LSP mappings
-vim.keymap.set("n", "gr", vim.lsp.buf.references, { desc = "Goto references", expr = true, silent = true })
+--
+-- NOTE: `gr` is deliberately NOT mapped. Neovim 0.11 ships `grr` (references),
+-- `grn` (rename), `gra` (code action) and `gri` (implementation) by default;
+-- mapping bare `gr` makes all of them wait out 'timeoutlen' before firing.
 vim.keymap.set("n", "gD", vim.lsp.buf.declaration, { desc = "Go to declaration" })
 vim.keymap.set("n", "gd", vim.lsp.buf.definition, { desc = "Go to definition" })
 vim.keymap.set("n", "gi", vim.lsp.buf.implementation, { desc = "Go to implementation" })
