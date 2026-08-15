@@ -8,11 +8,10 @@
 - [Introduction](#introduction)
 - [Requirements](#requirements)
 - [Installation](#installation)
-- [Docker Container](#docker-container)
-- [Core Plugins](#core-plugins)
 - [Configuration](#configuration)
-- [Key Mappings](#key-mappings)
-- [Features in Detail](#features-in-detail)
+- [AI Completion](#ai-completion)
+- [Docker Container](#docker-container)
+- [Features](#features)
 - [Troubleshooting](#troubleshooting)
 - [Gallery](#gallery)
 - [Contributing](#contributing)
@@ -20,20 +19,21 @@
 
 ## Introduction
 
-**JVIM** is a comprehensive, production-ready Neovim configuration specifically optimized for Java development. Built with modern development workflows in mind, it provides a complete IDE experience with advanced LSP support, debugging capabilities, intelligent code completion, and a rich plugin ecosystem.
+**JVIM** is a Neovim configuration built around Java development. It wires JDTLS,
+debugging, testing and build-tool integration into a single setup that behaves
+like an IDE, without giving up Neovim's startup time or keyboard-driven flow.
 
 ### Key Features
 
-- 🚀 **Full Java Development Suite**: JDTLS integration with debugging, testing, and refactoring
-- 🎨 **Modern UI**: Beautiful interface with custom Java colorscheme, statusline, and buffer management
-- 🔍 **Powerful Search**: Telescope fuzzy finder with file history and live grep
-- 🔄 **Git Integration**: Gitsigns for hunks, lazygit integration, and comprehensive git operations
-- 🤖 **AI-Powered**: GitHub Copilot and ChatGPT-4 support for intelligent code assistance
-- 📝 **Enhanced Editing**: Auto-save, smart commenting, snippets, and format-on-save
-- 🐛 **Advanced Debugging**: Full DAP (Debug Adapter Protocol) support with UI
-- 🔧 **LSP Excellence**: Multiple language server support with Mason package manager
-- 📦 **Plugin Management**: Lazy.nvim for fast, declarative plugin management
-- 🎯 **Efficient Navigation**: Which-key menu system, nvim-tree explorer, and quick jumps
+- 🚀 **Java, end to end** — JDTLS with debugging, tests, refactoring, and Maven/Gradle tasks
+- ⚡ **Fast startup** — every plugin loads on demand; `nvim --startuptime` reports roughly 40 ms
+- 👁 **Visible activity** — plugin loads and LSP progress are reported, so long operations are never silent
+- 🤖 **Switchable AI completion** — GitHub Copilot or self-hosted Tabby, changed without editing code
+- 🔍 **Search and replace** — Telescope for navigation, grug-far for project-wide replace, plus per-file history
+- 🐛 **Full DAP debugging** — breakpoints, stepping, watches, and remote JVM attach
+- 🔧 **Managed toolchain** — Mason installs language servers, formatters and debug adapters
+- 🎨 **Darcula UI** — JetBrains-inspired colorscheme, breadcrumbs, statusline and buffer bar
+- 🎯 **Discoverable keys** — every binding lives in a which-key menu instead of a cheatsheet
 
 ---
 
@@ -41,20 +41,20 @@
 
 ### System Requirements
 
-To use JVIM effectively, ensure the following software is installed on your system:
-
 | Software          | Purpose                            | Required       |
 | ----------------- | ---------------------------------- | -------------- |
-| **Neovim**        | Version 0.9.0+                     | ✅ Required    |
-| **Java JDK**      | Java Development Kit (JDK 11+)     | ✅ Required    |
+| **Neovim**        | Version 0.11+                      | ✅ Required    |
+| **Java JDK**      | Java Development Kit (JDK 17+)     | ✅ Required    |
 | **Git**           | Version control operations         | ✅ Required    |
-| **Node.js & npm** | Language server and plugin support | ✅ Required    |
+| **Node.js & npm** | Language servers and plugin support| ✅ Required    |
 | **curl**          | Downloading plugins and resources  | ✅ Required    |
 | **unzip**         | Extracting plugin archives         | ✅ Required    |
 | **ripgrep**       | Fast text search (for Telescope)   | ⭐ Recommended |
 | **fd**            | Fast file finder (for Telescope)   | ⭐ Recommended |
 | **yarn**          | Markdown preview UI                | ⚙️ Optional    |
-| **lazygit**       | Terminal UI for git                | ⚙️ Optional    |
+
+> Neovim 0.11 is a hard minimum: the LSP setup uses `vim.lsp.config` /
+> `vim.lsp.enable`, which do not exist in earlier versions.
 
 ### Font Requirements
 
@@ -91,109 +91,107 @@ For proper icon display, install a [Nerd Font](https://www.nerdfonts.com/). Popu
    nvim
    ```
 
-   On first launch, Lazy.nvim will automatically install all plugins. Wait for the installation to complete.
+   On first launch, Lazy.nvim installs all plugins. Wait for it to finish.
 
-4. **Verify installation**:
-   - Check Mason status: `:Mason`
-   - Check LSP status: `:LspInfo`
-   - Check installed plugins: `:Lazy`
+4. **Install the toolchain** — language servers, formatters and the Java debug
+   adapter are installed on request rather than on every startup:
 
-### Post-Installation Setup
+   ```vim
+   :MasonToolsInstall
+   ```
 
-#### Markdown Preview (Optional)
+5. **Verify the installation**:
 
-If you need Markdown preview functionality:
+   ```vim
+   :Mason      " toolchain status
+   :LspInfo    " active language servers
+   :Lazy       " plugin status
+   :checkhealth
+   ```
+
+### Markdown Preview (Optional)
 
 ```bash
 cd ~/.local/share/nvim/lazy/markdown-preview.nvim && yarn install
 ```
 
-#### Mason Tools
+---
 
-JVIM automatically installs essential tools via Mason:
+## Configuration
 
-- `java-debug-adapter` - Java debugging support
-- `java-test` - Java testing framework
-- `stylua` - Lua code formatter
-- `prettier` - Multi-language formatter
-
-Additional language servers will be installed automatically when you open files of supported types.
-
-### AI Integration Setup
-
-Choose the active inline completion provider in `lua/io/github/israiloff/config/properties.lua` or in the gitignored local override file `lua/io/github/israiloff/config/properties-local.lua`.
+All user-facing settings live in a single table in
+`lua/io/github/israiloff/config/properties.lua`. To change anything without
+touching the tracked file, create
+`lua/io/github/israiloff/config/properties-local.lua` — it is gitignored and
+deep-merged over the defaults:
 
 ```lua
 return {
+  gui = {
+    -- Transparent background, so the terminal's own theme shows through.
+    transparent = true,
+    -- Bottom-right activity indicator.
+    activity = {
+      enabled = true,
+      lazy = true, -- report plugin loads
+      lsp = true,  -- report LSP progress
+    },
+  },
   ai = {
     provider = "tabby", -- copilot | tabby | none
+  },
+  jdtls = {
+    jvm = { xms = "256M", xmx = "1G" },
+  },
+  shell = {
+    WINDOWS = "pwsh.exe",
+    LINUX = "zsh",
+    MACOS = "zsh",
+  },
+  logger = {
+    enabled = false, -- turn on to trace the config's own startup
+    enabled_loggers = { "*" },
   },
 }
 ```
 
-You can also switch providers from the which-key menu with `<Space>A`.
+Only the keys you override need to be present.
 
-#### GitHub Copilot
+---
 
-GitHub Copilot provides AI-powered code completions and suggestions.
+## AI Completion
 
-**Setup:**
+JVIM ships inline completion from either **GitHub Copilot** or **Tabby**, and only
+loads the plugin for the provider you selected. Switching providers is a
+configuration change, not a code change — pick one from the `AI` which-key menu
+or set `ai.provider` directly, then restart Neovim.
 
-1. Run `:Copilot setup` in Neovim
-2. Follow the authentication process
-3. Enable with `:Copilot enable`
+```vim
+:JvimAiStatus   " which provider is live now, and which is set for next start
+:JvimAiSelect   " copilot | tabby | none
+```
 
-**Usage:**
+The selection is written to `properties-local.lua`, so it survives updates to the
+repository.
 
-- Completions are available in insert mode with `Alt+L`
-- Provider controls and the Copilot panel are available in the `<Space>A` which-key menu
+### GitHub Copilot
 
-#### Tabby
+1. Run `:Copilot setup` and complete the authentication flow.
+2. Enable it with `:Copilot enable`.
 
-Tabby provides self-hosted inline code completions and shares the same accept key as Copilot.
+The Copilot panel entry appears in the AI menu automatically while Copilot is the
+active provider.
 
-**Setup:**
+### Tabby
+
+Self-hosted completion, sharing the same accept key as Copilot.
 
 1. Install the agent: `npm install --global tabby-agent`
 2. Configure `~/.tabby-client/agent/config.toml`
-3. Select Tabby with `<Space>A t` or set `ai.provider = "tabby"`
-4. Restart Neovim
+3. Select Tabby, then restart Neovim.
 
-**Usage:**
-
-- Completions are available in insert mode with `Alt+L`
-- Manual trigger/dismiss remains available on Tabby’s default `<C-\>` mapping
-
-#### OpenAI ChatGPT-4
-
-ChatGPT integration enables AI-powered code assistance, refactoring, and more.
-
-**Setup:**
-
-1. Get an [OpenAI API key](https://platform.openai.com/api-keys)
-2. Set the environment variable:
-
-   ```bash
-   echo 'export OPENAI_API_KEY=YOUR_PERSONAL_OPENAI_API_KEY' >> ~/.zshrc
-   # or for bash:
-   echo 'export OPENAI_API_KEY=YOUR_PERSONAL_OPENAI_API_KEY' >> ~/.bashrc
-   ```
-
-   > ⚠️ **Security Note**: Never commit your API key to version control. Consider using a separate `.env` file or a secrets manager for production environments.
-
-3. Reload your shell configuration
-
-**Usage:**
-All ChatGPT features are accessible via the which-key menu (`Space + a`):
-
-- Code editing with instructions
-- Grammar correction
-- Translation
-- Docstring generation
-- Test generation
-- Code optimization
-
-> **Tip**: Press `Space` to open the which-key menu and explore all available features.
+Ghost text is re-themed on every colorscheme change so it stays readable on a
+transparent background.
 
 ---
 
@@ -243,431 +241,188 @@ For more details, visit the [jvim-docker repository](https://github.com/Israilof
 
 ---
 
-## Core Plugins
-
-JVIM includes a carefully curated collection of plugins organized by functionality:
-
-### Language Support & LSP
-
-| Plugin                                                                                    | Description                                                                    |
-| ----------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
-| [nvim-lspconfig](https://github.com/neovim/nvim-lspconfig)                                | Quickstart configurations for Neovim LSP client                                |
-| [nvim-jdtls](https://github.com/mfussenegger/nvim-jdtls)                                  | Java LSP extensions and JDTLS integration                                      |
-| [mason.nvim](https://github.com/williamboman/mason.nvim)                                  | Portable package manager for LSP servers, DAP servers, linters, and formatters |
-| [mason-lspconfig.nvim](https://github.com/williamboman/mason-lspconfig.nvim)              | Bridge between Mason and nvim-lspconfig                                        |
-| [mason-tool-installer.nvim](https://github.com/WhoIsSethDaniel/mason-tool-installer.nvim) | Automatic installation of Mason tools                                          |
-| [none-ls.nvim](https://github.com/nvimtools/none-ls.nvim)                                 | Use Neovim as a language server for linting and formatting                     |
-| [lazydev.nvim](https://github.com/folke/lazydev.nvim)                                     | Faster Lua development with proper LSP support                                 |
-
-### Completion & Snippets
-
-| Plugin                                                     | Description                             |
-| ---------------------------------------------------------- | --------------------------------------- |
-| [nvim-cmp](https://github.com/hrsh7th/nvim-cmp)            | Completion engine with multiple sources |
-| [cmp-nvim-lsp](https://github.com/hrsh7th/cmp-nvim-lsp)    | LSP source for nvim-cmp                 |
-| [cmp-buffer](https://github.com/hrsh7th/cmp-buffer)        | Buffer words source for nvim-cmp        |
-| [cmp-path](https://github.com/hrsh7th/cmp-path)            | File path source for nvim-cmp           |
-| [cmp-cmdline](https://github.com/hrsh7th/cmp-cmdline)      | Command line source for nvim-cmp        |
-| [LuaSnip](https://github.com/L3MON4D3/LuaSnip)             | Snippet engine                          |
-| [cmp_luasnip](https://github.com/saadparwaiz1/cmp_luasnip) | LuaSnip source for nvim-cmp             |
-| [lspkind.nvim](https://github.com/onsails/lspkind.nvim)    | VSCode-like pictograms for completion   |
-
-### Syntax & Parsing
-
-| Plugin                                                                | Description                                        |
-| --------------------------------------------------------------------- | -------------------------------------------------- |
-| [nvim-treesitter](https://github.com/nvim-treesitter/nvim-treesitter) | Advanced syntax highlighting and code manipulation |
-
-### Debugging
-
-| Plugin                                                                     | Description                                                         |
-| -------------------------------------------------------------------------- | ------------------------------------------------------------------- |
-| [nvim-dap](https://github.com/mfussenegger/nvim-dap)                       | Debug Adapter Protocol client implementation                        |
-| [nvim-dap-ui](https://github.com/rcarriga/nvim-dap-ui)                     | UI for nvim-dap with virtual text and enhanced debugging experience |
-| [telescope-dap.nvim](https://github.com/nvim-telescope/telescope-dap.nvim) | Telescope integration for DAP                                       |
-| [vim-codelens](https://github.com/markwoodhall/vim-codelens)               | CodeLens support for displaying code actions                        |
-
-### File Navigation & Search
-
-| Plugin                                                                                | Description                                 |
-| ------------------------------------------------------------------------------------- | ------------------------------------------- |
-| [telescope.nvim](https://github.com/nvim-telescope/telescope.nvim)                    | Fuzzy finder over lists with previews       |
-| [telescope-file-history.nvim](https://github.com/dawsers/telescope-file-history.nvim) | Browse file history with Telescope          |
-| [nvim-tree.lua](https://github.com/nvim-tree/nvim-tree.lua)                           | File explorer with icons and tree view      |
-| [lir.nvim](https://github.com/tamago324/lir.nvim)                                     | Lightweight file browser                    |
-| [project.nvim](https://github.com/ahmedkhalf/project.nvim)                            | Project management with auto root detection |
-
-### Git Integration
-
-| Plugin                                                      | Description                         |
-| ----------------------------------------------------------- | ----------------------------------- |
-| [gitsigns.nvim](https://github.com/lewis6991/gitsigns.nvim) | Git decorations and hunk operations |
-
-### User Interface
-
-| Plugin                                                                          | Description                                                  |
-| ------------------------------------------------------------------------------- | ------------------------------------------------------------ |
-| [darcula-java](https://github.com/israiloff/darcula-java)                       | Custom Java-optimized colorscheme based on JetBrains Darcula |
-| [lualine.nvim](https://github.com/nvim-lualine/lualine.nvim)                    | Fast and customizable statusline                             |
-| [lualine-time](https://github.com/archibate/lualine-time)                       | Time component for lualine                                   |
-| [bufferline.nvim](https://github.com/akinsho/bufferline.nvim)                   | Buffer line with tabs and IDE-like buffer management         |
-| [alpha-nvim](https://github.com/goolord/alpha-nvim)                             | Fast and customizable greeter/dashboard                      |
-| [nvim-navic](https://github.com/SmiteshP/nvim-navic)                            | Shows code context in statusline                             |
-| [indent-blankline.nvim](https://github.com/lukas-reineke/indent-blankline.nvim) | Indent guides with scope highlighting                        |
-| [nvim-scrollbar](https://github.com/petertriho/nvim-scrollbar)                  | Scrollbar with diagnostic indicators                         |
-| [nvim-web-devicons](https://github.com/nvim-tree/nvim-web-devicons)             | File type icons                                              |
-
-### Terminal
-
-| Plugin                                                        | Description                                                                |
-| ------------------------------------------------------------- | -------------------------------------------------------------------------- |
-| [toggleterm.nvim](https://github.com/akinsho/toggleterm.nvim) | Terminal management with multiple layouts (floating, vertical, horizontal) |
-
-### Editing Enhancement
-
-| Plugin                                                            | Description                             |
-| ----------------------------------------------------------------- | --------------------------------------- |
-| [which-key.nvim](https://github.com/folke/which-key.nvim)         | Displays available keybindings in popup |
-| [Comment.nvim](https://github.com/numToStr/Comment.nvim)          | Smart and powerful commenting           |
-| [auto-save.nvim](https://github.com/Pocco81/auto-save.nvim)       | Automatic file saving                   |
-| [todo-comments.nvim](https://github.com/folke/todo-comments.nvim) | Highlight and search TODO comments      |
-| [formatter.nvim](https://github.com/mhartington/formatter.nvim)   | Format runner for Neovim                |
-| [grug-far.nvim](https://github.com/MagicDuck/grug-far.nvim)       | Search and replace with modern UI       |
-
-### AI & Productivity
-
-| Plugin                                               | Description                                                |
-| ---------------------------------------------------- | ---------------------------------------------------------- |
-| [copilot.vim](https://github.com/github/copilot.vim) | GitHub Copilot integration for AI-powered code suggestions |
-| [vim-tabby](https://github.com/TabbyML/vim-tabby)    | Tabby integration for self-hosted AI code suggestions      |
-
-### Markdown
-
-| Plugin                                                                   | Description                      |
-| ------------------------------------------------------------------------ | -------------------------------- |
-| [markdown-preview.nvim](https://github.com/iamcco/markdown-preview.nvim) | Live markdown preview in browser |
-
-### XML Support
-
-| Plugin                                                            | Description                                         |
-| ----------------------------------------------------------------- | --------------------------------------------------- |
-| [lemminx-compiled](https://github.com/Israiloff/lemminx-compiled) | Precompiled Eclipse Lemminx language server for XML |
-
-### Utilities
-
-| Plugin                                                        | Description                                |
-| ------------------------------------------------------------- | ------------------------------------------ |
-| [plenary.nvim](https://github.com/nvim-lua/plenary.nvim)      | Lua utility functions used by many plugins |
-| [lush.nvim](https://github.com/rktjmp/lush.nvim)              | Colorscheme creation tool                  |
-| [luvit-meta](https://github.com/Bilal2453/luvit-meta)         | Meta type definitions for Lua              |
-| [nvim-nio](https://github.com/nvim-neotest/nvim-nio)          | Async IO library for Neovim                |
-| [mason-registry](https://github.com/mason-org/mason-registry) | Registry for Mason packages                |
-
----
-
-## Configuration
-
-### JDTLS (Java Language Server)
-
-JVIM automatically configures JDTLS with:
-
-- **Logger Setup**: Debug logging for troubleshooting
-- **Maven Integration**: Automatic dependency resolution and updates
-- **Debug Support**: Full DAP integration with Java Debug Adapter
-- **Code Actions**: Extract variable/constant/method, organize imports
-- **Test Runner**: JUnit and TestNG support via java-test
-- **Spring Boot**: Profile support with `-Dspring.profiles.active=local`
-- **IntelliJ-style**: Code lens for references and implementations
-
-### Key Mappings
-
-> **Tip**: Press `Space` to open the which-key menu for an interactive guide to all available commands.
-
-#### General Navigation
-
-| Key     | Mode                 | Description          |
-| ------- | -------------------- | -------------------- |
-| `<C-h>` | Normal               | Move to left window  |
-| `<C-j>` | Normal               | Move to lower window |
-| `<C-k>` | Normal               | Move to upper window |
-| `<C-l>` | Normal               | Move to right window |
-| `<M-l>` | Normal               | Next buffer          |
-| `<M-h>` | Normal               | Previous buffer      |
-| `<M-j>` | Normal/Visual/Insert | Move line down       |
-| `<M-k>` | Normal/Visual/Insert | Move line up         |
-
-#### Terminal
-
-| Key            | Mode            | Description                |
-| -------------- | --------------- | -------------------------- |
-| `<M-1>` or `¡` | Normal/Terminal | Toggle horizontal terminal |
-| `<M-2>` or `™` | Normal/Terminal | Toggle vertical terminal   |
-| `<M-3>` or `£` | Normal/Terminal | Toggle floating terminal   |
-
-> **macOS Note**: The special characters are Alt-key mappings that work on macOS keyboards.
-
-#### LSP Operations
-
-| Key     | Mode   | Description              |
-| ------- | ------ | ------------------------ |
-| `gr`    | Normal | Go to references         |
-| `gD`    | Normal | Go to declaration        |
-| `gd`    | Normal | Go to definition         |
-| `gi`    | Normal | Go to implementation     |
-| `gt`    | Normal | Go to type definition    |
-| `<M-p>` | Normal | Show signature help      |
-| `<M-i>` | Normal | Show hover documentation |
-
-#### Java Quick Actions
-
-| Key     | Mode   | Description                |
-| ------- | ------ | -------------------------- |
-| `<M-5>` | Normal | Refresh Maven dependencies |
-| `<M-7>` | Normal | Toggle DAP UI              |
-| `<M-8>` | Normal | Debug step over            |
-| `<M-9>` | Normal | Debug continue             |
-| `<M-0>` | Normal | Debug stop                 |
-
-#### which-key Mappings
-
-Press `<Space>` to activate the which-key menu.
-
-| Key Combination | Description                           |
-| --------------- | ------------------------------------- |
-| `<Space>f`      | Find Files                            |
-| `<Space>u`      | Update configs                        |
-| `<Space>c`      | Close buffer                          |
-| `<Space>q`      | Quit                                  |
-| `<Space>e`      | Explorer                              |
-| `<Space>l`      | Code Actions                          |
-| `<Space>l d`    | Buffer Diagnostics                    |
-| `<Space>l w`    | Diagnostics                           |
-| `<Space>l i`    | Info                                  |
-| `<Space>l j`    | Next Diagnostic                       |
-| `<Space>l k`    | Prev Diagnostic                       |
-| `<Space>l r`    | Rename                                |
-| `<Space>F`      | File                                  |
-| `<Space>F h`    | View the file’s history               |
-| `<Space>F l`    | View the file’s history incrementally |
-| `<Space>F f`    | View every file in the repo           |
-| `<Space>n`      | Notifications                         |
-| `<Space>n l`    | Show notification log                 |
-| `<Space>s`      | Search                                |
-| `<Space>s b`    | Checkout branch                       |
-| `<Space>s c`    | Colorscheme                           |
-| `<Space>s f`    | Find File                             |
-| `<Space>s h`    | Find Help                             |
-| `<Space>s H`    | Find highlight groups                 |
-| `<Space>s M`    | Man Pages                             |
-| `<Space>s r`    | Open Recent File                      |
-| `<Space>s R`    | Registers                             |
-| `<Space>s t`    | Text                                  |
-| `<Space>s k`    | Keymaps                               |
-| `<Space>s C`    | Commands                              |
-| `<Space>s l`    | Resume last search                    |
-| `<Space>s p`    | Colorscheme with Preview              |
-| `<Space>s u`    | Search/Replace UI (grug-far)          |
-| `<Space>s w`    | Search word (current file)            |
-| `<Space>s W`    | Search word (all files)               |
-| `<Space>s r`    | Replace word (current file)           |
-| `<Space>s R`    | Replace word (all files)              |
-| `<Space>g`      | Git                                   |
-| `<Space>g g`    | Lazygit                               |
-| `<Space>g j`    | Next Hunk                             |
-| `<Space>g k`    | Prev Hunk                             |
-| `<Space>g l`    | Blame                                 |
-| `<Space>g L`    | Blame Line (full)                     |
-| `<Space>g p`    | Preview Hunk                          |
-| `<Space>g r`    | Reset Hunk                            |
-| `<Space>g R`    | Reset Buffer                          |
-| `<Space>g s`    | Stage Hunk                            |
-| `<Space>g u`    | Undo Stage Hunk                       |
-| `<Space>g o`    | Open changed file                     |
-| `<Space>g b`    | Checkout branch                       |
-| `<Space>g c`    | Checkout commit                       |
-| `<Space>/`      | Comment current line                  |
-| `<Space>P`      | Plugins                               |
-| `<Space>P i`    | Install                               |
-| `<Space>P s`    | Sync                                  |
-| `<Space>P S`    | Status                                |
-| `<Space>P c`    | Clean                                 |
-| `<Space>P u`    | Update                                |
-| `<Space>P p`    | Profile                               |
-| `<Space>P l`    | Log                                   |
-| `<Space>P d`    | Debug                                 |
-| `<Space>p`      | Projects                              |
-| `<Space>r`      | Recent Files                          |
-| `<Space>A`      | AI provider menu                      |
-| `<Space>A s`    | Show current/next AI provider         |
-| `<Space>A e`    | Edit local AI properties              |
-| `<Space>A c`    | Use Copilot on next start             |
-| `<Space>A t`    | Use Tabby on next start               |
-| `<Space>A d`    | Disable AI on next start              |
-| `<Space>A p`    | Open Copilot panel                    |
-| `<Space>a`      | Open AI                               |
-| `<Space>a c`    | ChatGPT                               |
-| `<Space>a e`    | Edit with instruction                 |
-| `<Space>a g`    | Grammar Correction                    |
-| `<Space>a t`    | Translate                             |
-| `<Space>a k`    | Keywords                              |
-| `<Space>a d`    | Docstring                             |
-| `<Space>a a`    | Add Tests                             |
-| `<Space>a o`    | Optimize Code                         |
-
-### Java which-key Mappings
-
-| Key Combination | Description                    |
-| --------------- | ------------------------------ |
-| `<Space>j o`    | Organize Imports               |
-| `<Space>j v`    | Extract Variable               |
-| `<Space>j c`    | Extract Constant               |
-| `<Space>j t`    | Test Method                    |
-| `<Space>j T`    | Test Class                     |
-| `<Space>j u`    | Update Config                  |
-| `<Space>j d t`  | Debug - Toggle Breakpoint      |
-| `<Space>j d b`  | Debug - Step Back              |
-| `<Space>j d c`  | Debug - Continue               |
-| `<Space>j d C`  | Debug - Run To Cursor          |
-| `<Space>j d d`  | Debug - Disconnect             |
-| `<Space>j d g`  | Debug - Get Session            |
-| `<Space>j d i`  | Debug - Step Into              |
-| `<Space>j d o`  | Debug - Step Over              |
-| `<Space>j d u`  | Debug - Step Out               |
-| `<Space>j d p`  | Debug - Pause                  |
-| `<Space>j d r`  | Debug - Toggle Repl            |
-| `<Space>j d s`  | Debug - Start                  |
-| `<Space>j d q`  | Debug - Quit                   |
-| `<Space>j d U`  | Debug - Toggle UI              |
-| `<Space>j v`    | Extract Variable (Visual Mode) |
-| `<Space>j c`    | Extract Constant (Visual Mode) |
-| `<Space>j m`    | Extract Method (Visual Mode)   |
-
-### Visual Mode Mappings
-
-| Key Combination | Description                      |
-| --------------- | -------------------------------- |
-| `<Space>/`      | Comment selection                |
-| `<Space>f s`    | Search selection (current file)  |
-| `<Space>f S`    | Search selection (all files)     |
-| `<Space>f r`    | Replace selection (current file) |
-| `<Space>f R`    | Replace selection (all files)    |
-
----
-
-## Features in Detail
+## Features
 
 ### Java Development
 
-JVIM provides a complete Java IDE experience:
+JDTLS is started per project rather than per editor session, with its workspace
+keyed to the project root, so two checkouts of the same repository never share
+state.
 
-- **Language Server**: JDTLS with full LSP capabilities
-- **Code Navigation**: Go to definition, references, implementations
-- **Refactoring**: Extract method/variable/constant, organize imports
-- **Debugging**: Full DAP support with breakpoints, step through, watches
-- **Testing**: Run individual tests or full test classes
-- **Maven Support**: Automatic dependency management and updates
-- **Spring Boot**: Profile configuration and running
+- **Project detection** — Maven and Gradle roots (`pom.xml`, `build.gradle`, wrappers) with a Git fallback
+- **Navigation** — go to definition, references, implementations, type definitions
+- **Refactoring** — extract method, variable and constant; organize imports
+- **Code lenses** — reference and implementation counts, refreshed as you edit
+- **Formatting** — Eclipse formatter driven by the bundled `java-style.xml`
+- **Lombok** — `lombok.jar` is fetched on first use and attached as a `-javaagent`
+- **Decompiled sources** — navigation works into dependencies without attached sources
+- **Heap limits** — JDTLS JVM sizing is configurable, so large projects can be given more room
 
-### Search & Replace
+### Debugging and Testing
 
-Powered by grug-far.nvim for a modern search and replace experience:
+Full DAP support, wired to the Java debug adapter and test runner:
 
-- **Visual UI**: Modern, intuitive interface for find and replace operations
-- **Context-aware**: Search in current file or entire project
-- **Visual mode**: Search and replace selected text
-- **Live Preview**: See changes before applying them
-- **RegExp Support**: Full regular expression support for complex patterns
+- Breakpoints, stepping, watches, scopes, stack frames and a REPL
+- A dedicated DAP UI layout that opens on session start and closes on exit
+- Run a single test method or an entire test class
+- Spring Boot main classes are launched with the `local` profile active
+- A ready-made **Attach to remote JVM :5005** configuration for debugging running services
 
-### Terminal Integration
+### Build Tools
 
-Three terminal layouts available:
+Maven and Gradle tasks run in an embedded terminal without leaving the editor —
+compile, test, package, install, deploy, clean, dependency refresh, and local
+repository purge.
 
-- **Floating Terminal** (`<M-3>` or `£`): Overlay terminal for quick commands
-- **Vertical Terminal** (`<M-2>` or `™`): Side-by-side terminal and editor
-- **Horizontal Terminal** (`<M-1>` or `¡`): Bottom terminal panel
+### Startup and Feedback
 
-All terminals:
+Every plugin declares when it is needed, so nothing is loaded speculatively.
+Telescope, DAP, the terminal and the formatter only appear once you reach for
+them, and `nvim --startuptime` reports roughly **40 ms** to a usable editor.
 
-- Persist across sessions
-- Support full color and Unicode
-- Auto-detect shell (bash/zsh/fish)
-- Work seamlessly with tmux and screen
+Because work happens on demand, a small indicator in the bottom-right corner
+reports what is going on:
 
-### File Explorer
+- **Plugin loads** — which plugin was pulled in, how long it took, and what triggered it
+- **LSP progress** — live progress with a spinner, which matters most for JDTLS, whose initial project indexing can run for half a minute
 
-**nvim-tree** provides a feature-rich file explorer:
+The indicator can be narrowed to one source or turned off entirely in
+`properties.lua`.
 
-- Toggle with `<Space>e`
-- Icons for file types
-- Git status indicators
-- Create, delete, rename files/folders
-- Open files in splits or tabs
-- Bookmark system
+### Language Servers
 
-### Project Management
+Mason manages the toolchain, and installed servers are enabled automatically with
+shared defaults — completion capabilities, breadcrumbs and code lenses are applied
+once, centrally, rather than repeated per server.
 
-Automatic project detection and management:
+Out of the box: **Java**, **Lua**, **JSON**, **YAML**, **Dockerfile**, **Markdown**
+and **XML**. XML is served from a pre-compiled LemMinX build, which avoids the slow
+first-run download the Mason package performs.
 
-- Recent projects accessible via `<Space>p`
-- Auto-detection of project root (git, Maven, etc.)
-- Per-project settings and workspaces
-- Quick switching between projects
+### Completion
 
-### Auto-save
+`nvim-cmp` with LSP, buffer, path, command-line and LuaSnip sources, rendered with
+type icons. Java snippet entries are filtered out of the LSP source, since JDTLS
+duplicates most of them as regular completions.
 
-Files are automatically saved:
+### Search and Replace
 
-- On buffer leave
-- On focus lost
-- After idle time
-- Configurable per file type
+- **Telescope** — files, live grep, buffers, help, keymaps, highlights, commands, registers, man pages
+- **grug-far** — project-wide find and replace with live preview and full regular expressions; can be scoped to the current file, seeded from the word under the cursor, or driven from a visual selection
+- **File history** — every save is journalled into a separate Git repository, so previous versions of a file can be browsed and restored independently of project history
+
+### Git Integration
+
+Gitsigns provides hunk signs, staging, resetting, blame and diff views. Hunk
+markers are mirrored into the scrollbar, so changes elsewhere in a long file stay
+visible. Branch and change counts are shown in the statusline, and Telescope
+covers branches, commits and per-file history.
+
+### User Interface
+
+- **Darcula** — JetBrains-inspired colorscheme, with optional transparency that survives colorscheme switching
+- **Breadcrumbs** — the current class/method path is shown in the winbar
+- **Statusline** — Git branch, diagnostics, active language servers and formatters, AI provider, clock
+- **Buffer bar** — open buffers with diagnostic counts and an explorer offset
+- **Dashboard** — a start screen with quick access to files, projects and recent work
+- **Diagnostics** — icons in the sign column, bordered floats, and both document- and workspace-wide lists
+
+### Terminals
+
+Three toggleable layouts — floating, vertical and horizontal — reusing persistent
+terminal instances, so a session keeps its state and size between toggles. The
+shell is chosen per operating system from `properties.lua`. Build-tool tasks reuse
+the horizontal terminal instead of spawning a new one.
+
+### File Explorer and Projects
+
+nvim-tree provides the file tree, with type icons, Git status, diagnostics,
+file operations and a window picker for opening into splits. The tree follows the
+active buffer and keeps its root in step with the current project.
+
+Projects are detected automatically from version control and build files, and
+recent projects are reachable through Telescope.
+
+### Editing
+
+Treesitter-based highlighting and indentation with incremental selection,
+comment toggling that follows the language, indentation guides, TODO comment
+highlighting, and a live Markdown preview.
+
+### Discoverable Keys
+
+There is no cheatsheet to memorise. Press the leader key (`Space`) and which-key
+shows every available binding, grouped and labelled with icons; groups expand as
+you type. Java, debugging and build-tool menus appear only in the buffers where
+they apply.
+
+To search bindings as text instead, use Telescope's keymap picker.
 
 ---
 
 ## Troubleshooting
 
-### Common Issues
+### LSP not working for Java files
 
-#### LSP not working for Java files
+1. Confirm JDTLS is installed: `:Mason`
+2. Check active clients: `:LspInfo`
+3. Read the log: `~/.local/state/nvim/lsp.log`
+4. Verify the JDK: `java --version`
+5. Watch the activity indicator — JDTLS reports its indexing progress there
 
-1. Check if JDTLS is installed: `:Mason`
-2. Check LSP status: `:LspInfo`
-3. View logs: `~/.local/state/nvim/lsp.log`
-4. Ensure Java JDK is installed: `java --version`
+### A language server is missing
 
-#### Copilot not providing suggestions
+Language servers are **not** installed automatically when you open an unfamiliar
+file type. Install what you need explicitly:
 
-1. Check auth status: `:Copilot status`
-2. Re-authenticate: `:Copilot setup`
-3. Enable if disabled: `:Copilot enable`
+```vim
+:Mason                  " browse and install interactively
+:MasonToolsInstall      " install everything this config declares
+```
 
-#### Plugins not loading
+### Copilot not providing suggestions
 
-1. Update plugins: `<Space>P u`
-2. Sync plugins: `<Space>P s`
-3. Check for errors: `<Space>P l`
-4. Clean and reinstall: `<Space>P c` then `<Space>P i`
+1. Confirm Copilot is the active provider: `:JvimAiStatus`
+2. Check authentication: `:Copilot status`
+3. Re-authenticate: `:Copilot setup`
 
-#### Terminal not opening
+### Plugins not loading
 
-1. Check toggleterm status: `:checkhealth toggleterm`
-2. Verify shell is accessible: `echo $SHELL`
-3. Try different terminal layout with different key binding
+```vim
+:Lazy update
+:Lazy sync
+:Lazy log
+:Lazy clean
+```
 
-#### Mason tools not installing
+Plugins are lazy-loaded, so a plugin showing as "not loaded" in `:Lazy` is
+usually correct — it will load when its trigger fires.
+
+### Terminal not opening
+
+1. `:checkhealth toggleterm`
+2. Verify the shell exists: `echo $SHELL`
+3. Check the `shell` block in `properties.lua` matches your system
+
+### Mason tools not installing
 
 1. Check network connectivity
-2. Ensure curl, git, and unzip are installed
-3. Check Mason log: `:Mason` then view log in Mason UI
-4. Manually install: `:MasonInstall <tool-name>`
+2. Ensure `curl`, `git` and `unzip` are available
+3. Review the Mason log from the `:Mason` UI
+4. Install manually: `:MasonInstall <tool-name>`
+
+### Tracing the configuration itself
+
+Set `logger.enabled = true` in `properties-local.lua` to make the config report
+its own startup, then read the output with `:messages`.
 
 ### Getting Help
 
-- View Neovim health: `:checkhealth`
-- Check plugin status: `<Space>P S`
-- View messages: `<Space>n l`
-- Open help: `<Space>s h`
-- Browse keymaps: `<Space>s k`
+```vim
+:checkhealth
+:Lazy
+:messages
+```
 
 ---
 
