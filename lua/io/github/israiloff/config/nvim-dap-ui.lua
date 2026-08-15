@@ -9,7 +9,7 @@ local logger_name = "io.github.israiloff.config.nvim-dap-ui"
 local dap_status, dap = pcall(require, "dap")
 
 if not dap_status then
-    log.error(logger_name, "'nvim.dap' not found")
+    log.error(logger_name, "'nvim-dap' not found")
     return
 end
 
@@ -131,5 +131,9 @@ dap.listeners.after.event_stopped["dapui_config"] = function()
 end
 
 dap.listeners.after.event_terminated["dapui_config"] = function()
-    dapui.open()
+    dapui.close()
+end
+
+dap.listeners.after.event_exited["dapui_config"] = function()
+    dapui.close()
 end
