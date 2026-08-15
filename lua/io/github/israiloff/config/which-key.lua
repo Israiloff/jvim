@@ -162,10 +162,14 @@ which_key.add({
 		desc = icons.diagnostics.Scan .. " Document diagnostics",
 	},
 	{ "<leader>li", "<cmd>LspInfo<cr>", desc = icons.diagnostics.Information .. " LSP client information" },
-	{ "<leader>lj", "<cmd>lua vim.diagnostic.goto_next()<cr>", desc = icons.ui.ArrowCircleDown .. " Next diagnostics" },
+	{
+		"<leader>lj",
+		"<cmd>lua vim.diagnostic.jump({ count = 1, float = true })<cr>",
+		desc = icons.ui.ArrowCircleDown .. " Next diagnostics",
+	},
 	{
 		"<leader>lk",
-		"<cmd>lua vim.diagnostic.goto_prev()<cr>",
+		"<cmd>lua vim.diagnostic.jump({ count = -1, float = true })<cr>",
 		desc = icons.ui.ArrowCircleUp .. " Previous diagnostics",
 	},
 	{ "<leader>lr", "<cmd>lua vim.lsp.buf.rename()<cr>", desc = icons.lsp.rename .. " Rename" },
