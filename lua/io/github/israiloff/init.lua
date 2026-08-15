@@ -17,6 +17,10 @@ require("io.github.israiloff.config.clipboard")
 require("io.github.israiloff.config.buffer-ops")
 require("io.github.israiloff.config.keymap")
 
+-- Activity indicator. Must be registered before lazy.nvim so that it sees the
+-- `User LazyLoad` events, and it deliberately depends on no plugin.
+require("io.github.israiloff.config.activity").setup()
+
 -- Plugin manager. Everything else is pulled in from here on demand.
 require("io.github.israiloff.config.lazy")
 

@@ -45,6 +45,18 @@ local base_properties = {
 	-- This is used to determine the appearance of the GUI.
 	gui = {
 		transparent = true,
+		-- Bottom-right activity indicator.
+		-- Reports lazy.nvim plugin loads and LSP progress (jdtls indexing in
+		-- particular, which is otherwise completely silent).
+		activity = {
+			enabled = true,
+			lazy = true,
+			lsp = true,
+			linger_ms = 1200,
+			interval_ms = 80,
+			max_width = 60,
+			max_entries = 6,
+		},
 	},
 	-- The default shell to use for the system.
 	-- This is used to determine the preferred shell for the system.
