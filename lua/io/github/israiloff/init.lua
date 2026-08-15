@@ -1,38 +1,31 @@
+-- Startup path.
+--
+-- Only things that must exist before any plugin loads live here. Everything that
+-- configures a plugin now lives in that plugin's lazy.nvim spec
+-- (`config/plugins.lua`), so the plugin's own `event`/`ft`/`cmd`/`keys` trigger
+-- decides when it — and its config — is loaded.
+
+-- Editor-level settings (no plugin dependency).
 require("io.github.israiloff.config.startup")
-require("io.github.israiloff.config.lazy")
-require("io.github.israiloff.config.lazydev")
-require("io.github.israiloff.config.none-ls")
-require("io.github.israiloff.config.mason")
-require("io.github.israiloff.config.mason-lspconfig")
-require("io.github.israiloff.config.mason-tool-installer")
-require("io.github.israiloff.config.lspconfig")
-require("io.github.israiloff.config.keymap")
-require("io.github.israiloff.config.formatting")
 require("io.github.israiloff.config.editor")
-require("io.github.israiloff.config.which-key")
-require("io.github.israiloff.config.nvim-cmp")
-require("io.github.israiloff.config.treesitter")
-require("io.github.israiloff.config.formatter-nvim")
-require("io.github.israiloff.config.nvim-tree")
-require("io.github.israiloff.config.gitsigns")
-require("io.github.israiloff.config.lir")
-require("io.github.israiloff.config.theme")
-require("io.github.israiloff.config.bufferline")
-require("io.github.israiloff.config.telescope-file-history")
-require("io.github.israiloff.config.colors")
-require("io.github.israiloff.config.lualine")
-require("io.github.israiloff.config.transparent")
-require("io.github.israiloff.config.indent-blankline")
-require("io.github.israiloff.config.toggleterm")
-require("io.github.israiloff.config.nvim-scrollbar")
-require("io.github.israiloff.config.comment")
-require("io.github.israiloff.config.alpha")
-require("io.github.israiloff.config.project-nvim")
-require("io.github.israiloff.config.nvim-dap")
-require("io.github.israiloff.config.telescope")
-require("io.github.israiloff.config.nvim-dap-ui")
-require("io.github.israiloff.config.nvim-navic").setup()
-require("io.github.israiloff.config.markdown")
+require("io.github.israiloff.config.formatting")
 require("io.github.israiloff.config.diagnostics")
-require("io.github.israiloff.config.ripgrep")
 require("io.github.israiloff.config.clipboard")
+
+-- User commands and keymaps that must be available immediately. Both only
+-- reference plugins through `<Cmd>...` strings, so they do not force a load.
+require("io.github.israiloff.config.buffer-ops")
+require("io.github.israiloff.config.keymap")
+
+-- Plugin manager. Everything else is pulled in from here on demand.
+require("io.github.israiloff.config.lazy")
+
+-- Deferred housekeeping: checking for ripgrep should never block the first paint.
+-- "VeryLazy" is a User event emitted by lazy.nvim once the UI has settled.
+vim.api.nvim_create_autocmd("User", {
+	pattern = "VeryLazy",
+	once = true,
+	callback = function()
+		require("io.github.israiloff.config.ripgrep")
+	end,
+})

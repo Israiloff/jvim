@@ -16,8 +16,7 @@ end
 
 vim.opt.rtp:prepend(lazypath)
 
-vim.g.mapleader = " "
-vim.g.maplocalleader = "\\"
+-- NOTE: `mapleader` is set in config/startup.lua, which runs before this file.
 
 require("lazy").setup({
 	spec = {
@@ -25,5 +24,17 @@ require("lazy").setup({
 	},
 	ui = {
 		border = "single",
+	},
+	performance = {
+		rtp = {
+			disabled_plugins = {
+				"gzip",
+				"tarPlugin",
+				"tohtml",
+				"tutor",
+				"zipPlugin",
+				"netrwPlugin",
+			},
+		},
 	},
 })
