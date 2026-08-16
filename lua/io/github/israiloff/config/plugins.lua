@@ -223,13 +223,24 @@ return {
 			"nvim-lua/plenary.nvim",
 			"nvim-telescope/telescope-dap.nvim",
 			"dawsers/telescope-file-history.nvim",
-			"ahmedkhalf/project.nvim",
 		},
 		config = function()
-			require("io.github.israiloff.config.project-nvim")
 			require("io.github.israiloff.config.telescope-file-history")
 			require("io.github.israiloff.config.telescope")
 		end,
+	},
+	{
+		-- Deliberately not lazy. The project list is built from the directories
+		-- you actually open, so it has to be watching from the first buffer;
+		-- loaded on demand behind Telescope it only ever recorded the sessions
+		-- where a picker happened to be opened, and the project you were sitting
+		-- in was missing from its own list.
+		--
+		-- Telescope finds the `projects` extension on the runtimepath, so it no
+		-- longer needs to carry this as a dependency.
+		"ahmedkhalf/project.nvim",
+		lazy = false,
+		config = conf("project-nvim"),
 	},
 	{
 		"MagicDuck/grug-far.nvim",
@@ -252,6 +263,22 @@ return {
 		dependencies = {
 			"nvim-tree/nvim-web-devicons",
 		},
+		init = function()
+			-- `nvim .` otherwise lands on a blank buffer: netrw is disabled in
+			-- config/startup.lua and this plugin only loads on its commands, so
+			-- nothing draws the directory. Pull it in during startup instead,
+			-- early enough for its directory hijack to claim that buffer.
+			if vim.fn.argc(-1) ~= 1 then
+				return
+			end
+
+			local path = vim.fn.argv(0)
+			local stat = (vim.uv or vim.loop).fs_stat(path)
+
+			if stat and stat.type == "directory" then
+				require("lazy").load({ plugins = { "nvim-tree.lua" } })
+			end
+		end,
 		config = conf("nvim-tree"),
 	},
 	{
