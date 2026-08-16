@@ -158,7 +158,9 @@ return {
     MACOS = "zsh",
   },
   logger = {
-    enabled = false, -- turn on to trace the config's own startup
+    enabled = true, -- on by default so config failures are not silent
+    -- Only errors are reported; the quieter levels are for tracing startup.
+    level = { debug = false, info = false, warn = false, error = true },
     enabled_loggers = { "*" },
   },
 }
@@ -530,15 +532,22 @@ usually correct — it will load when its trigger fires.
 
 ### Tracing the configuration itself
 
-Set `logger.enabled = true` in `properties-local.lua` to make the config report
-its own startup, then read the output with `:messages`.
+The config logs its own failures out of the box, at error level only, so a
+broken step is reported in the activity panel rather than swallowed. Read the
+history with `:JvimNotifyLog`.
+
+To trace a startup in full, turn on the quieter levels from
+`Notifications ▸ Logger` — or `:JvimToggle logger_debug` — and reproduce the
+problem. They are off by default because they report every step of every
+module, which is noise unless you are chasing something specific.
 
 ### Getting Help
 
 ```vim
 :checkhealth
 :Lazy
-:messages
+:JvimNotifyLog   " what the config itself reported
+:messages        " plain Vim messages
 ```
 
 ---

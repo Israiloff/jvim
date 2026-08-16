@@ -28,15 +28,19 @@ end
 
 local base_properties = {
 	-- Version of the JVIM IDE.
-	version = "0.38.68",
+	version = "0.39.69",
 	-- Logging configuration.
-	-- This is used to determine the logging level and whether logging is enabled.
+	--
+	-- On by default, but at error level only: a failure inside the config used to
+	-- be swallowed entirely unless you knew to turn logging on first. The quieter
+	-- levels stay off — they are for tracing startup, not for daily use — and all
+	-- of them are switchable from the Notifications menu.
 	logger = {
-		enabled = false,
+		enabled = true,
 		level = {
-			debug = true,
-			info = true,
-			warn = true,
+			debug = false,
+			info = false,
+			warn = false,
 			error = true,
 		},
 		enabled_loggers = { "*" },
