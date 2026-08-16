@@ -439,8 +439,9 @@ nvim-tree provides the file tree, with type icons, Git status, diagnostics,
 file operations and a window picker for opening into splits. The tree follows the
 active buffer and keeps its root in step with the current project.
 
-Starting with a directory — `nvim .` — opens the tree on it directly. Picking a
-file moves the tree to a sidebar and opens the file beside it.
+Starting with a directory — `nvim .` — opens the tree as a sidebar with the
+start screen beside it, so closing the tree leaves something usable rather than
+an empty buffer.
 
 Projects are detected automatically from version control and build files, and
 recent projects are reachable through Telescope or from the `p` entry on the

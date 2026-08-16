@@ -263,21 +263,9 @@ return {
 		dependencies = {
 			"nvim-tree/nvim-web-devicons",
 		},
+		-- `nvim .` needs a layout rather than a bare tree; see config/dir-session.lua.
 		init = function()
-			-- `nvim .` otherwise lands on a blank buffer: netrw is disabled in
-			-- config/startup.lua and this plugin only loads on its commands, so
-			-- nothing draws the directory. Pull it in during startup instead,
-			-- early enough for its directory hijack to claim that buffer.
-			if vim.fn.argc(-1) ~= 1 then
-				return
-			end
-
-			local path = vim.fn.argv(0)
-			local stat = (vim.uv or vim.loop).fs_stat(path)
-
-			if stat and stat.type == "directory" then
-				require("lazy").load({ plugins = { "nvim-tree.lua" } })
-			end
+			require("io.github.israiloff.config.dir-session").setup()
 		end,
 		config = conf("nvim-tree"),
 	},
