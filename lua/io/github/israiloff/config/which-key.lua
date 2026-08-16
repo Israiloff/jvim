@@ -176,7 +176,12 @@ which_key.add({
 	{ "<leader>lw", "<cmd>Telescope diagnostics<cr>", desc = icons.diagnostics.ScanBold .. " Workspace diagnostics" },
 
 	{ "<leader>n", group = icons.ui.Notification .. " Notifications" },
-	{ "<leader>nl", "<cmd>mess<CR>", desc = icons.ui.ListUnordered .. " Log" },
+	-- `:messages` no longer carries notifications: they are rendered in the
+	-- activity panel and retained separately, so the two logs are listed apart.
+	{ "<leader>nl", "<cmd>JvimNotifyLog<CR>", desc = icons.ui.ListUnordered .. " Log" },
+	{ "<leader>nc", "<cmd>JvimNotifyClear<CR>", desc = icons.ui.Close .. " Clear log" },
+	{ "<leader>nd", "<cmd>JvimActivityDismiss<CR>", desc = icons.ui.CloseOthers .. " Dismiss panel" },
+	{ "<leader>nm", "<cmd>mess<CR>", desc = icons.ui.List .. " Vim messages" },
 
 	{ "<leader>P", group = icons.kind.Module .. " Plugins" },
 	{ "<leader>Pc", "<cmd>Lazy clean<cr>", desc = icons.plugin.Clean .. " Clean" },

@@ -28,7 +28,7 @@ like an IDE, without giving up Neovim's startup time or keyboard-driven flow.
 
 - 🚀 **Java, end to end** — JDTLS with debugging, tests, refactoring, and Maven/Gradle tasks
 - ⚡ **Fast startup** — every plugin loads on demand; `nvim --startuptime` reports roughly 40 ms
-- 👁 **Visible activity** — plugin loads and LSP progress are reported, so long operations are never silent
+- 👁 **Visible activity** — plugin loads, LSP progress and notifications land in one unobtrusive panel, never in the message area
 - 🤖 **Switchable AI completion** — GitHub Copilot or self-hosted Tabby, changed without editing code
 - 🍃 **Optional Spring Boot tooling** — query-method completion from entity fields, `application.yml` support; off by default
 - 🔍 **Search and replace** — Telescope for navigation, grug-far for project-wide replace, plus per-file history
@@ -135,8 +135,11 @@ return {
     -- Bottom-right activity indicator.
     activity = {
       enabled = true,
-      lazy = true, -- report plugin loads
-      lsp = true,  -- report LSP progress
+      lazy = true,   -- report plugin loads
+      lsp = true,    -- report LSP progress
+      notify = true, -- route vim.notify into the panel
+      -- Per-level dwell time for notifications, in milliseconds.
+      notify_linger_ms = { error = 8000, warn = 6000, info = 4000, debug = 3000 },
     },
   },
   ai = {
@@ -328,14 +331,33 @@ Every plugin declares when it is needed, so nothing is loaded speculatively.
 Telescope, DAP, the terminal and the formatter only appear once you reach for
 them, and `nvim --startuptime` reports roughly **40 ms** to a usable editor.
 
-Because work happens on demand, a small indicator in the bottom-right corner
-reports what is going on:
+Because work happens on demand, a small panel in the bottom-right corner reports
+what is going on:
 
 - **Plugin loads** — which plugin was pulled in, how long it took, and what triggered it
 - **LSP progress** — live progress with a spinner, which matters most for JDTLS, whose initial project indexing can run for half a minute
+- **Notifications** — everything sent through `vim.notify`, the config's own logger included, coloured by level
 
-The indicator can be narrowed to one source or turned off entirely in
-`properties.lua`.
+Routing notifications here keeps them out of the message area, where a
+multi-line message pushes the text down and stops for a `Press ENTER` prompt.
+The panel never takes focus and never steals a keystroke.
+
+Panel entries expire, so notifications are also retained in a searchable log:
+
+```vim
+:JvimNotifyLog        " retained notifications, newest last; q closes it
+:JvimNotifyClear      " drop them
+:JvimActivityDismiss  " clear whatever is on screen right now
+```
+
+Note that `:messages` no longer receives notifications — `:silent echomsg`
+drops the history entry along with the echo, and every variant that does record
+also draws to the screen. `:JvimNotifyLog` is the notification history;
+`:messages` keeps carrying plain Vim messages.
+
+Each source can be turned off independently in `properties.lua`, along with the
+per-level dwell times. With `gui.activity.notify` off, notifications go back to
+the default handler and to `:messages`.
 
 ### Language Servers
 
