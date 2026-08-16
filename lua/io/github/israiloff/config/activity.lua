@@ -1,6 +1,6 @@
--- Bottom-right activity indicator.
+-- Bottom-right activity panel.
 --
--- Two sources feed the same widget:
+-- Three sources feed the same widget:
 --
 --   * lazy.nvim plugin loads (`User LazyLoad`). The event fires *after* the plugin
 --     finished loading and carries the elapsed time, so these are reported as
@@ -11,10 +11,22 @@
 --     spends 20-30 seconds indexing a project without a single character of
 --     feedback otherwise.
 --
+--   * Notifications. `vim.notify` is replaced so that everything routed through
+--     it — the project logger included — lands in this panel instead of the
+--     message area, where it would push the cursor line around and force a
+--     "Press ENTER" prompt on anything multi-line.
+--
+-- Because the panel expires entries, notifications are also kept in a bounded
+-- history readable with `:JvimNotifyLog`. They cannot be written to `:messages`
+-- instead: `:silent echomsg` suppresses the history entry along with the echo,
+-- and every variant that does record also draws to the screen, which is the one
+-- thing this panel exists to avoid.
+--
 -- The window never takes focus and never enters the buffer list.
 local M = {}
 
 local properties = require("io.github.israiloff.config.properties")
+local icons = require("io.github.israiloff.config.icons")
 
 local config = vim.tbl_deep_extend("force", {
 	enabled = true,
@@ -22,8 +34,22 @@ local config = vim.tbl_deep_extend("force", {
 	lazy = true,
 	-- Report LSP progress.
 	lsp = true,
+	-- Route `vim.notify` into the panel.
+	notify = true,
 	-- How long a finished entry stays on screen, in milliseconds.
 	linger_ms = 1200,
+	-- How long a notification stays on screen, per level. Errors get longer:
+	-- a message you cannot finish reading is no better than no message.
+	notify_linger_ms = {
+		error = 8000,
+		warn = 6000,
+		info = 4000,
+		debug = 3000,
+	},
+	-- Most wrapped lines a single notification may occupy.
+	notify_max_lines = 6,
+	-- Notifications retained for `:JvimNotifyLog`.
+	notify_history = 200,
 	-- Spinner tick, in milliseconds.
 	interval_ms = 80,
 	-- Widest the window is allowed to get, in columns. Shrinks on narrow terminals.
@@ -36,10 +62,46 @@ local SPINNER = { "⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇",
 local LAZY_ICON = "⚡"
 local DONE_ICON = "✓"
 
+local LEVELS = vim.log.levels
+
+local LEVEL_ICON = {
+	[LEVELS.ERROR] = icons.diagnostics.Error,
+	[LEVELS.WARN] = icons.diagnostics.Warning,
+	[LEVELS.INFO] = icons.diagnostics.Information,
+	[LEVELS.DEBUG] = icons.diagnostics.Hint,
+	[LEVELS.TRACE] = icons.diagnostics.Hint,
+}
+
+local LEVEL_HL = {
+	[LEVELS.ERROR] = "JvimActivityError",
+	[LEVELS.WARN] = "JvimActivityWarn",
+	[LEVELS.INFO] = "JvimActivityInfo",
+	[LEVELS.DEBUG] = "JvimActivityDebug",
+	[LEVELS.TRACE] = "JvimActivityDebug",
+}
+
+local LEVEL_LINGER = {
+	[LEVELS.ERROR] = "error",
+	[LEVELS.WARN] = "warn",
+	[LEVELS.INFO] = "info",
+	[LEVELS.DEBUG] = "debug",
+	[LEVELS.TRACE] = "debug",
+}
+
+local LEVEL_LABEL = {
+	[LEVELS.ERROR] = "ERROR",
+	[LEVELS.WARN] = "WARN",
+	[LEVELS.INFO] = "INFO",
+	[LEVELS.DEBUG] = "DEBUG",
+	[LEVELS.TRACE] = "TRACE",
+}
+
 local NS = vim.api.nvim_create_namespace("JvimActivity")
 
 local state = {
-	-- Ordered list of entries. Each is { key, icon_kind, name, detail, expires_at }.
+	-- Ordered list of entries. Activity entries are
+	-- { key, icon_kind, name, detail, expires_at }; notifications are
+	-- { key, kind = "notify", level, title, message, expires_at }.
 	entries = {},
 	buf = nil,
 	win = nil,
@@ -51,6 +113,12 @@ local state = {
 	-- Plugin loads during startup are noise; `:Lazy profile` already reports them.
 	-- Flipped on shortly after the UI settles.
 	armed = false,
+	-- Monotonic counter, so every notification gets its own entry rather than
+	-- overwriting the previous one.
+	notify_seq = 0,
+	-- Bounded log of everything that came through `vim.notify`, kept because
+	-- panel entries expire. Read with `:JvimNotifyLog`.
+	history = {},
 }
 
 -- ---------------------------------------------------------------------------
@@ -60,6 +128,10 @@ local function apply_highlights()
 	vim.api.nvim_set_hl(0, "JvimActivityIcon", { link = "DiagnosticInfo", default = true })
 	vim.api.nvim_set_hl(0, "JvimActivityName", { link = "Normal", default = true })
 	vim.api.nvim_set_hl(0, "JvimActivityDetail", { link = "Comment", default = true })
+	vim.api.nvim_set_hl(0, "JvimActivityError", { link = "DiagnosticError", default = true })
+	vim.api.nvim_set_hl(0, "JvimActivityWarn", { link = "DiagnosticWarn", default = true })
+	vim.api.nvim_set_hl(0, "JvimActivityInfo", { link = "DiagnosticInfo", default = true })
+	vim.api.nvim_set_hl(0, "JvimActivityDebug", { link = "Comment", default = true })
 end
 
 -- ---------------------------------------------------------------------------
@@ -93,9 +165,115 @@ local function truncate(text, width)
 	return vim.fn.strcharpart(text, 0, width - 1) .. "…"
 end
 
+-- Hard-split on display cells. Used for the pathological case of a single
+-- "word" wider than the panel — a stack trace path or a URL.
+local function split_by_cells(text, width)
+	local parts, current, current_width = {}, "", 0
+
+	for _, char in ipairs(vim.fn.split(text, "\\zs")) do
+		local char_width = vim.fn.strdisplaywidth(char)
+		if current ~= "" and current_width + char_width > width then
+			table.insert(parts, current)
+			current, current_width = "", 0
+		end
+		current = current .. char
+		current_width = current_width + char_width
+	end
+
+	if current ~= "" then
+		table.insert(parts, current)
+	end
+
+	return parts
+end
+
+---Wrap a message to `width` cells, honouring the newlines it already contains.
+local function wrap(text, width)
+	local lines = {}
+
+	for _, paragraph in ipairs(vim.split(text, "\n", { plain = true })) do
+		if paragraph:match("^%s*$") then
+			table.insert(lines, "")
+		else
+			local current = ""
+
+			for word in paragraph:gmatch("%S+") do
+				local candidate = current == "" and word or (current .. " " .. word)
+
+				if vim.fn.strdisplaywidth(candidate) <= width then
+					current = candidate
+				else
+					if current ~= "" then
+						table.insert(lines, current)
+						current = ""
+					end
+
+					local pieces = split_by_cells(word, width)
+					for index = 1, #pieces - 1 do
+						table.insert(lines, pieces[index])
+					end
+					current = pieces[#pieces] or ""
+				end
+			end
+
+			if current ~= "" then
+				table.insert(lines, current)
+			end
+		end
+	end
+
+	return lines
+end
+
+-- ---------------------------------------------------------------------------
+-- Rows
+--
+-- One entry produces one or more physical rows. Activity entries keep the
+-- original two-column table layout; notifications wrap across as many rows as
+-- their message needs.
+-- ---------------------------------------------------------------------------
+local function notify_rows(entry, text_width)
+	local icon = LEVEL_ICON[entry.level] or LEVEL_ICON[LEVELS.INFO]
+	local icon_hl = LEVEL_HL[entry.level] or "JvimActivityInfo"
+	local body = wrap(entry.message, text_width)
+	local rows = {}
+
+	local function push(row_icon, text, text_hl)
+		table.insert(rows, {
+			kind = "text",
+			icon = row_icon,
+			icon_hl = icon_hl,
+			text = text,
+			text_hl = text_hl,
+		})
+	end
+
+	-- With a title the icon row names the source and the message is indented
+	-- under it; without one the message simply starts next to the icon.
+	if entry.title and entry.title ~= "" then
+		push(icon, truncate(entry.title, text_width), "JvimActivityName")
+		for _, line in ipairs(body) do
+			push(nil, line, "JvimActivityDetail")
+		end
+	else
+		for index, line in ipairs(body) do
+			push(index == 1 and icon or nil, line, index == 1 and "JvimActivityName" or "JvimActivityDetail")
+		end
+	end
+
+	local limit = math.max(config.notify_max_lines, 1)
+	while #rows > limit do
+		table.remove(rows)
+		rows[#rows].text = truncate(rows[#rows].text .. " …", text_width)
+	end
+
+	return rows
+end
+
 ---Build the display lines plus the highlight ranges for each of them.
 ---
----Laid out as a two-column table so the timings and percentages line up:
+---Activity rows are laid out as a two-column table so the timings and
+---percentages line up:
 ---
 ---    ⚡ telescope.nvim          14.2ms  cmd
 ---    ⠙ jdtls        Starting Java Language Server  27%
@@ -111,15 +289,26 @@ local function build_lines()
 	-- " " + icon slot + " " + name + "  " + detail
 	local CHROME = 1 + ICON_CELLS + 1 + 2
 
-	local rows = {}
-	for _, entry in ipairs(state.entries) do
-		local icon = entry.icon_kind == "spinner" and spinner
-			or (entry.icon_kind == "lazy" and LAZY_ICON or DONE_ICON)
-		table.insert(rows, { icon = icon, name = entry.name, detail = entry.detail or "" })
-	end
-
 	-- Shrink rather than disappear on a narrow terminal.
 	local max_width = math.min(config.max_width, math.max(vim.o.columns - 8, 24))
+	local text_width = math.max(max_width - (1 + ICON_CELLS + 1), 12)
+
+	local rows = {}
+	for _, entry in ipairs(state.entries) do
+		if entry.kind == "notify" then
+			vim.list_extend(rows, notify_rows(entry, text_width))
+		else
+			local icon = entry.icon_kind == "spinner" and spinner
+				or (entry.icon_kind == "lazy" and LAZY_ICON or DONE_ICON)
+			table.insert(rows, {
+				kind = "columns",
+				icon = icon,
+				icon_hl = "JvimActivityIcon",
+				name = entry.name,
+				detail = entry.detail or "",
+			})
+		end
+	end
 
 	-- The detail column may grow until the name column is down to MIN_NAME cells;
 	-- the name column then takes whatever is left. Both are truncated to fit, so a
@@ -128,15 +317,19 @@ local function build_lines()
 	local detail_cap = math.max(max_width - CHROME - MIN_NAME, 8)
 	local detail_width = 0
 	for _, row in ipairs(rows) do
-		row.detail = truncate(row.detail, detail_cap)
-		detail_width = math.max(detail_width, vim.fn.strdisplaywidth(row.detail))
+		if row.kind == "columns" then
+			row.detail = truncate(row.detail, detail_cap)
+			detail_width = math.max(detail_width, vim.fn.strdisplaywidth(row.detail))
+		end
 	end
 
 	local name_budget = math.max(max_width - CHROME - detail_width, 8)
 	local name_width = 0
 	for _, row in ipairs(rows) do
-		row.name = truncate(row.name, name_budget)
-		name_width = math.max(name_width, vim.fn.strdisplaywidth(row.name))
+		if row.kind == "columns" then
+			row.name = truncate(row.name, name_budget)
+			name_width = math.max(name_width, vim.fn.strdisplaywidth(row.name))
+		end
 	end
 
 	-- Column widths only ever grow while the window is on screen. Without this the
@@ -150,29 +343,42 @@ local function build_lines()
 	local lines, marks = {}, {}
 
 	for _, row in ipairs(rows) do
-		local icon_pad = string.rep(" ", math.max(ICON_CELLS - vim.fn.strdisplaywidth(row.icon), 0))
-		local prefix = " " .. row.icon .. icon_pad .. " "
-		local name_start = #prefix
-		local name_end = name_start + #row.name
+		local icon = row.icon or ""
+		local icon_pad = string.rep(" ", math.max(ICON_CELLS - vim.fn.strdisplaywidth(icon), 0))
+		local prefix = " " .. icon .. icon_pad .. " "
+		local spans = {}
 
-		local line = prefix .. row.name
-		local detail_start = nil
+		if row.icon then
+			table.insert(spans, { 1, #prefix - 1, row.icon_hl })
+		end
 
-		if detail_width > 0 then
-			-- Pad the name column, then right-align the detail column.
-			local pad = name_width - vim.fn.strdisplaywidth(row.name)
-			local gap = detail_width - vim.fn.strdisplaywidth(row.detail)
-			line = line .. string.rep(" ", pad + 2 + gap)
-			detail_start = #line
-			line = line .. row.detail
+		local line
+		if row.kind == "columns" then
+			local text_start = #prefix
+			line = prefix .. row.name
+			table.insert(spans, { text_start, #line, "JvimActivityName" })
+
+			if detail_width > 0 then
+				-- Pad the name column, then right-align the detail column.
+				local pad = name_width - vim.fn.strdisplaywidth(row.name)
+				local gap = detail_width - vim.fn.strdisplaywidth(row.detail)
+				line = line .. string.rep(" ", pad + 2 + gap)
+				local detail_start = #line
+				line = line .. row.detail
+				if row.detail ~= "" then
+					table.insert(spans, { detail_start, #line, "JvimActivityDetail" })
+				end
+			end
+		else
+			local text_start = #prefix
+			line = prefix .. row.text
+			if row.text ~= "" then
+				table.insert(spans, { text_start, #line, row.text_hl })
+			end
 		end
 
 		table.insert(lines, line)
-		table.insert(marks, {
-			icon = { 1, name_start },
-			name = { name_start, name_end },
-			detail = (detail_start and row.detail ~= "") and { detail_start, #line } or nil,
-		})
+		table.insert(marks, spans)
 	end
 
 	return lines, marks
@@ -204,20 +410,12 @@ local function render()
 	vim.bo[buf].modifiable = false
 
 	vim.api.nvim_buf_clear_namespace(buf, NS, 0, -1)
-	for i, mark in ipairs(marks) do
+	for i, spans in ipairs(marks) do
 		local row = i - 1
-		vim.api.nvim_buf_set_extmark(buf, NS, row, mark.icon[1], {
-			end_col = mark.icon[2],
-			hl_group = "JvimActivityIcon",
-		})
-		vim.api.nvim_buf_set_extmark(buf, NS, row, mark.name[1], {
-			end_col = mark.name[2],
-			hl_group = "JvimActivityName",
-		})
-		if mark.detail then
-			vim.api.nvim_buf_set_extmark(buf, NS, row, mark.detail[1], {
-				end_col = mark.detail[2],
-				hl_group = "JvimActivityDetail",
+		for _, span in ipairs(spans) do
+			vim.api.nvim_buf_set_extmark(buf, NS, row, span[1], {
+				end_col = span[2],
+				hl_group = span[3],
 			})
 		end
 	end
@@ -335,7 +533,7 @@ end
 -- Sources
 -- ---------------------------------------------------------------------------
 local function on_lazy_load(name)
-	if not state.armed or not name then
+	if not config.enabled or not config.lazy or not state.armed or not name then
 		return
 	end
 
@@ -372,6 +570,10 @@ local function on_lazy_load(name)
 end
 
 local function on_lsp_progress(args)
+	if not config.enabled or not config.lsp then
+		return
+	end
+
 	local data = args.data
 	if not data or not data.params or not data.params.value then
 		return
@@ -415,14 +617,153 @@ local function on_lsp_progress(args)
 	})
 end
 
+local function record_history(level, title, message)
+	table.insert(state.history, {
+		time = os.date("%H:%M:%S"),
+		level = level,
+		title = title,
+		message = message,
+	})
+
+	local limit = math.max(config.notify_history, 1)
+	while #state.history > limit do
+		table.remove(state.history, 1)
+	end
+end
+
+local function on_notify(message, level, opts)
+	message = type(message) == "string" and message or vim.inspect(message)
+	level = type(level) == "number" and level or LEVELS.INFO
+
+	local title = opts and opts.title or nil
+	record_history(level, title, message)
+
+	state.notify_seq = state.notify_seq + 1
+
+	local linger = config.notify_linger_ms[LEVEL_LINGER[level] or "info"] or config.notify_linger_ms.info
+
+	upsert({
+		key = "notify:" .. state.notify_seq,
+		kind = "notify",
+		level = level,
+		title = title,
+		message = message,
+		expires_at = vim.uv.now() + linger,
+	})
+end
+
+-- ---------------------------------------------------------------------------
+-- Notification log
+-- ---------------------------------------------------------------------------
+local LOG_NS = vim.api.nvim_create_namespace("JvimNotifyLog")
+
+---Render the retained notifications into a scratch buffer.
+---
+---One line per message, continuation lines indented under it, so the log stays
+---greppable:
+---
+---    00:03:46  WARN   [probe] logger line routed through the panel
+function M.show_log()
+	local lines, spans = {}, {}
+
+	for _, item in ipairs(state.history) do
+		local label = LEVEL_LABEL[item.level] or "INFO"
+		local head = ("%s  %-5s  "):format(item.time, label)
+		local prefix = item.title and ("[" .. item.title .. "] ") or ""
+		local body = vim.split(item.message, "\n", { plain = true })
+
+		table.insert(spans, {
+			row = #lines,
+			from = #item.time + 2,
+			to = #item.time + 2 + #label,
+			hl = LEVEL_HL[item.level] or "JvimActivityInfo",
+		})
+		table.insert(lines, head .. prefix .. (body[1] or ""))
+
+		for index = 2, #body do
+			table.insert(lines, string.rep(" ", #head) .. body[index])
+		end
+	end
+
+	if #lines == 0 then
+		lines = { "(no notifications yet)" }
+	end
+
+	local buf = vim.api.nvim_create_buf(false, true)
+	vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
+	vim.bo[buf].modifiable = false
+	vim.bo[buf].bufhidden = "wipe"
+	vim.bo[buf].filetype = "jvim-notify-log"
+
+	for _, span in ipairs(spans) do
+		pcall(vim.api.nvim_buf_set_extmark, buf, LOG_NS, span.row, span.from, {
+			end_col = span.to,
+			hl_group = span.hl,
+		})
+	end
+
+	vim.cmd("botright split")
+	vim.api.nvim_win_set_buf(0, buf)
+	vim.api.nvim_win_set_height(0, math.min(math.max(#lines + 1, 8), math.floor(vim.o.lines / 2)))
+	vim.wo[0].number = false
+	vim.wo[0].relativenumber = false
+	vim.wo[0].wrap = false
+
+	-- Jump to the newest entry; a log you have to scroll to is a log you ignore.
+	pcall(vim.api.nvim_win_set_cursor, 0, { #lines, 0 })
+
+	vim.keymap.set("n", "q", "<cmd>close<cr>", { buffer = buf, nowait = true, desc = "Close notification log" })
+end
+
+function M.clear_log()
+	state.history = {}
+end
+
 -- ---------------------------------------------------------------------------
 -- Setup
 -- ---------------------------------------------------------------------------
-function M.setup()
-	if not config.enabled then
-		return
-	end
+local original_notify = vim.notify
 
+local function install_notify()
+	-- Re-entrancy guard: the panel's own failure path logs, and the logger calls
+	-- `vim.notify`. Without this a broken render would recurse until the stack
+	-- gave out instead of reporting itself.
+	local inside = false
+
+	vim.notify = function(message, level, opts)
+		if inside or not config.enabled or not config.notify then
+			return original_notify(message, level, opts)
+		end
+
+		inside = true
+		local ok, err = pcall(on_notify, message, level, opts)
+		inside = false
+
+		if not ok then
+			-- Never lose the caller's message because the panel misbehaved.
+			original_notify(message, level, opts)
+			original_notify("activity panel failed: " .. tostring(err), LEVELS.ERROR)
+		end
+	end
+end
+
+---Flip one of the panel's switches at runtime.
+---
+---Every source is gated at handler time rather than at registration time, so
+---the which-key toggles in `config/toggles.lua` take effect without a restart.
+---@param key "enabled"|"lazy"|"lsp"|"notify"
+---@param value boolean
+function M.set_option(key, value)
+	config[key] = value
+
+	if key == "enabled" and not value then
+		state.entries = {}
+		stop_timer()
+		close_window()
+	end
+end
+
+function M.setup()
 	apply_highlights()
 
 	local group = vim.api.nvim_create_augroup("JvimActivity", { clear = true })
@@ -432,59 +773,60 @@ function M.setup()
 		callback = apply_highlights,
 	})
 
-	if config.lazy then
-		vim.api.nvim_create_autocmd("User", {
-			group = group,
-			pattern = "LazyLoad",
-			callback = function(args)
-				on_lazy_load(args.data)
-			end,
-		})
+	-- Installed unconditionally: the replacement delegates to the original
+	-- whenever the panel is off, which is also what makes the switch reversible
+	-- inside a running session.
+	install_notify()
 
-		-- Stay quiet through the startup cascade; `:Lazy profile` already reports
-		-- it, and a wall of toasts on every launch is noise.
-		--
-		-- Armed off VimEnter rather than lazy.nvim's VeryLazy: VeryLazy rides on
-		-- UIEnter, which never fires in a headless session, and the indicator must
-		-- not stay permanently disabled there. The delay covers the VeryLazy burst.
-		local function arm()
-			vim.defer_fn(function()
-				state.armed = true
-			end, 500)
-		end
+	vim.api.nvim_create_autocmd("User", {
+		group = group,
+		pattern = "LazyLoad",
+		callback = function(args)
+			on_lazy_load(args.data)
+		end,
+	})
 
-		if vim.v.vim_did_enter == 1 then
-			arm()
-		else
-			vim.api.nvim_create_autocmd("VimEnter", {
-				group = group,
-				once = true,
-				callback = arm,
-			})
-		end
+	-- Stay quiet through the startup cascade; `:Lazy profile` already reports
+	-- it, and a wall of toasts on every launch is noise.
+	--
+	-- Armed off VimEnter rather than lazy.nvim's VeryLazy: VeryLazy rides on
+	-- UIEnter, which never fires in a headless session, and the indicator must
+	-- not stay permanently disabled there. The delay covers the VeryLazy burst.
+	local function arm()
+		vim.defer_fn(function()
+			state.armed = true
+		end, 500)
 	end
 
-	if config.lsp then
-		vim.api.nvim_create_autocmd("LspProgress", {
+	if vim.v.vim_did_enter == 1 then
+		arm()
+	else
+		vim.api.nvim_create_autocmd("VimEnter", {
 			group = group,
-			callback = function(args)
-				pcall(on_lsp_progress, args)
-			end,
+			once = true,
+			callback = arm,
 		})
+	end
 
-		-- A crashed server never sends its "end" report.
-		vim.api.nvim_create_autocmd("LspDetach", {
-			group = group,
-			callback = function(args)
-				local prefix = ("lsp:%d:"):format(args.data.client_id)
-				for i = #state.entries, 1, -1 do
-					if state.entries[i].key:sub(1, #prefix) == prefix then
-						table.remove(state.entries, i)
-					end
+	vim.api.nvim_create_autocmd("LspProgress", {
+		group = group,
+		callback = function(args)
+			pcall(on_lsp_progress, args)
+		end,
+	})
+
+	-- A crashed server never sends its "end" report.
+	vim.api.nvim_create_autocmd("LspDetach", {
+		group = group,
+		callback = function(args)
+			local prefix = ("lsp:%d:"):format(args.data.client_id)
+			for i = #state.entries, 1, -1 do
+				if state.entries[i].key:sub(1, #prefix) == prefix then
+					table.remove(state.entries, i)
 				end
-			end,
-		})
-	end
+			end
+		end,
+	})
 
 	vim.api.nvim_create_autocmd("VimResized", {
 		group = group,
@@ -507,7 +849,15 @@ function M.setup()
 		state.entries = {}
 		stop_timer()
 		close_window()
-	end, { desc = "Dismiss the activity indicator" })
+	end, { desc = "Dismiss the activity panel" })
+
+	vim.api.nvim_create_user_command("JvimNotifyLog", function()
+		M.show_log()
+	end, { desc = "Show retained notifications" })
+
+	vim.api.nvim_create_user_command("JvimNotifyClear", function()
+		M.clear_log()
+	end, { desc = "Drop the retained notifications" })
 end
 
 -- Exposed for the dismiss command and for ad-hoc testing.

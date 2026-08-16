@@ -28,7 +28,7 @@ like an IDE, without giving up Neovim's startup time or keyboard-driven flow.
 
 - 🚀 **Java, end to end** — JDTLS with debugging, tests, refactoring, and Maven/Gradle tasks
 - ⚡ **Fast startup** — every plugin loads on demand; `nvim --startuptime` reports roughly 40 ms
-- 👁 **Visible activity** — plugin loads and LSP progress are reported, so long operations are never silent
+- 👁 **Visible activity** — plugin loads, LSP progress and notifications land in one unobtrusive panel, never in the message area
 - 🤖 **Switchable AI completion** — GitHub Copilot or self-hosted Tabby, changed without editing code
 - 🍃 **Optional Spring Boot tooling** — query-method completion from entity fields, `application.yml` support; off by default
 - 🔍 **Search and replace** — Telescope for navigation, grug-far for project-wide replace, plus per-file history
@@ -36,6 +36,7 @@ like an IDE, without giving up Neovim's startup time or keyboard-driven flow.
 - 🔧 **Managed toolchain** — Mason installs language servers, formatters and debug adapters
 - 🎨 **Darcula UI** — JetBrains-inspired colorscheme, breadcrumbs, statusline and buffer bar
 - 🎯 **Discoverable keys** — every binding lives in a which-key menu instead of a cheatsheet
+- 🎛 **Settings in the menu** — every switch is toggled from which-key, applied live and persisted
 
 ---
 
@@ -135,8 +136,11 @@ return {
     -- Bottom-right activity indicator.
     activity = {
       enabled = true,
-      lazy = true, -- report plugin loads
-      lsp = true,  -- report LSP progress
+      lazy = true,   -- report plugin loads
+      lsp = true,    -- report LSP progress
+      notify = true, -- route vim.notify into the panel
+      -- Per-level dwell time for notifications, in milliseconds.
+      notify_linger_ms = { error = 8000, warn = 6000, info = 4000, debug = 3000 },
     },
   },
   ai = {
@@ -154,13 +158,38 @@ return {
     MACOS = "zsh",
   },
   logger = {
-    enabled = false, -- turn on to trace the config's own startup
+    enabled = true, -- on by default so config failures are not silent
+    -- Only errors are reported; the quieter levels are for tracing startup.
+    level = { debug = false, info = false, warn = false, error = true },
     enabled_loggers = { "*" },
   },
 }
 ```
 
 Only the keys you override need to be present.
+
+### Switches without editing files
+
+Every boolean in that table is also a which-key entry, placed with the feature
+it controls. Flipping one applies immediately **and** writes the new value to
+`properties-local.lua`, so the choice survives a restart:
+
+| Where | What |
+| --- | --- |
+| `UI` menu | transparency, activity panel, plugin-load reports, LSP progress, notifications |
+| `Notifications ▸ Logger` menu | logging on/off and the debug / info / warn / error levels |
+
+Each entry shows its current state in the label, so the menu doubles as a status
+readout. From the command line:
+
+```vim
+:JvimToggleStatus   " every switch and its state
+:JvimToggle <name>  " flip one by name
+```
+
+The AI provider and Spring Boot support keep their own menus instead, because
+they cannot be applied live — both decide how a language server is started, and
+that has already happened by the time you reach the menu.
 
 ---
 
@@ -328,14 +357,33 @@ Every plugin declares when it is needed, so nothing is loaded speculatively.
 Telescope, DAP, the terminal and the formatter only appear once you reach for
 them, and `nvim --startuptime` reports roughly **40 ms** to a usable editor.
 
-Because work happens on demand, a small indicator in the bottom-right corner
-reports what is going on:
+Because work happens on demand, a small panel in the bottom-right corner reports
+what is going on:
 
 - **Plugin loads** — which plugin was pulled in, how long it took, and what triggered it
 - **LSP progress** — live progress with a spinner, which matters most for JDTLS, whose initial project indexing can run for half a minute
+- **Notifications** — everything sent through `vim.notify`, the config's own logger included, coloured by level
 
-The indicator can be narrowed to one source or turned off entirely in
-`properties.lua`.
+Routing notifications here keeps them out of the message area, where a
+multi-line message pushes the text down and stops for a `Press ENTER` prompt.
+The panel never takes focus and never steals a keystroke.
+
+Panel entries expire, so notifications are also retained in a searchable log:
+
+```vim
+:JvimNotifyLog        " retained notifications, newest last; q closes it
+:JvimNotifyClear      " drop them
+:JvimActivityDismiss  " clear whatever is on screen right now
+```
+
+Note that `:messages` no longer receives notifications — `:silent echomsg`
+drops the history entry along with the echo, and every variant that does record
+also draws to the screen. `:JvimNotifyLog` is the notification history;
+`:messages` keeps carrying plain Vim messages.
+
+Each source can be turned off independently in `properties.lua`, along with the
+per-level dwell times. With `gui.activity.notify` off, notifications go back to
+the default handler and to `:messages`.
 
 ### Language Servers
 
@@ -409,6 +457,10 @@ they apply.
 
 To search bindings as text instead, use Telescope's keymap picker.
 
+Configuration switches live in the same menus, next to the feature they affect,
+and carry their current state in the label — so there is nothing to remember and
+no file to open to find out what is on.
+
 ---
 
 ## Troubleshooting
@@ -480,15 +532,22 @@ usually correct — it will load when its trigger fires.
 
 ### Tracing the configuration itself
 
-Set `logger.enabled = true` in `properties-local.lua` to make the config report
-its own startup, then read the output with `:messages`.
+The config logs its own failures out of the box, at error level only, so a
+broken step is reported in the activity panel rather than swallowed. Read the
+history with `:JvimNotifyLog`.
+
+To trace a startup in full, turn on the quieter levels from
+`Notifications ▸ Logger` — or `:JvimToggle logger_debug` — and reproduce the
+problem. They are off by default because they report every step of every
+module, which is noise unless you are chasing something specific.
 
 ### Getting Help
 
 ```vim
 :checkhealth
 :Lazy
-:messages
+:JvimNotifyLog   " what the config itself reported
+:messages        " plain Vim messages
 ```
 
 ---

@@ -33,7 +33,7 @@ return {
 		config = function()
 			require("io.github.israiloff.config.theme")
 			require("io.github.israiloff.config.colors")
-			require("io.github.israiloff.config.transparent")
+			require("io.github.israiloff.config.transparent").setup()
 		end,
 	},
 

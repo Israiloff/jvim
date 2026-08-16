@@ -55,8 +55,16 @@ function _G.CM_LOGGER(level, text, logger)
 			text, logger = logger, "unknown"
 		end
 
-		vim.notify(
-			vim.fn.strftime("%Y-%m-%d %H:%M:%S")
+		-- The activity panel renders the timestamp, the level and the source
+		-- itself, so baking them into the message would print each of them
+		-- twice. Only pre-format when the message is going somewhere that shows
+		-- nothing but the raw string.
+		local activity = (properties.gui or {}).activity or {}
+		local panel_formats = activity.enabled ~= false and activity.notify ~= false
+
+		local message = tostring(text)
+		if not panel_formats then
+			message = vim.fn.strftime("%Y-%m-%d %H:%M:%S")
 				.. TAB
 				.. "["
 				.. level
@@ -64,10 +72,10 @@ function _G.CM_LOGGER(level, text, logger)
 				.. TAB
 				.. tostring(logger)
 				.. TAB
-				.. tostring(text),
-			levels[level] or vim.log.levels.INFO,
-			{ title = tostring(logger) }
-		)
+				.. message
+		end
+
+		vim.notify(message, levels[level] or vim.log.levels.INFO, { title = tostring(logger) })
 	end
 end
 

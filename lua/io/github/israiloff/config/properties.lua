@@ -28,15 +28,19 @@ end
 
 local base_properties = {
 	-- Version of the JVIM IDE.
-	version = "0.36.66",
+	version = "0.39.69",
 	-- Logging configuration.
-	-- This is used to determine the logging level and whether logging is enabled.
+	--
+	-- On by default, but at error level only: a failure inside the config used to
+	-- be swallowed entirely unless you knew to turn logging on first. The quieter
+	-- levels stay off — they are for tracing startup, not for daily use — and all
+	-- of them are switchable from the Notifications menu.
 	logger = {
-		enabled = false,
+		enabled = true,
 		level = {
-			debug = true,
-			info = true,
-			warn = true,
+			debug = false,
+			info = false,
+			warn = false,
 			error = true,
 		},
 		enabled_loggers = { "*" },
@@ -45,14 +49,25 @@ local base_properties = {
 	-- This is used to determine the appearance of the GUI.
 	gui = {
 		transparent = true,
-		-- Bottom-right activity indicator.
-		-- Reports lazy.nvim plugin loads and LSP progress (jdtls indexing in
-		-- particular, which is otherwise completely silent).
+		-- Bottom-right activity panel.
+		-- Reports lazy.nvim plugin loads, LSP progress (jdtls indexing in
+		-- particular, which is otherwise completely silent) and notifications.
 		activity = {
 			enabled = true,
 			lazy = true,
 			lsp = true,
+			-- Route `vim.notify` — the project logger included — into the panel
+			-- instead of the message area. `:messages` still records everything.
+			notify = true,
 			linger_ms = 1200,
+			-- Per-level dwell time for notifications; errors get longer.
+			notify_linger_ms = {
+				error = 8000,
+				warn = 6000,
+				info = 4000,
+				debug = 3000,
+			},
+			notify_max_lines = 6,
 			interval_ms = 80,
 			max_width = 60,
 			max_entries = 6,

@@ -115,6 +115,8 @@ return {
 		Resume = "",
 		SearchList = "󱩾",
 		Registers = "󱃔",
+		Settings = "",
+		Transparency = "󰗧",
         Neovim = "",
 	},
 	diagnostics = {
