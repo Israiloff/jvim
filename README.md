@@ -439,14 +439,24 @@ nvim-tree provides the file tree, with type icons, Git status, diagnostics,
 file operations and a window picker for opening into splits. The tree follows the
 active buffer and keeps its root in step with the current project.
 
+Starting with a directory — `nvim .` — opens the tree as a sidebar with the
+start screen beside it, so closing the tree leaves something usable rather than
+an empty buffer.
+
 Projects are detected automatically from version control and build files, and
-recent projects are reachable through Telescope.
+recent projects are reachable through Telescope or from the `p` entry on the
+start screen. Detection runs from the first buffer of the session, so the
+project you are sitting in is always in its own list.
 
 ### Editing
 
 Treesitter-based highlighting and indentation with incremental selection,
 comment toggling that follows the language, indentation guides, TODO comment
 highlighting, and a live Markdown preview.
+
+Modified buffers are written automatically when you leave insert mode and as
+text changes, debounced to at most one write every 135 ms. Suspend it for the
+session with `:ASToggle`.
 
 ### Discoverable Keys
 

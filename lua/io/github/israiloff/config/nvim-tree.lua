@@ -134,8 +134,10 @@ require("nvim-tree").setup({
 			},
 		},
 	},
+	-- Claims the buffer Neovim opens for `nvim <dir>`. Without this the argument
+	-- directory stays an empty unrendered buffer, since netrw is disabled.
 	hijack_directories = {
-		enable = false,
+		enable = true,
 		auto_open = true,
 	},
 	update_focused_file = {

@@ -223,13 +223,24 @@ return {
 			"nvim-lua/plenary.nvim",
 			"nvim-telescope/telescope-dap.nvim",
 			"dawsers/telescope-file-history.nvim",
-			"ahmedkhalf/project.nvim",
 		},
 		config = function()
-			require("io.github.israiloff.config.project-nvim")
 			require("io.github.israiloff.config.telescope-file-history")
 			require("io.github.israiloff.config.telescope")
 		end,
+	},
+	{
+		-- Deliberately not lazy. The project list is built from the directories
+		-- you actually open, so it has to be watching from the first buffer;
+		-- loaded on demand behind Telescope it only ever recorded the sessions
+		-- where a picker happened to be opened, and the project you were sitting
+		-- in was missing from its own list.
+		--
+		-- Telescope finds the `projects` extension on the runtimepath, so it no
+		-- longer needs to carry this as a dependency.
+		"ahmedkhalf/project.nvim",
+		lazy = false,
+		config = conf("project-nvim"),
 	},
 	{
 		"MagicDuck/grug-far.nvim",
@@ -252,6 +263,10 @@ return {
 		dependencies = {
 			"nvim-tree/nvim-web-devicons",
 		},
+		-- `nvim .` needs a layout rather than a bare tree; see config/dir-session.lua.
+		init = function()
+			require("io.github.israiloff.config.dir-session").setup()
+		end,
 		config = conf("nvim-tree"),
 	},
 	{
@@ -333,11 +348,25 @@ return {
 		cmd = { "Format", "FormatWrite", "FormatLock", "FormatWriteLock" },
 		config = conf("formatter-nvim"),
 	},
+	{
+		-- Switched on by its own `plugin/auto-save.lua`, which calls `on()` as
+		-- soon as the plugin is sourced; `setup()` only records options and
+		-- activates nothing. The load trigger is therefore the on/off switch,
+		-- and `lazy = true` with nothing requiring the module silently disabled
+		-- auto-saving altogether.
+		--
+		-- Loaded before the buffer can be edited, because the plugin registers
+		-- its InsertLeave/TextChanged handlers at load time and would miss the
+		-- event that pulled it in.
+		"Pocco81/auto-save.nvim",
+		event = BUF_ENTER,
+	},
+
 	-- -----------------------------------------------------------------------
-	-- Installed but currently inert — no setup() call anywhere. Kept lazy so they
-	-- cost nothing; candidates for removal.
+	-- Installed but currently inert. `lualine-time` ships lualine components
+	-- that nothing in `config/lualine.lua` references, so it never runs. Kept
+	-- lazy at no cost; a candidate for removal.
 	-- -----------------------------------------------------------------------
-	{ "Pocco81/auto-save.nvim", lazy = true },
 	{ "archibate/lualine-time", lazy = true },
 
 	{
