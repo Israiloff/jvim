@@ -203,6 +203,16 @@ local function get_bundles()
 		add_unique(bundles, seen, jar)
 	end
 
+	-- Spring Boot LS reads the type model out of jdtls through these extension
+	-- jars; without them it can parse a repository interface but cannot resolve
+	-- the entity's fields. Returns an empty list when the feature is off.
+	local spring = safe_require("io.github.israiloff.config.java.spring", "JAVA: spring module not found")
+	if spring then
+		for _, jar in ipairs(spring.java_extensions()) do
+			add_unique(bundles, seen, jar)
+		end
+	end
+
 	cache.bundles = bundles
 	logger.info(logger_name, "JAVA: bundles count: " .. tostring(#bundles))
 	return bundles

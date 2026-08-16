@@ -28,7 +28,7 @@ end
 
 local base_properties = {
 	-- Version of the JVIM IDE.
-	version = "0.35.65",
+	version = "0.36.66",
 	-- Logging configuration.
 	-- This is used to determine the logging level and whether logging is enabled.
 	logger = {
@@ -75,6 +75,15 @@ local base_properties = {
 			agent_start_command = { "npx", "tabby-agent", "--stdio" },
 			inline_completion_trigger = "auto",
 		},
+	},
+	-- Spring Boot support (spring-boot.nvim + spring-boot-language-server).
+	-- Layers on top of jdtls rather than replacing it: adds content-assist for
+	-- Spring Data repository query methods, application.yml/.properties
+	-- completion, bean and endpoint navigation.
+	-- Costs a second LSP client and a second JVM, so it is off by default.
+	-- Toggle with `:JvimSpringToggle`; takes effect on the next start.
+	spring = {
+		enabled = false,
 	},
 	-- The default configuration for the Java Development Tools Language Server (JDTLS).
 	-- This is used to determine the JVM options for the JDTLS.

@@ -13,6 +13,7 @@ if not which_key_status then
 end
 
 local icons = require("io.github.israiloff.config.icons")
+local spring = require("io.github.israiloff.config.java.spring")
 
 -- ---------------------------------------------------------------------------
 -- Normal mode
@@ -129,6 +130,29 @@ which_key.add({
 		"<cmd>lua exec_in_terminal_horizontal('./gradlew test')<CR>",
 		desc = icons.gradle.Test .. " Test",
 	},
+
+	-- Spring Boot support lives here rather than at the top level: it is only
+	-- meaningful in a Java project, and this whole spec is registered from
+	-- jdtls's on_attach. The label reports what is live in this session, which
+	-- is not necessarily what is configured — the jdtls bundles the Spring
+	-- server needs are only read when the client starts.
+	{ "<leader>js", group = icons.spring.Logo .. " Spring [" .. spring.get_label(spring.is_enabled()) .. "]" },
+	{
+		"<leader>jse",
+		function()
+			spring.set_enabled(true)
+		end,
+		desc = icons.spring.Enable .. " Enable on next start",
+	},
+	{
+		"<leader>jsd",
+		function()
+			spring.set_enabled(false)
+		end,
+		desc = icons.spring.Disable .. " Disable on next start",
+	},
+	{ "<leader>jst", spring.toggle, desc = icons.ui.Refresh .. " Toggle" },
+	{ "<leader>jss", spring.show_status, desc = icons.spring.Status .. " Status" },
 })
 
 -- ---------------------------------------------------------------------------

@@ -47,7 +47,18 @@ local function setup_codelens_refresh(client, bufnr)
     vim.lsp.codelens.refresh({ bufnr = bufnr })
 end
 
+-- Servers that share a buffer with a primary language server and must not claim
+-- the winbar breadcrumb. navic binds one client per buffer and warns on every
+-- buffer if a second one tries, so these are skipped before it gets the chance.
+local navic_excluded_clients = {
+    ["spring-boot"] = true,
+}
+
 local function setup_navic(client, bufnr)
+    if navic_excluded_clients[client.name] then
+        return
+    end
+
     local navic_status, navic = pcall(require, "io.github.israiloff.config.nvim-navic")
 
     if not navic_status then

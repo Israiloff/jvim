@@ -1,6 +1,9 @@
 local M = {}
 
 local properties = require("io.github.israiloff.config.properties")
+local local_properties = require("io.github.israiloff.config.local-properties")
+
+local TITLE = "JVIM AI"
 
 M.providers = {
 	COPILOT = "copilot",
@@ -18,13 +21,6 @@ local valid_tabby_triggers = {
 	auto = true,
 	manual = true,
 }
-
-local local_properties_path = vim.fn.stdpath("config") .. "/lua/io/github/israiloff/config/properties-local.lua"
-
-local function file_exists(path)
-	local uv = vim.uv or vim.loop
-	return uv.fs_stat(path) ~= nil
-end
 
 local function is_valid_provider(provider)
 	return valid_providers[provider] == true
@@ -46,12 +42,8 @@ local function normalize_tabby_trigger(trigger)
 	return "auto"
 end
 
-local function serialize_lua_table(tbl)
-	return "return " .. vim.inspect(tbl) .. "\n"
-end
-
 function M.get_local_properties_path()
-	return local_properties_path
+	return local_properties.path()
 end
 
 function M.get_provider()
@@ -77,33 +69,11 @@ function M.is(provider)
 end
 
 function M.read_local_properties()
-	if not file_exists(local_properties_path) then
-		return {}
-	end
-
-	local chunk, load_err = loadfile(local_properties_path)
-	if not chunk then
-		vim.notify("Failed to load local properties: " .. load_err, vim.log.levels.ERROR, { title = "JVIM AI" })
-		return {}
-	end
-
-	local ok, local_properties = pcall(chunk)
-	if not ok then
-		vim.notify("Failed to evaluate local properties: " .. local_properties, vim.log.levels.ERROR, { title = "JVIM AI" })
-		return {}
-	end
-
-	if type(local_properties) ~= "table" then
-		vim.notify("Local properties must return a table: " .. local_properties_path, vim.log.levels.ERROR, { title = "JVIM AI" })
-		return {}
-	end
-
-	return local_properties
+	return local_properties.read(TITLE)
 end
 
 function M.get_configured_provider()
-	local local_properties = M.read_local_properties()
-	local local_ai = local_properties.ai
+	local local_ai = M.read_local_properties().ai
 
 	if type(local_ai) ~= "table" or local_ai.provider == nil then
 		return M.get_runtime_provider()
@@ -128,61 +98,29 @@ function M.get_tabby_inline_completion_trigger()
 	return normalize_tabby_trigger(tabby_config and tabby_config.inline_completion_trigger)
 end
 
-function M.write_local_properties(local_properties)
-	if type(local_properties) ~= "table" then
-		vim.notify("Local properties payload must be a table.", vim.log.levels.ERROR, { title = "JVIM AI" })
-		return false
-	end
-
-	local dir = vim.fn.fnamemodify(local_properties_path, ":h")
-	vim.fn.mkdir(dir, "p")
-
-	local file, open_err = io.open(local_properties_path, "w")
-	if not file then
-		vim.notify("Failed to open local properties: " .. open_err, vim.log.levels.ERROR, { title = "JVIM AI" })
-		return false
-	end
-
-	local ok, write_err = file:write(serialize_lua_table(local_properties))
-	file:close()
-
-	if not ok then
-		vim.notify("Failed to write local properties: " .. tostring(write_err), vim.log.levels.ERROR, { title = "JVIM AI" })
-		return false
-	end
-
-	return true
+function M.write_local_properties(payload)
+	return local_properties.write(payload, TITLE)
 end
 
 function M.select_provider(provider)
 	if not is_valid_provider(provider) then
-		vim.notify("Unsupported AI provider: " .. tostring(provider), vim.log.levels.ERROR, { title = "JVIM AI" })
+		vim.notify("Unsupported AI provider: " .. tostring(provider), vim.log.levels.ERROR, { title = TITLE })
 		return
 	end
 
-	local local_properties = M.read_local_properties()
-	local local_ai = local_properties.ai
-
-	if type(local_ai) ~= "table" then
-		local_ai = {}
-		local_properties.ai = local_ai
-	end
-
-	local_ai.provider = provider
-
-	if not M.write_local_properties(local_properties) then
+	if not local_properties.set({ "ai", "provider" }, provider, TITLE) then
 		return
 	end
 
 	vim.notify(
 		"AI provider for the next Neovim start: " .. M.get_provider_label(provider) .. ". Restart Neovim to apply.",
 		vim.log.levels.INFO,
-		{ title = "JVIM AI" }
+		{ title = TITLE }
 	)
 end
 
 function M.edit_local_properties()
-	if not file_exists(local_properties_path) then
+	if not local_properties.exists() then
 		if not M.write_local_properties({
 			ai = {
 				provider = M.get_runtime_provider(),
@@ -192,7 +130,7 @@ function M.edit_local_properties()
 		end
 	end
 
-	vim.cmd("edit " .. vim.fn.fnameescape(local_properties_path))
+	vim.cmd("edit " .. vim.fn.fnameescape(local_properties.path()))
 end
 
 function M.show_status()
@@ -203,10 +141,10 @@ function M.show_status()
 		table.concat({
 			"Current session: " .. M.get_provider_label(runtime_provider),
 			"Next start: " .. M.get_provider_label(configured_provider),
-			"Local override: " .. (file_exists(local_properties_path) and local_properties_path or "not created"),
+			"Local override: " .. (local_properties.exists() and local_properties.path() or "not created"),
 		}, "\n"),
 		vim.log.levels.INFO,
-		{ title = "JVIM AI" }
+		{ title = TITLE }
 	)
 end
 

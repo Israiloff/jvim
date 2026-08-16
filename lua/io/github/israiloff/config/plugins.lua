@@ -173,6 +173,22 @@ return {
 		},
 	},
 	{
+		-- Spring Boot LS. Not a standalone Java server — it needs jdtls running
+		-- and reads the type model back from it, so this is strictly additive.
+		-- Off unless `properties.spring.enabled`, since it costs a second JVM.
+		"JavaHello/spring-boot.nvim",
+		ft = { "java", "yaml", "jproperties" },
+		enabled = function()
+			return require("io.github.israiloff.config.java.spring").is_enabled()
+		end,
+		dependencies = {
+			"mfussenegger/nvim-jdtls",
+		},
+		config = function()
+			require("io.github.israiloff.config.java.spring").setup()
+		end,
+	},
+	{
 		-- Uber-jar consumed directly by config/lsp-servers.lua; no Lua to load.
 		"Israiloff/lemminx-compiled",
 		version = "v0.28.0",
