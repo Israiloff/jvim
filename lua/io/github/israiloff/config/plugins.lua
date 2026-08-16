@@ -333,11 +333,25 @@ return {
 		cmd = { "Format", "FormatWrite", "FormatLock", "FormatWriteLock" },
 		config = conf("formatter-nvim"),
 	},
+	{
+		-- Switched on by its own `plugin/auto-save.lua`, which calls `on()` as
+		-- soon as the plugin is sourced; `setup()` only records options and
+		-- activates nothing. The load trigger is therefore the on/off switch,
+		-- and `lazy = true` with nothing requiring the module silently disabled
+		-- auto-saving altogether.
+		--
+		-- Loaded before the buffer can be edited, because the plugin registers
+		-- its InsertLeave/TextChanged handlers at load time and would miss the
+		-- event that pulled it in.
+		"Pocco81/auto-save.nvim",
+		event = BUF_ENTER,
+	},
+
 	-- -----------------------------------------------------------------------
-	-- Installed but currently inert — no setup() call anywhere. Kept lazy so they
-	-- cost nothing; candidates for removal.
+	-- Installed but currently inert. `lualine-time` ships lualine components
+	-- that nothing in `config/lualine.lua` references, so it never runs. Kept
+	-- lazy at no cost; a candidate for removal.
 	-- -----------------------------------------------------------------------
-	{ "Pocco81/auto-save.nvim", lazy = true },
 	{ "archibate/lualine-time", lazy = true },
 
 	{

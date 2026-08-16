@@ -448,6 +448,10 @@ Treesitter-based highlighting and indentation with incremental selection,
 comment toggling that follows the language, indentation guides, TODO comment
 highlighting, and a live Markdown preview.
 
+Modified buffers are written automatically when you leave insert mode and as
+text changes, debounced to at most one write every 135 ms. Suspend it for the
+session with `:ASToggle`.
+
 ### Discoverable Keys
 
 There is no cheatsheet to memorise. Press the leader key (`Space`) and which-key
