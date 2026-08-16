@@ -10,6 +10,7 @@
 - [Installation](#installation)
 - [Configuration](#configuration)
 - [AI Completion](#ai-completion)
+- [Spring Boot](#spring-boot)
 - [Docker Container](#docker-container)
 - [Features](#features)
 - [Troubleshooting](#troubleshooting)
@@ -29,6 +30,7 @@ like an IDE, without giving up Neovim's startup time or keyboard-driven flow.
 - ⚡ **Fast startup** — every plugin loads on demand; `nvim --startuptime` reports roughly 40 ms
 - 👁 **Visible activity** — plugin loads and LSP progress are reported, so long operations are never silent
 - 🤖 **Switchable AI completion** — GitHub Copilot or self-hosted Tabby, changed without editing code
+- 🍃 **Optional Spring Boot tooling** — query-method completion from entity fields, `application.yml` support; off by default
 - 🔍 **Search and replace** — Telescope for navigation, grug-far for project-wide replace, plus per-file history
 - 🐛 **Full DAP debugging** — breakpoints, stepping, watches, and remote JVM attach
 - 🔧 **Managed toolchain** — Mason installs language servers, formatters and debug adapters
@@ -140,6 +142,9 @@ return {
   ai = {
     provider = "tabby", -- copilot | tabby | none
   },
+  spring = {
+    enabled = false, -- Spring Boot tooling; costs a second language server
+  },
   jdtls = {
     jvm = { xms = "256M", xmx = "1G" },
   },
@@ -192,6 +197,49 @@ Self-hosted completion, sharing the same accept key as Copilot.
 
 Ghost text is re-themed on every colorscheme change so it stays readable on a
 transparent background.
+
+---
+
+## Spring Boot
+
+Spring Boot tooling is **off by default**. It can be turned on from the `Spring`
+entry of the Java which-key menu — which only exists inside a Java project — or
+from the command line anywhere:
+
+```vim
+:JvimSpringStatus    " what is live now, and what is set for next start
+:JvimSpringToggle    " flip it
+:JvimSpringEnable
+:JvimSpringDisable
+```
+
+Like the AI provider, the choice is written to `properties-local.lua` and applied
+on the next start. It cannot take effect immediately: the tooling contributes
+extension bundles that JDTLS only reads when the client starts.
+
+Once enabled, `:MasonInstall vscode-spring-boot-tools` provides the server, and
+you get:
+
+- **Query-method completion** — typing `findBy` in a `Repository` interface completes from the entity's own fields, with parameter types filled in
+- **Configuration files** — completion and navigation in `application.properties`, `application.yml` and their profile variants
+- **Spring symbols** — beans and web endpoints exposed as workspace symbols, searchable through Telescope
+- **Annotation hints** — inline information on Spring annotations
+
+### What it costs
+
+This is an add-on to JDTLS, not a replacement. `spring-boot-language-server`
+starts as a **second LSP client** on Java and configuration buffers, and reaches
+back into JDTLS over `workspace/executeCommand` for the type model — which is why
+turning off JDTLS is not an option, and why disabling Spring support leaves
+everything else untouched.
+
+That second server is a separate JVM, roughly 300–600 MB in a real project on top
+of JDTLS's own heap. On a large monorepo or a memory-constrained machine, leaving
+it off is a reasonable default.
+
+When the feature is disabled nothing is paid for it: the plugin is never
+installed, the bundles are never collected, and the Mason package is dropped from
+the tool list. Startup stays at roughly 40 ms either way.
 
 ---
 
@@ -299,6 +347,9 @@ Out of the box: **Java**, **Lua**, **JSON**, **YAML**, **Dockerfile**, **Markdow
 and **XML**. XML is served from a pre-compiled LemMinX build, which avoids the slow
 first-run download the Mason package performs.
 
+A Spring Boot server can be layered on top of JDTLS as an opt-in extra — see
+[Spring Boot](#spring-boot).
+
 ### Completion
 
 `nvim-cmp` with LSP, buffer, path, command-line and LuaSnip sources, rendered with
@@ -379,6 +430,22 @@ file type. Install what you need explicitly:
 :Mason                  " browse and install interactively
 :MasonToolsInstall      " install everything this config declares
 ```
+
+### Spring Boot completions not appearing
+
+Check the toggle and the server package first:
+
+```vim
+:JvimSpringStatus       " must report On for the current session, package installed
+:MasonInstall vscode-spring-boot-tools
+:checkhealth lsp        " expect two clients on a Java buffer: jdtls and spring-boot
+```
+
+Enabling the feature only takes effect after a restart. If both clients are
+attached but query methods still do not complete, JDTLS is most likely still
+indexing — the Spring server resolves entity fields through it, and returns
+nothing until the project is built. Watch the activity indicator in the
+bottom-right corner and retry once it clears.
 
 ### Copilot not providing suggestions
 

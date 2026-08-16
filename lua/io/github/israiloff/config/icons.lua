@@ -209,6 +209,12 @@ return {
 		Compile = "",
 		Build = "",
 	},
+	spring = {
+		Logo = "",
+		Enable = "",
+		Disable = "",
+		Status = "",
+	},
 	maven = {
 		Refresh = "",
 		Install = "",
