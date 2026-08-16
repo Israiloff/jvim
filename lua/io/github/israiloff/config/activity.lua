@@ -533,7 +533,7 @@ end
 -- Sources
 -- ---------------------------------------------------------------------------
 local function on_lazy_load(name)
-	if not state.armed or not name then
+	if not config.enabled or not config.lazy or not state.armed or not name then
 		return
 	end
 
@@ -570,6 +570,10 @@ local function on_lazy_load(name)
 end
 
 local function on_lsp_progress(args)
+	if not config.enabled or not config.lsp then
+		return
+	end
+
 	local data = args.data
 	if not data or not data.params or not data.params.value then
 		return
@@ -743,11 +747,23 @@ local function install_notify()
 	end
 end
 
-function M.setup()
-	if not config.enabled then
-		return
-	end
+---Flip one of the panel's switches at runtime.
+---
+---Every source is gated at handler time rather than at registration time, so
+---the which-key toggles in `config/toggles.lua` take effect without a restart.
+---@param key "enabled"|"lazy"|"lsp"|"notify"
+---@param value boolean
+function M.set_option(key, value)
+	config[key] = value
 
+	if key == "enabled" and not value then
+		state.entries = {}
+		stop_timer()
+		close_window()
+	end
+end
+
+function M.setup()
 	apply_highlights()
 
 	local group = vim.api.nvim_create_augroup("JvimActivity", { clear = true })
@@ -757,63 +773,60 @@ function M.setup()
 		callback = apply_highlights,
 	})
 
-	if config.notify then
-		install_notify()
+	-- Installed unconditionally: the replacement delegates to the original
+	-- whenever the panel is off, which is also what makes the switch reversible
+	-- inside a running session.
+	install_notify()
+
+	vim.api.nvim_create_autocmd("User", {
+		group = group,
+		pattern = "LazyLoad",
+		callback = function(args)
+			on_lazy_load(args.data)
+		end,
+	})
+
+	-- Stay quiet through the startup cascade; `:Lazy profile` already reports
+	-- it, and a wall of toasts on every launch is noise.
+	--
+	-- Armed off VimEnter rather than lazy.nvim's VeryLazy: VeryLazy rides on
+	-- UIEnter, which never fires in a headless session, and the indicator must
+	-- not stay permanently disabled there. The delay covers the VeryLazy burst.
+	local function arm()
+		vim.defer_fn(function()
+			state.armed = true
+		end, 500)
 	end
 
-	if config.lazy then
-		vim.api.nvim_create_autocmd("User", {
+	if vim.v.vim_did_enter == 1 then
+		arm()
+	else
+		vim.api.nvim_create_autocmd("VimEnter", {
 			group = group,
-			pattern = "LazyLoad",
-			callback = function(args)
-				on_lazy_load(args.data)
-			end,
+			once = true,
+			callback = arm,
 		})
-
-		-- Stay quiet through the startup cascade; `:Lazy profile` already reports
-		-- it, and a wall of toasts on every launch is noise.
-		--
-		-- Armed off VimEnter rather than lazy.nvim's VeryLazy: VeryLazy rides on
-		-- UIEnter, which never fires in a headless session, and the indicator must
-		-- not stay permanently disabled there. The delay covers the VeryLazy burst.
-		local function arm()
-			vim.defer_fn(function()
-				state.armed = true
-			end, 500)
-		end
-
-		if vim.v.vim_did_enter == 1 then
-			arm()
-		else
-			vim.api.nvim_create_autocmd("VimEnter", {
-				group = group,
-				once = true,
-				callback = arm,
-			})
-		end
 	end
 
-	if config.lsp then
-		vim.api.nvim_create_autocmd("LspProgress", {
-			group = group,
-			callback = function(args)
-				pcall(on_lsp_progress, args)
-			end,
-		})
+	vim.api.nvim_create_autocmd("LspProgress", {
+		group = group,
+		callback = function(args)
+			pcall(on_lsp_progress, args)
+		end,
+	})
 
-		-- A crashed server never sends its "end" report.
-		vim.api.nvim_create_autocmd("LspDetach", {
-			group = group,
-			callback = function(args)
-				local prefix = ("lsp:%d:"):format(args.data.client_id)
-				for i = #state.entries, 1, -1 do
-					if state.entries[i].key:sub(1, #prefix) == prefix then
-						table.remove(state.entries, i)
-					end
+	-- A crashed server never sends its "end" report.
+	vim.api.nvim_create_autocmd("LspDetach", {
+		group = group,
+		callback = function(args)
+			local prefix = ("lsp:%d:"):format(args.data.client_id)
+			for i = #state.entries, 1, -1 do
+				if state.entries[i].key:sub(1, #prefix) == prefix then
+					table.remove(state.entries, i)
 				end
-			end,
-		})
-	end
+			end
+		end,
+	})
 
 	vim.api.nvim_create_autocmd("VimResized", {
 		group = group,
@@ -838,15 +851,13 @@ function M.setup()
 		close_window()
 	end, { desc = "Dismiss the activity panel" })
 
-	if config.notify then
-		vim.api.nvim_create_user_command("JvimNotifyLog", function()
-			M.show_log()
-		end, { desc = "Show retained notifications" })
+	vim.api.nvim_create_user_command("JvimNotifyLog", function()
+		M.show_log()
+	end, { desc = "Show retained notifications" })
 
-		vim.api.nvim_create_user_command("JvimNotifyClear", function()
-			M.clear_log()
-		end, { desc = "Drop the retained notifications" })
-	end
+	vim.api.nvim_create_user_command("JvimNotifyClear", function()
+		M.clear_log()
+	end, { desc = "Drop the retained notifications" })
 end
 
 -- Exposed for the dismiss command and for ad-hoc testing.

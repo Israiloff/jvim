@@ -28,7 +28,7 @@ end
 
 local base_properties = {
 	-- Version of the JVIM IDE.
-	version = "0.37.67",
+	version = "0.38.68",
 	-- Logging configuration.
 	-- This is used to determine the logging level and whether logging is enabled.
 	logger = {

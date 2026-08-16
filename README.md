@@ -36,6 +36,7 @@ like an IDE, without giving up Neovim's startup time or keyboard-driven flow.
 - 🔧 **Managed toolchain** — Mason installs language servers, formatters and debug adapters
 - 🎨 **Darcula UI** — JetBrains-inspired colorscheme, breadcrumbs, statusline and buffer bar
 - 🎯 **Discoverable keys** — every binding lives in a which-key menu instead of a cheatsheet
+- 🎛 **Settings in the menu** — every switch is toggled from which-key, applied live and persisted
 
 ---
 
@@ -164,6 +165,29 @@ return {
 ```
 
 Only the keys you override need to be present.
+
+### Switches without editing files
+
+Every boolean in that table is also a which-key entry, placed with the feature
+it controls. Flipping one applies immediately **and** writes the new value to
+`properties-local.lua`, so the choice survives a restart:
+
+| Where | What |
+| --- | --- |
+| `UI` menu | transparency, activity panel, plugin-load reports, LSP progress, notifications |
+| `Notifications ▸ Logger` menu | logging on/off and the debug / info / warn / error levels |
+
+Each entry shows its current state in the label, so the menu doubles as a status
+readout. From the command line:
+
+```vim
+:JvimToggleStatus   " every switch and its state
+:JvimToggle <name>  " flip one by name
+```
+
+The AI provider and Spring Boot support keep their own menus instead, because
+they cannot be applied live — both decide how a language server is started, and
+that has already happened by the time you reach the menu.
 
 ---
 
@@ -430,6 +454,10 @@ you type. Java, debugging and build-tool menus appear only in the buffers where
 they apply.
 
 To search bindings as text instead, use Telescope's keymap picker.
+
+Configuration switches live in the same menus, next to the feature they affect,
+and carry their current state in the label — so there is nothing to remember and
+no file to open to find out what is on.
 
 ---
 

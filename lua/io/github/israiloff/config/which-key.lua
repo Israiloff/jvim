@@ -2,6 +2,7 @@ require("io.github.israiloff.config.buffer-ops")
 local which_key = require("which-key")
 local ai = require("io.github.israiloff.config.ai")
 local icons = require("io.github.israiloff.config.icons")
+local toggles = require("io.github.israiloff.config.toggles")
 
 which_key.setup({
 	-- Bottom-anchored list, the same layout v2 produced with `window.position`.
@@ -182,6 +183,24 @@ which_key.add({
 	{ "<leader>nc", "<cmd>JvimNotifyClear<CR>", desc = icons.ui.Close .. " Clear log" },
 	{ "<leader>nd", "<cmd>JvimActivityDismiss<CR>", desc = icons.ui.CloseOthers .. " Dismiss panel" },
 	{ "<leader>nm", "<cmd>mess<CR>", desc = icons.ui.List .. " Vim messages" },
+
+	-- The logger is what feeds most of the notifications, so its switches sit
+	-- with them rather than in the UI menu.
+	{ "<leader>nL", group = icons.ui.ListUnordered .. " Logger" },
+	{ "<leader>nLe", toggles.action("logger"), desc = toggles.desc("logger") },
+	{ "<leader>nLd", toggles.action("logger_debug"), desc = toggles.desc("logger_debug") },
+	{ "<leader>nLi", toggles.action("logger_info"), desc = toggles.desc("logger_info") },
+	{ "<leader>nLw", toggles.action("logger_warn"), desc = toggles.desc("logger_warn") },
+	{ "<leader>nLr", toggles.action("logger_error"), desc = toggles.desc("logger_error") },
+
+	-- Everything under `gui.` in properties.lua.
+	{ "<leader>U", group = icons.ui.Settings .. " UI" },
+	{ "<leader>Ut", toggles.action("transparent"), desc = toggles.desc("transparent") },
+	{ "<leader>Ua", toggles.action("activity"), desc = toggles.desc("activity") },
+	{ "<leader>Up", toggles.action("activity_lazy"), desc = toggles.desc("activity_lazy") },
+	{ "<leader>Ul", toggles.action("activity_lsp"), desc = toggles.desc("activity_lsp") },
+	{ "<leader>Un", toggles.action("activity_notify"), desc = toggles.desc("activity_notify") },
+	{ "<leader>Us", "<cmd>JvimToggleStatus<CR>", desc = icons.ui.List .. " All switches" },
 
 	{ "<leader>P", group = icons.kind.Module .. " Plugins" },
 	{ "<leader>Pc", "<cmd>Lazy clean<cr>", desc = icons.plugin.Clean .. " Clean" },
