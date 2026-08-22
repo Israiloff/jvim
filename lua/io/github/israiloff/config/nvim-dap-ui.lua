@@ -130,10 +130,18 @@ dap.listeners.after.event_stopped["dapui_config"] = function()
     dapui.open()
 end
 
-dap.listeners.after.event_terminated["dapui_config"] = function()
+local function close_ui()
     dapui.close()
 end
 
-dap.listeners.after.event_exited["dapui_config"] = function()
-    dapui.close()
-end
+dap.listeners.after.event_terminated["dapui_config"] = close_ui
+
+dap.listeners.after.event_exited["dapui_config"] = close_ui
+
+-- The adapter is not obliged to announce the end of a session, and java-debug
+-- stays silent when the session is ended from the editor: neither `terminated`
+-- nor `exited` arrives, so the panels outlived the session they belonged to.
+-- The requests that end a session are therefore watched as well.
+dap.listeners.after.terminate["dapui_config"] = close_ui
+
+dap.listeners.after.disconnect["dapui_config"] = close_ui

@@ -201,13 +201,24 @@ return {
 	{
 		"mfussenegger/nvim-dap",
 		lazy = true,
+		dependencies = {
+			-- Not an optional extra: `config/nvim-dap-ui.lua` is what registers the
+			-- `event_initialized` / `event_terminated` listeners that open and close
+			-- the panels around a session. Left to load on its own, nothing required
+			-- `dapui` before a session started, so the listeners were never in place
+			-- and debugging ran with no UI at all.
+			--
+			-- The dependency points this way round on purpose: everything that starts
+			-- a session goes through `require("dap")`, so hanging the UI off dap makes
+			-- the two arrive together no matter who asked first.
+			"rcarriga/nvim-dap-ui",
+		},
 		config = conf("nvim-dap"),
 	},
 	{
 		"rcarriga/nvim-dap-ui",
 		lazy = true,
 		dependencies = {
-			"mfussenegger/nvim-dap",
 			"nvim-neotest/nvim-nio",
 		},
 		config = conf("nvim-dap-ui"),
