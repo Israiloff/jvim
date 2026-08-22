@@ -341,6 +341,8 @@ Full DAP support, wired to the Java debug adapter and test runner:
 
 - Breakpoints, stepping, watches, scopes, stack frames and a REPL
 - A dedicated DAP UI layout that opens on session start and closes on exit
+- A run that dies is reported with its exit code, and its panels are left open —
+  the console still holds the stack trace that explains it
 - Run a single test method or an entire test class
 - Spring Boot main classes are launched with the `local` profile active
 - A ready-made **Attach to remote JVM :5005** configuration for debugging running services
@@ -352,6 +354,14 @@ Full DAP support, wired to the Java debug adapter and test runner:
 Maven and Gradle tasks run in an embedded terminal without leaving the editor —
 compile, test, package, install, deploy, clean, dependency refresh, and local
 repository purge.
+
+Every build runs in its own window, in the directory of the project the current
+file belongs to — the nearest `pom.xml` for Maven, the nearest wrapper or
+settings file for Gradle — rather than wherever the editor happens to be
+sitting. The window is separate from the `<M-1>` terminal, so a build never
+lands in the middle of an interactive shell, and it stays open after the process
+exits: the exit code is reported and the output remains scrollable. `Java ▸
+Build output` brings the last one back.
 
 ### Startup and Feedback
 

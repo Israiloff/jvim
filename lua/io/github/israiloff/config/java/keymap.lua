@@ -20,6 +20,11 @@ local spring = require("io.github.israiloff.config.java.spring")
 -- ---------------------------------------------------------------------------
 which_key.add({
 	{ "<leader>j", group = icons.ui.Java .. " Java" },
+	{
+		"<leader>jb",
+		"<cmd>lua require('io.github.israiloff.config.java.build').toggle_output()<cr>",
+		desc = icons.ui.DebugConsole .. " Build output",
+	},
 	{ "<leader>jc", "<Cmd>lua require('jdtls').compile()<CR>", desc = icons.java.Compile .. " Compile" },
 	{ "<leader>jC", "<Cmd>lua require('jdtls').extract_constant()<CR>", desc = icons.java.Constant .. " Extract constant" },
 	{ "<leader>jM", "<Cmd>lua require('jdtls').extract_method(true)<CR>", desc = icons.java.Method .. " Extract method" },
@@ -79,67 +84,71 @@ which_key.add({
 	},
 
 	{ "<leader>jm", group = icons.maven.Logo .. " Maven" },
-	{ "<leader>jmC", "<cmd>lua exec_in_terminal_horizontal('mvn clean')<CR>", desc = icons.maven.Clean .. " Clean" },
+	{
+		"<leader>jmC",
+		"<cmd>lua require('io.github.israiloff.config.java.build').maven('clean')<cr>",
+		desc = icons.maven.Clean .. " Clean",
+	},
 	{
 		"<leader>jmc",
-		"<cmd>lua vim.cmd('silent !rm -rf target') vim.cmd('lua exec_in_terminal_horizontal(\"mvn compile\")')<CR>",
+		"<cmd>lua require('io.github.israiloff.config.java.build').maven('clean compile')<cr>",
 		desc = icons.maven.Compile .. " Compile",
 	},
 	{
 		"<leader>jmd",
-		"<cmd>lua vim.cmd('silent !rm -rf target') vim.cmd('lua exec_in_terminal_horizontal(\"mvn deploy\")')<CR>",
+		"<cmd>lua require('io.github.israiloff.config.java.build').maven('clean deploy')<cr>",
 		desc = icons.maven.Deploy .. " Deploy",
 	},
 	{
 		"<leader>jme",
-		"<cmd>lua exec_in_terminal_horizontal('mvn dependency:purge-local-repository')<CR>",
+		"<cmd>lua require('io.github.israiloff.config.java.build').maven('dependency:purge-local-repository')<cr>",
 		desc = icons.maven.Purge .. " Purge local repository",
 	},
 	{
 		"<leader>jmi",
-		"<cmd>lua vim.cmd('silent !rm -rf target') vim.cmd('lua exec_in_terminal_horizontal(\"mvn install\")')<CR>",
+		"<cmd>lua require('io.github.israiloff.config.java.build').maven('clean install')<cr>",
 		desc = icons.maven.Install .. " Install",
 	},
 	{
 		"<leader>jmp",
-		"<cmd>lua vim.cmd('silent !rm -rf target') vim.cmd('lua exec_in_terminal_horizontal(\"mvn package\")')<CR>",
+		"<cmd>lua require('io.github.israiloff.config.java.build').maven('clean package')<cr>",
 		desc = icons.maven.Package .. " Package",
 	},
 	{
 		"<leader>jmP",
-		"<cmd>lua vim.cmd('silent !rm -rf target') vim.cmd('lua exec_in_terminal_horizontal(\"mvn package -DskipTests\")')<CR>",
+		"<cmd>lua require('io.github.israiloff.config.java.build').maven('clean package -DskipTests')<cr>",
 		desc = icons.maven.PackageSkipTests .. " Package (skip tests)",
 	},
 	{
 		"<leader>jmr",
-		"<cmd>lua exec_in_terminal_horizontal('mvn clean -U dependency:resolve')<CR>",
+		"<cmd>lua require('io.github.israiloff.config.java.build').maven('clean -U dependency:resolve')<cr>",
 		desc = icons.maven.Refresh .. " Refresh dependencies",
 	},
 	{
 		"<leader>jmt",
-		"<cmd>lua vim.cmd('silent !rm -rf target') vim.cmd('lua exec_in_terminal_horizontal(\"mvn test\")')<CR>",
+		"<cmd>lua require('io.github.israiloff.config.java.build').maven('clean test')<cr>",
 		desc = icons.maven.Test .. " Test",
 	},
 
 	{ "<leader>jg", group = icons.gradle.Logo .. " Gradle" },
 	{
 		"<leader>jgb",
-		"<cmd>lua exec_in_terminal_horizontal('./gradlew build')<CR>",
+		"<cmd>lua require('io.github.israiloff.config.java.build').gradle('build')<cr>",
 		desc = icons.gradle.Build .. " Build",
 	},
 	{
 		"<leader>jgc",
-		"<cmd>lua exec_in_terminal_horizontal('./gradlew clean')<CR>",
+		"<cmd>lua require('io.github.israiloff.config.java.build').gradle('clean')<cr>",
 		desc = icons.gradle.Clean .. " Clean",
 	},
 	{
 		"<leader>jgr",
-		"<cmd>lua exec_in_terminal_horizontal('./gradlew --refresh-dependencies')<CR>",
+		"<cmd>lua require('io.github.israiloff.config.java.build').gradle('--refresh-dependencies')<cr>",
 		desc = icons.gradle.Refresh .. " Refresh deps",
 	},
 	{
 		"<leader>jgt",
-		"<cmd>lua exec_in_terminal_horizontal('./gradlew test')<CR>",
+		"<cmd>lua require('io.github.israiloff.config.java.build').gradle('test')<cr>",
 		desc = icons.gradle.Test .. " Test",
 	},
 
