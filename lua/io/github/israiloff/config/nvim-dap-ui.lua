@@ -118,7 +118,40 @@ vim.fn.sign_define("DapStopped", {
     numhl = "DapStoppedHL",
 })
 
+local TITLE = "Debug"
+
+-- How long the panels wait before closing themselves. `terminated` arrives from
+-- the adapter a few milliseconds ahead of the debuggee's own exit status, and
+-- the status is what decides whether the panels should go.
+local GRACE_MS = 250
+
+-- Why the session that is ending went wrong, or nil when it ended normally.
+local failure = nil
+
+-- Bumped for every session, so a close left over from the previous one cannot
+-- take the panels of the next one down with it.
+local generation = 0
+
+local function fail(message)
+    failure = message
+    vim.notify(message, vim.log.levels.ERROR, { title = TITLE })
+end
+
+---Report a launch or attach request the adapter refused.
+local function on_start(_, err)
+    if err then
+        fail("The debug session could not be started: " .. tostring(err))
+    end
+end
+
+dap.listeners.after.launch["dapui_config"] = on_start
+
+dap.listeners.after.attach["dapui_config"] = on_start
+
 dap.listeners.after.event_initialized["dapui_config"] = function()
+    failure = nil
+    stopping = false
+    generation = generation + 1
     dapui.open()
 end
 
@@ -130,13 +163,74 @@ dap.listeners.after.event_stopped["dapui_config"] = function()
     dapui.open()
 end
 
+-- Ending a session from the editor kills the JVM, and a killed process still
+-- exits non-zero — every Quit would otherwise be reported as a crash. The three
+-- entry points that end a session are wrapped rather than watched: their
+-- listeners only fire when the adapter answers, which is after the process is
+-- already gone, and dapui's own stop buttons go through the very same table.
+local stopping = false
+
+for _, name in ipairs({ "terminate", "disconnect", "close" }) do
+    local original = dap[name]
+
+    if type(original) == "function" then
+        dap[name] = function(...)
+            stopping = true
+            return original(...)
+        end
+    end
+end
+
+-- How a failed run used to disappear without a word: java-debug asks for
+-- `runInTerminal`, so the program runs in a terminal nvim-dap spawns, and the
+-- adapter then reports the end of the session as a bare `terminated` — no exit
+-- code, and `Session.event_exited` in nvim-dap discards it even when one is
+-- sent. Nothing upstream knows the program died. The pty does, so the status is
+-- read from `TermClose` on the buffer nvim-dap names `[dap-terminal] ...`.
+vim.api.nvim_create_autocmd("TermClose", {
+    group = vim.api.nvim_create_augroup("jvim_dap_ui", { clear = true }),
+    callback = function(event)
+        if not vim.api.nvim_buf_get_name(event.buf):match("%[dap%-terminal%]") then
+            return
+        end
+
+        local status = vim.v.event.status
+
+        if status and status ~= 0 and not stopping then
+            fail("The program exited with code " .. tostring(status) .. ". The debugger panels stay open.")
+        end
+    end,
+})
+
 local function close_ui()
-    dapui.close()
+    local current = generation
+
+    vim.defer_fn(function()
+        -- Closing takes the console with it, and after a failure that console
+        -- is the only place the stack trace is left.
+        if failure or current ~= generation then
+            return
+        end
+
+        dapui.close()
+    end, GRACE_MS)
+end
+
+-- Reporting and closing share one listener on purpose: two entries under the
+-- same event are called in whatever order the table happens to iterate in, and
+-- the panels would close before the failure that must keep them open is known.
+dap.listeners.after.event_exited["dapui_config"] = function(_, body)
+    local code = body and body.exitCode
+
+    if code and code ~= 0 then
+        fail("The program exited with code " .. tostring(code) .. ". The debugger panels stay open.")
+        return
+    end
+
+    close_ui()
 end
 
 dap.listeners.after.event_terminated["dapui_config"] = close_ui
-
-dap.listeners.after.event_exited["dapui_config"] = close_ui
 
 -- The adapter is not obliged to announce the end of a session, and java-debug
 -- stays silent when the session is ended from the editor: neither `terminated`

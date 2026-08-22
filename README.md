@@ -341,6 +341,8 @@ Full DAP support, wired to the Java debug adapter and test runner:
 
 - Breakpoints, stepping, watches, scopes, stack frames and a REPL
 - A dedicated DAP UI layout that opens on session start and closes on exit
+- A run that dies is reported with its exit code, and its panels are left open —
+  the console still holds the stack trace that explains it
 - Run a single test method or an entire test class
 - Spring Boot main classes are launched with the `local` profile active
 - A ready-made **Attach to remote JVM :5005** configuration for debugging running services
