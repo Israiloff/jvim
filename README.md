@@ -344,6 +344,8 @@ Full DAP support, wired to the Java debug adapter and test runner:
 - Run a single test method or an entire test class
 - Spring Boot main classes are launched with the `local` profile active
 - A ready-made **Attach to remote JVM :5005** configuration for debugging running services
+- **Start** launches the main class and **Attach** connects to the remote JVM, each
+  without a configuration prompt; only a project with several main classes still asks
 
 ### Build Tools
 

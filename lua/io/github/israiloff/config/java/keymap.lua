@@ -33,9 +33,17 @@ which_key.add({
 	},
 
 	{ "<leader>jd", group = icons.ui.DebugConsole .. " Debug" },
-	{ "<leader>jda", "<cmd>lua require'dap'.continue()<cr>", desc = icons.java.Attach .. " Attach (select config)" },
+	{
+		"<leader>jda",
+		"<cmd>lua require('io.github.israiloff.config.java.debug').attach()<cr>",
+		desc = icons.java.Attach .. " Attach to remote JVM",
+	},
 	{ "<leader>jdb", "<cmd>lua require'dap'.step_back()<cr>", desc = icons.java.StepBack .. " Step back" },
-	{ "<leader>jdc", "<cmd>lua require'dap'.continue()<cr>", desc = icons.java.Continue .. " Continue" },
+	{
+		"<leader>jdc",
+		"<cmd>lua require'dap'.continue()<cr>",
+		desc = icons.java.Continue .. " Continue (asks when nothing is running)",
+	},
 	{ "<leader>jdC", "<cmd>lua require'dap'.run_to_cursor()<cr>", desc = icons.java.RunToCursor .. " Run to cursor" },
 	{ "<leader>jdd", "<cmd>lua require'dap'.disconnect()<cr>", desc = icons.java.Disconnect .. " Disconnect" },
 	{ "<leader>jdg", "<cmd>lua require'dap'.session()<cr>", desc = icons.java.GetSession .. " Get session" },
@@ -44,7 +52,11 @@ which_key.add({
 	{ "<leader>jdp", "<cmd>lua require'dap'.pause()<cr>", desc = icons.java.Pause .. " Pause" },
 	{ "<leader>jdq", "<cmd>lua require'dap'.close()<cr>", desc = icons.java.Close .. " Quit" },
 	{ "<leader>jdr", "<cmd>lua require'dap'.repl.toggle()<cr>", desc = icons.java.ToggleRepl .. " Toggle repl" },
-	{ "<leader>jds", "<cmd>lua require'dap'.continue()<cr>", desc = icons.java.Start .. " Start" },
+	{
+		"<leader>jds",
+		"<cmd>lua require('io.github.israiloff.config.java.debug').start()<cr>",
+		desc = icons.java.Start .. " Start (main class)",
+	},
 	{ "<leader>jdt", "<cmd>lua require'dap'.toggle_breakpoint()<cr>", desc = icons.java.Bug .. " Toggle breakpoint" },
 	{ "<leader>jdu", "<cmd>lua require'dap'.step_out()<cr>", desc = icons.java.StepOut .. " Step out" },
 	{
