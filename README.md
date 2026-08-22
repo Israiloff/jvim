@@ -397,6 +397,26 @@ Each source can be turned off independently in `properties.lua`, along with the
 per-level dwell times. With `gui.activity.notify` off, notifications go back to
 the default handler and to `:messages`.
 
+### Resource Monitor
+
+The language servers are JVMs — JDTLS is one, the Spring Boot server a second,
+a debug session a third — and together they are the heaviest thing running.
+`UI ▸ Resource monitor` puts a panel in the top-right corner showing what each
+of them holds:
+
+```vim
+:JvimResources       " show or hide the panel
+:JvimResourcesReset  " measure growth from now on
+```
+
+Every process descending from Neovim is sampled, language servers under their
+own names and everything else under its command, largest first. Each row
+carries what the process holds now, how far that has moved since it was first
+seen, its high water mark, the share of the last interval it spent on the CPU,
+and a sparkline of the recent samples — growth that never comes back down is
+what a leak looks like from the outside. Nothing is sampled while the panel is
+closed; the interval and the thresholds live under `gui.resources`.
+
 ### Language Servers
 
 Mason manages the toolchain, and installed servers are enabled automatically with

@@ -200,6 +200,8 @@ which_key.add({
 	{ "<leader>Up", toggles.action("activity_lazy"), desc = toggles.desc("activity_lazy") },
 	{ "<leader>Ul", toggles.action("activity_lsp"), desc = toggles.desc("activity_lsp") },
 	{ "<leader>Un", toggles.action("activity_notify"), desc = toggles.desc("activity_notify") },
+	{ "<leader>Ur", "<cmd>JvimResources<CR>", desc = icons.ui.Gauge .. " Resource monitor" },
+	{ "<leader>UR", "<cmd>JvimResourcesReset<CR>", desc = icons.ui.Refresh .. " Reset resource baselines" },
 	{ "<leader>Us", "<cmd>JvimToggleStatus<CR>", desc = icons.ui.List .. " All switches" },
 
 	{ "<leader>P", group = icons.kind.Module .. " Plugins" },
