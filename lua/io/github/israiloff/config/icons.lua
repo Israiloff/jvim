@@ -117,6 +117,7 @@ return {
 		Registers = "󱃔",
 		Settings = "",
 		Transparency = "󰗧",
+		Gauge = "󰾆",
         Neovim = "",
 	},
 	diagnostics = {

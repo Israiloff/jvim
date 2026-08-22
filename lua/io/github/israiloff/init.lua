@@ -31,5 +31,8 @@ vim.api.nvim_create_autocmd("User", {
 	once = true,
 	callback = function()
 		require("io.github.israiloff.config.ripgrep")
+		-- Registers `:JvimResources` and nothing else; the panel polls only
+		-- while it is on screen.
+		require("io.github.israiloff.config.resources").setup()
 	end,
 })
