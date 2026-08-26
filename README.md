@@ -141,6 +141,8 @@ return {
       notify = true, -- route vim.notify into the panel
       -- Per-level dwell time for notifications, in milliseconds.
       notify_linger_ms = { error = 8000, warn = 6000, info = 4000, debug = 3000 },
+      -- Silence after which an in-flight LSP task is given up on, in milliseconds.
+      lsp_stale_ms = 60000,
     },
   },
   ai = {
@@ -396,6 +398,18 @@ also draws to the screen. `:JvimNotifyLog` is the notification history;
 Each source can be turned off independently in `properties.lua`, along with the
 per-level dwell times. With `gui.activity.notify` off, notifications go back to
 the default handler and to `:messages`.
+
+A spinner is not trusted forever. A language server opens a progress token per
+task and is meant to close it, but JDTLS hands every internal Eclipse job its
+own token and only closes one when the job reports that it finished — a job
+that dies or blocks in between leaves the token open, and the spinner would
+animate for the rest of the session. An in-flight task that says nothing for
+`gui.activity.lsp_stale_ms` is therefore dropped from the panel and written to
+`:JvimNotifyLog`, where the entry names the server and the task that stalled.
+Progress reports are throttled to a few hundred milliseconds, so a minute of
+silence means stuck, not slow. If a task is reported as abandoned, the server
+is usually still stuck on it: `~/.local/share/nvim/workspace/java/<project>/.metadata/.log`
+says what JDTLS was doing.
 
 ### Resource Monitor
 

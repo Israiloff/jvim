@@ -28,7 +28,7 @@ end
 
 local base_properties = {
 	-- Version of the JVIM IDE.
-	version = "0.42.0",
+	version = "0.42.1",
 	-- Logging configuration.
 	--
 	-- On by default, but at error level only: a failure inside the config used to
@@ -56,6 +56,12 @@ local base_properties = {
 			enabled = true,
 			lazy = true,
 			lsp = true,
+			-- How long an in-flight LSP task may stay silent before the panel
+			-- gives up on it. Servers do abandon progress tokens without ever
+			-- closing them; jdtls does it whenever an internal job dies or
+			-- blocks. Reports are throttled to a few hundred milliseconds, so
+			-- a minute of silence means stuck, not slow.
+			lsp_stale_ms = 60000,
 			-- Route `vim.notify` — the project logger included — into the panel
 			-- instead of the message area. `:messages` still records everything.
 			notify = true,
