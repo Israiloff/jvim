@@ -9,7 +9,8 @@
 --   * LSP work-done progress (`LspProgress`). This one is genuinely in flight, so
 --     it gets the animated spinner. It is the reason this module exists: jdtls
 --     spends 20-30 seconds indexing a project without a single character of
---     feedback otherwise.
+--     feedback otherwise. A spinner is not trusted indefinitely though — see
+--     `lsp_stale_ms` for the servers that forget to close a task.
 --
 --   * Notifications. `vim.notify` is replaced so that everything routed through
 --     it — the project logger included — lands in this panel instead of the
@@ -34,6 +35,15 @@ local config = vim.tbl_deep_extend("force", {
 	lazy = true,
 	-- Report LSP progress.
 	lsp = true,
+	-- How long an in-flight LSP task may stay silent before the panel gives up
+	-- on it, in milliseconds. jdtls hands every Eclipse job its own progress
+	-- token and only ever sends the closing `end` report once the job either
+	-- calls `done()` or works its way to `totalWork`; a job that dies or blocks
+	-- in between leaves the token dangling, and the spinner would otherwise
+	-- animate for the rest of the session. Reports are throttled to a few
+	-- hundred milliseconds, so a task that says nothing for a minute is stuck,
+	-- not slow.
+	lsp_stale_ms = 60000,
 	-- Route `vim.notify` into the panel.
 	notify = true,
 	-- How long a finished entry stays on screen, in milliseconds.
@@ -101,7 +111,8 @@ local NS = vim.api.nvim_create_namespace("JvimActivity")
 local state = {
 	-- Ordered list of entries. Activity entries are
 	-- { key, icon_kind, name, detail, expires_at }; notifications are
-	-- { key, kind = "notify", level, title, message, expires_at }.
+	-- { key, kind = "notify", level, title, message, expires_at }. `expires_at`
+	-- is a deadline for finished entries and a watchdog for in-flight ones.
 	entries = {},
 	buf = nil,
 	win = nil,
@@ -448,6 +459,11 @@ end
 -- ---------------------------------------------------------------------------
 -- Timer
 -- ---------------------------------------------------------------------------
+
+-- Defined further down, next to the notification plumbing it belongs to;
+-- forward-declared because `tick` records the LSP tasks it gives up on.
+local record_history
+
 local function stop_timer()
 	if state.timer then
 		state.timer:stop()
@@ -464,6 +480,18 @@ local function tick()
 	for _, entry in ipairs(state.entries) do
 		if not entry.expires_at or entry.expires_at > now then
 			table.insert(kept, entry)
+		elseif entry.icon_kind == "spinner" then
+			-- A task that ran out of time never reported that it finished. The
+			-- panel drops it rather than spinning forever, but the server is
+			-- most likely still stuck on it, so leave a trace in the log.
+			record_history(
+				LEVELS.DEBUG,
+				entry.name,
+				("gave up on \"%s\" after %ds without a report"):format(
+					(entry.detail and entry.detail ~= "") and entry.detail or "an unnamed task",
+					math.floor(config.lsp_stale_ms / 1000)
+				)
+			)
 		end
 	end
 	state.entries = kept
@@ -611,13 +639,15 @@ local function on_lsp_progress(args)
 		icon_kind = "spinner",
 		name = client.name,
 		detail = detail,
-		-- No expiry: an in-flight task lives until its "end" report arrives. The
-		-- LspDetach handler below covers servers that die mid-progress.
-		expires_at = nil,
+		-- Every report pushes the deadline back, so a task that keeps talking
+		-- keeps its spinner. One that goes quiet is dropped by `tick`: servers
+		-- do abandon progress tokens without ever sending the closing report
+		-- (see `lsp_stale_ms`), and there is no other signal that it happened.
+		expires_at = vim.uv.now() + config.lsp_stale_ms,
 	})
 end
 
-local function record_history(level, title, message)
+function record_history(level, title, message)
 	table.insert(state.history, {
 		time = os.date("%H:%M:%S"),
 		level = level,
@@ -815,16 +845,30 @@ function M.setup()
 		end,
 	})
 
-	-- A crashed server never sends its "end" report.
+	-- A crashed server never sends its "end" report. `LspDetach` also fires for
+	-- every single buffer that lets go of a server that is still running —
+	-- closing one Java file would otherwise wipe the progress of a perfectly
+	-- healthy jdtls — so the entries are only dropped once the client itself is
+	-- gone. The check is deferred because the client is still registered while
+	-- the event runs.
 	vim.api.nvim_create_autocmd("LspDetach", {
 		group = group,
 		callback = function(args)
-			local prefix = ("lsp:%d:"):format(args.data.client_id)
-			for i = #state.entries, 1, -1 do
-				if state.entries[i].key:sub(1, #prefix) == prefix then
-					table.remove(state.entries, i)
+			local client_id = args.data.client_id
+			vim.schedule(function()
+				local client = vim.lsp.get_client_by_id(client_id)
+				if client and not client:is_stopped() then
+					return
 				end
-			end
+
+				local prefix = ("lsp:%d:"):format(client_id)
+				for i = #state.entries, 1, -1 do
+					if state.entries[i].key:sub(1, #prefix) == prefix then
+						table.remove(state.entries, i)
+					end
+				end
+				render()
+			end)
 		end,
 	})
 
