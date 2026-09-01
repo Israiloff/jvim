@@ -28,7 +28,7 @@ end
 
 local base_properties = {
 	-- Version of the JVIM IDE.
-	version = "0.43.1",
+	version = "0.44.0",
 	-- Logging configuration.
 	--
 	-- On by default, but at error level only: a failure inside the config used to
@@ -78,10 +78,14 @@ local base_properties = {
 			max_width = 60,
 			max_entries = 6,
 		},
-		-- Resource monitor (`:JvimResources`), off until it is asked for.
-		-- Samples the processes Neovim runs — the language server JVMs above
-		-- all — so that growth that never comes back down is visible.
+		-- Resource monitor (`:JvimResources`). Samples the processes Neovim
+		-- runs — the language server JVMs above all — so that growth that
+		-- never comes back down is visible.
 		resources = {
+			-- Whether the panel is on screen. Saved, so a session that wants
+			-- to watch its servers keeps watching them across restarts; the
+			-- switch is in the UI menu and nothing is polled while it is off.
+			enabled = false,
 			interval_ms = 2000,
 			max_entries = 8,
 			history = 12,

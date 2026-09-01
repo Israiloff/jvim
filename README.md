@@ -150,6 +150,11 @@ return {
       -- Silence after which an in-flight LSP task is given up on, in milliseconds.
       lsp_stale_ms = 60000,
     },
+    -- Top-right resource monitor. On means on at every start, not just today.
+    resources = {
+      enabled = false,
+      interval_ms = 2000,
+    },
   },
   ai = {
     provider = "tabby", -- copilot | tabby | none
@@ -184,7 +189,7 @@ it controls. Flipping one applies immediately **and** writes the new value to
 
 | Where | What |
 | --- | --- |
-| `UI` menu | transparency, activity panel, plugin-load reports, LSP progress, notifications |
+| `UI` menu | transparency, activity panel, plugin-load reports, LSP progress, notifications, resource monitor |
 | `Notifications ▸ Logger` menu | logging on/off and the debug / info / warn / error levels |
 
 Each entry shows its current state in the label, so the menu doubles as a status
@@ -442,13 +447,20 @@ of them holds:
 :JvimResourcesReset  " measure growth from now on
 ```
 
+The panel is a saved switch, not a per-session decision: leave it on and it
+comes back on the next start, so watching a server grow over a working day does
+not mean asking for the panel again after every restart. It reads its state
+from `gui.resources.enabled`, reports it in the menu label like every other
+switch, and writing it is what `:JvimResources` does — the command and the menu
+cannot disagree.
+
 Every process descending from Neovim is sampled, language servers under their
 own names and everything else under its command, largest first. Each row
 carries what the process holds now, how far that has moved since it was first
 seen, its high water mark, the share of the last interval it spent on the CPU,
 and a sparkline of the recent samples — growth that never comes back down is
 what a leak looks like from the outside. Nothing is sampled while the panel is
-closed; the interval and the thresholds live under `gui.resources`.
+off; the interval and the thresholds live under `gui.resources`.
 
 ### Language Servers
 
