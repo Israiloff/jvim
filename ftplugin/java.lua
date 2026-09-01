@@ -182,6 +182,62 @@ end
 -- ---------------------------------------------------------------------------
 -- Bundles
 -- ---------------------------------------------------------------------------
+
+---The jars among `paths` that Equinox can actually load.
+---
+---Everything JDTLS is handed as a bundle has to declare itself one, and the
+---java-test package ships two jars that do not: `jacocoagent.jar` is a Java
+---agent attached to the JVM a test runs in, and the test runner goes on that
+---JVM's classpath. Neither belongs in the language server's framework, and
+---JDTLS logs an error for each of them on every single start.
+---
+---Only the manifest says which jar is which, so the manifests are read. The
+---reads are started together and collected afterwards because one process per
+---jar in sequence costs seven times as much for the same answer.
+---
+---A jar whose manifest cannot be read at all is kept: dropping a real bundle
+---costs a feature, keeping a plain jar costs the log line this exists to
+---remove.
+---@param paths string[]
+---@return string[]
+local function osgi_bundles(paths)
+	if vim.fn.executable("unzip") ~= 1 then
+		logger.debug(logger_name, "JAVA: unzip not found, every jar is passed to jdtls as-is")
+		return paths
+	end
+
+	local readers = {}
+	for _, path in ipairs(paths) do
+		readers[path] = vim.system({ "unzip", "-p", path, "META-INF/MANIFEST.MF" }, { text = true })
+	end
+
+	local bundles = {}
+
+	for _, path in ipairs(paths) do
+		local read_ok, result = pcall(function()
+			return readers[path]:wait(5000)
+		end)
+
+		-- A jar with no manifest at all exits non-zero and still hands back an
+		-- empty string, so the exit code is what separates "not a bundle" from
+		-- "could not tell".
+		local manifest = (read_ok and result.code == 0) and result.stdout or nil
+
+		-- A header only ever starts a line; a continuation line starts with a
+		-- space, so the name itself is never split across one.
+		if not manifest then
+			logger.debug(logger_name, "JAVA: manifest unreadable, kept anyway: " .. path)
+			table.insert(bundles, path)
+		elseif manifest:find("^Bundle%-SymbolicName:") or manifest:find("\nBundle%-SymbolicName:") then
+			table.insert(bundles, path)
+		else
+			logger.debug(logger_name, "JAVA: not an OSGi bundle, left out: " .. path)
+		end
+	end
+
+	return bundles
+end
+
 local function get_bundles()
 	if cache.bundles then
 		return cache.bundles
@@ -213,9 +269,9 @@ local function get_bundles()
 		end
 	end
 
-	cache.bundles = bundles
-	logger.info(logger_name, "JAVA: bundles count: " .. tostring(#bundles))
-	return bundles
+	cache.bundles = osgi_bundles(bundles)
+	logger.info(logger_name, "JAVA: bundles count: " .. tostring(#cache.bundles))
+	return cache.bundles
 end
 
 -- ---------------------------------------------------------------------------
