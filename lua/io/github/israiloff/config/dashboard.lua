@@ -23,15 +23,15 @@ dashboard.section.header.opts = {
 
 ---One entry on the start screen.
 ---
----The icon is marked and the label is not. Colour on every word is colour that
----says nothing, and six identical grey lines have to be read rather than
----scanned — but the marks are all the same colour on purpose. Six different
----ones turn a menu into a set of signals, each asking to be decoded, and none
----of the six entries here means anything by being red rather than green.
+---Icon and label are one colour. Marking the icon separately was tried twice:
+---a colour per entry turned six rows into six signals that meant nothing, and
+---one accent for all of them put gold at both ends of every row, where it
+---blurred into the shortcut it was supposed to be distinct from. The shortcut
+---is the only thing on the row worth setting apart, so it is the only thing
+---that is.
 ---
----Ranges are byte offsets into the label, which is why the icon's byte length
----rather than its width ends the first one. Alpha adds the centring padding to
----them itself.
+---Both groups come from the colourscheme rather than the `Keyword` alpha
+---hardcodes, so the screen follows the theme.
 ---@param shortcut string
 ---@param icon string
 ---@param label string
@@ -39,13 +39,7 @@ dashboard.section.header.opts = {
 local function entry(shortcut, icon, label, command)
 	local button = dashboard.button(shortcut, icon .. " " .. label, command)
 
-	button.opts.hl = {
-		-- The same gold as the shortcut on the other end of the row, so each
-		-- entry is a neutral label held between two marks of one colour. The
-		-- banner keeps the keyword orange to itself.
-		{ "AlphaShortcut", 0, #icon },
-		{ "AlphaButtons", #icon, -1 },
-	}
+	button.opts.hl = "AlphaButtons"
 	button.opts.hl_shortcut = "AlphaShortcut"
 
 	return button

@@ -28,7 +28,7 @@ end
 
 local base_properties = {
 	-- Version of the JVIM IDE.
-	version = "0.48.1",
+	version = "0.48.2",
 	-- Logging configuration.
 	--
 	-- On by default, but at error level only: a failure inside the config used to
