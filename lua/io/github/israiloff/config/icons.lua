@@ -230,12 +230,28 @@ return {
 		PackageSkipTests = "󱧔",
 		Compile = "",
 	},
+	-- Deliberately the same glyphs as `maven` for the same intentions: the two
+	-- menus are the same menu for two build tools, and a task that means
+	-- "package this" should look the same whichever one is running it.
 	gradle = {
-		Build = "",
-		Test = "󱖫",
-		Clean = "󰃢",
-		Refresh = "",
 		Logo = "",
+		Build = "",
+		BuildSkipTests = "󱧔",
+		Assemble = "󰏗",
+		Clean = "󰃢",
+		Compile = "",
+		Install = "",
+		Publish = "",
+		Refresh = "",
+		Tasks = "",
+		Test = "󱖫",
+	},
+	ai = {
+		Logo = "󰚩",
+		Tabby = "󰄛",
+		Disable = "",
+		Edit = "󰏫",
+		Status = "",
 	},
 	search = {
 		Gui = "󱦞",

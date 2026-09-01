@@ -260,8 +260,12 @@ which_key.add({
 	mode = "v",
 	{ "<leader>/", "<Plug>(comment_toggle_linewise_visual)", desc = icons.ui.CommentCode .. " Comment" },
 	{ "<leader>f", group = icons.ui.FindFile .. " Find/Replace" },
-	{ "<leader>fs", grug_selection("file"), desc = "Search selection in current file" },
-	{ "<leader>fS", grug_selection("global"), desc = "Search selection globally" },
+	{
+		"<leader>fs",
+		grug_selection("file"),
+		desc = icons.search.SearchCurrent .. " Search selection in current file",
+	},
+	{ "<leader>fS", grug_selection("global"), desc = icons.search.SearchGlobal .. " Search selection globally" },
 })
 
 -- ---------------------------------------------------------------------------
@@ -274,29 +278,29 @@ which_key.add({
 	{ "<leader>lf", "<cmd>CmFormat<cr>", desc = icons.code.Format .. " Format" },
 
 	-- The group label reports the provider that is live in this session.
-	{ "<leader>A", group = "AI [" .. ai.get_provider_label(ai.get_runtime_provider()) .. "]" },
+	{ "<leader>A", group = icons.ai.Logo .. " AI [" .. ai.get_provider_label(ai.get_runtime_provider()) .. "]" },
 	{
 		"<leader>Ac",
 		function()
 			ai.select_provider(ai.providers.COPILOT)
 		end,
-		desc = "Use Copilot on next start",
+		desc = icons.copilot.Logo .. " Use Copilot on next start",
 	},
 	{
 		"<leader>Ad",
 		function()
 			ai.select_provider(ai.providers.NONE)
 		end,
-		desc = "Disable AI on next start",
+		desc = icons.ai.Disable .. " Disable AI on next start",
 	},
-	{ "<leader>Ae", ai.edit_local_properties, desc = "Edit local properties" },
-	{ "<leader>As", ai.show_status, desc = "Status" },
+	{ "<leader>Ae", ai.edit_local_properties, desc = icons.ai.Edit .. " Edit local properties" },
+	{ "<leader>As", ai.show_status, desc = icons.ai.Status .. " Status" },
 	{
 		"<leader>At",
 		function()
 			ai.select_provider(ai.providers.TABBY)
 		end,
-		desc = "Use Tabby on next start",
+		desc = icons.ai.Tabby .. " Use Tabby on next start",
 	},
 	-- v2 built this entry conditionally at load time; `cond` lets which-key
 	-- re-evaluate it instead, so the entry follows the active provider.
