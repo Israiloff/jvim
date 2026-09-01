@@ -371,6 +371,14 @@ Maven goals, `Java ▸ Gradle` as Gradle tasks. Gradle spells several of them
 differently (a Maven install is `publishToMavenLocal`, a package is `assemble`),
 but which of the two a project uses does not change what you press.
 
+Only the one that applies is offered. The menu is attached to the buffer rather
+than to the session, so a Maven service and a Gradle library open side by side
+each show their own tool and nothing else — a Maven project has no `assemble`
+task and a Gradle project has no `package` goal, and a menu listing both is half
+wrong wherever you open it. A project carrying both build files shows both,
+because it really can be built either way; one carrying neither shows no build
+menu at all rather than one whose every entry fails.
+
 Both run in an embedded terminal without leaving the editor, and both start from
 the **outermost** build file above the current one. That is the aggregator POM
 or the `settings.gradle` that declares the modules, not the module the file

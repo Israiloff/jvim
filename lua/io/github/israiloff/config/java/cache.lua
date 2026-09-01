@@ -2,7 +2,9 @@
 --
 -- `ftplugin/java.lua` is re-executed for every Java buffer, so anything that is
 -- expensive (globbing Mason jars, resolving the launcher) or must happen exactly
--- once (DAP configuration, which-key registration) has to live outside of it.
+-- once (DAP configuration) has to live outside of it. The which-key menus are
+-- not on that list: `require` already caches the shared ones, and the build
+-- menu is registered per buffer on purpose.
 --
 -- This used to be stored in `vim.g.jdtls_cache`, which silently never worked:
 -- reading `vim.g.<name>` returns a *copy* of the variable, so mutating that copy
@@ -15,8 +17,6 @@ local M = {
 	paths = nil,
 	-- Whether jdtls.setup_dap() and friends have already run.
 	dap_initialized = false,
-	-- Whether the Java which-key mappings have already been registered.
-	keymaps_initialized = false,
 }
 
 return M

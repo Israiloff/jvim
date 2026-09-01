@@ -39,10 +39,14 @@ local function has_marker(dir, markers)
 	return false
 end
 
----Directory of the current buffer, or the working directory for scratch ones.
+---Directory of `bufnr`, or the working directory for scratch buffers.
+---
+---The buffer is a parameter because the menus are built from an LSP
+---`on_attach`, which runs for a buffer that is not necessarily the current one.
+---@param bufnr? integer defaults to the current buffer
 ---@return string
-function M.buffer_directory()
-	local name = vim.api.nvim_buf_get_name(0)
+function M.buffer_directory(bufnr)
+	local name = vim.api.nvim_buf_get_name(bufnr or 0)
 
 	if name == "" then
 		return vim.fn.getcwd()
@@ -66,9 +70,10 @@ end
 ---stops at the home directory, so a stray build file higher up cannot swallow
 ---every project below it.
 ---@param markers string[]
+---@param bufnr? integer defaults to the current buffer
 ---@return string|nil
-function M.find_build_root(markers)
-	local marker = vim.fs.find(markers, { upward = true, path = M.buffer_directory(), type = "file" })[1]
+function M.find_build_root(markers, bufnr)
+	local marker = vim.fs.find(markers, { upward = true, path = M.buffer_directory(bufnr), type = "file" })[1]
 
 	if not marker then
 		return nil
