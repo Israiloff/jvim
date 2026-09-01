@@ -23,10 +23,11 @@ dashboard.section.header.opts = {
 
 ---One entry on the start screen.
 ---
----The icon carries the colour and the label stays neutral, the way the
----which-key menus in this configuration read: colour on every word is colour
----that says nothing, and a row of six identical grey lines has to be read
----rather than scanned.
+---The icon is marked and the label is not. Colour on every word is colour that
+---says nothing, and six identical grey lines have to be read rather than
+---scanned — but the marks are all the same colour on purpose. Six different
+---ones turn a menu into a set of signals, each asking to be decoded, and none
+---of the six entries here means anything by being red rather than green.
 ---
 ---Ranges are byte offsets into the label, which is why the icon's byte length
 ---rather than its width ends the first one. Alpha adds the centring padding to
@@ -35,12 +36,14 @@ dashboard.section.header.opts = {
 ---@param icon string
 ---@param label string
 ---@param command string
----@param icon_hl string
-local function entry(shortcut, icon, label, command, icon_hl)
+local function entry(shortcut, icon, label, command)
 	local button = dashboard.button(shortcut, icon .. " " .. label, command)
 
 	button.opts.hl = {
-		{ icon_hl, 0, #icon },
+		-- The same gold as the shortcut on the other end of the row, so each
+		-- entry is a neutral label held between two marks of one colour. The
+		-- banner keeps the keyword orange to itself.
+		{ "AlphaShortcut", 0, #icon },
 		{ "AlphaButtons", #icon, -1 },
 	}
 	button.opts.hl_shortcut = "AlphaShortcut"
@@ -54,24 +57,18 @@ end
 -- search the directory the editor happened to start in, which on a start screen
 -- is the one thing nobody has chosen yet. Everything below either opens
 -- something, makes something, or is about the editor itself.
---
--- The colours are the ones this configuration already uses for those meanings:
--- gold for the way in, the blue it marks changed things with, the green it
--- marks additions with, the keyword orange of the banner for the editor's own
--- settings, and grey for the one entry that is not starting work.
 dashboard.section.buttons.val = {
-	entry("p", icons.ui.Project, "Projects", ":Telescope projects<CR>", "Function"),
-	entry("r", icons.ui.History, "Recent files", ":Telescope oldfiles<CR>", "Number"),
-	entry("e", icons.ui.NewFile, "New file", ":ene <BAR> startinsert<CR>", "String"),
+	entry("p", icons.ui.Project, "Projects", ":Telescope projects<CR>"),
+	entry("r", icons.ui.History, "Recent files", ":Telescope oldfiles<CR>"),
+	entry("e", icons.ui.NewFile, "New file", ":ene <BAR> startinsert<CR>"),
 	entry(
 		"c",
 		icons.ui.Settings,
 		"Configuration",
-		":edit " .. vim.fn.stdpath("config") .. "/lua/io/github/israiloff/config/properties.lua<CR>",
-		"Keyword"
+		":edit " .. vim.fn.stdpath("config") .. "/lua/io/github/israiloff/config/properties.lua<CR>"
 	),
-	entry("u", icons.plugin.Update, "Update plugins", ":Lazy update<CR>", "Constant"),
-	entry("q", icons.ui.SignOut, "Quit", ":qa<CR>", "Comment"),
+	entry("u", icons.plugin.Update, "Update plugins", ":Lazy update<CR>"),
+	entry("q", icons.ui.SignOut, "Quit", ":qa<CR>"),
 }
 
 -- What the wordmark stands for, directly under it.
