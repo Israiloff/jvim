@@ -384,13 +384,20 @@ local function setup_dap_once()
 	cache.dap_initialized = true
 end
 
-local function setup_keymaps_once()
-	if cache.keymaps_initialized then
-		return
-	end
+---The Java menus for `bufnr`.
+---
+---The shared entries are registered the first time the module is required and
+---`require` caches, so they land once. The build-tool menu is per buffer: which
+---of Maven and Gradle applies is a property of the project the file belongs to,
+---and both kinds are routinely open in the same session.
+local function setup_keymaps(bufnr)
+	local keymap = safe_require("io.github.israiloff.config.java.keymap", "JAVA: java keymap module not found")
 
-	require("io.github.israiloff.config.java.keymap")
-	cache.keymaps_initialized = true
+	-- The module returns nothing when it gives up on a missing dependency, and
+	-- `require` turns that into `true`.
+	if type(keymap) == "table" and keymap.setup_buffer then
+		keymap.setup_buffer(bufnr)
+	end
 end
 
 -- ---------------------------------------------------------------------------
@@ -451,7 +458,7 @@ local config = {
 
 	on_attach = function(client, bufnr)
 		lsp_utils.global_on_attach(client, bufnr)
-		setup_keymaps_once()
+		setup_keymaps(bufnr)
 		setup_dap_once()
 		client.server_capabilities.semanticTokensProvider = nil
 	end,

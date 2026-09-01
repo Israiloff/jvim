@@ -302,8 +302,10 @@ which_key.add({
 		end,
 		desc = icons.ai.Tabby .. " Use Tabby on next start",
 	},
-	-- v2 built this entry conditionally at load time; `cond` lets which-key
-	-- re-evaluate it instead, so the entry follows the active provider.
+	-- Hidden unless Copilot is the provider. `cond` is not a live predicate —
+	-- which-key runs it once, while it parses this spec, and keeps the answer —
+	-- but that is exactly right here: the provider is read when the session
+	-- starts and changing it only takes effect on the next one.
 	{
 		"<leader>Ap",
 		"<cmd>Copilot panel<CR>",
