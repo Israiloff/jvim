@@ -11,7 +11,10 @@
 -- water mark, and a sparkline of the recent samples. Growth that never comes
 -- back down is what a leak looks like from the outside.
 --
--- Nothing is polled unless the panel is on screen.
+-- Nothing is polled unless the panel is on screen, and whether it is on screen
+-- is a saved switch rather than a per-session decision: watching a server grow
+-- is something you either do or do not do, and having to ask for the panel
+-- again after every restart is what stops anyone from watching at all.
 local M = {}
 
 local properties = require("io.github.israiloff.config.properties")
@@ -20,6 +23,8 @@ local NS = vim.api.nvim_create_namespace("jvim-resources")
 local SPARK = { "▁", "▂", "▃", "▄", "▅", "▆", "▇", "█" }
 
 local defaults = {
+	-- Off by default: the panel is a diagnostic, not furniture.
+	enabled = false,
 	interval_ms = 2000,
 	-- Rows are sorted by size, so the cut only ever loses the small fry.
 	max_entries = 8,
@@ -526,12 +531,34 @@ function M.stop()
 	close_window()
 end
 
-function M.toggle()
-	if M.is_running() then
-		M.stop()
-	else
+---Put the panel on screen, or take it off.
+---
+---The switch is what `toggles` persists, so this is the whole of applying it:
+---the saved value has already been written by the time this runs.
+---@param value boolean
+function M.set_enabled(value)
+	config.enabled = value == true
+
+	if config.enabled then
 		M.start()
+	else
+		M.stop()
 	end
+end
+
+function M.toggle()
+	-- Routed through `toggles` so the command and the UI menu cannot disagree
+	-- about the state, and so flipping it here is remembered. Falls back to a
+	-- plain start/stop if the switch registry is somehow unavailable, because a
+	-- panel that will not open is worse than one that forgets.
+	local ok, toggles = pcall(require, "io.github.israiloff.config.toggles")
+
+	if ok then
+		toggles.toggle("resources")
+		return
+	end
+
+	M.set_enabled(not M.is_running())
 end
 
 ---Forget the baselines and peaks, so growth is measured from now on.
@@ -555,6 +582,10 @@ function M.setup()
 	vim.api.nvim_create_user_command("JvimResourcesReset", function()
 		M.reset()
 	end, { desc = "Measure resource growth from now on" })
+
+	if config.enabled then
+		M.start()
+	end
 
 	local group = vim.api.nvim_create_augroup("jvim_resources", { clear = true })
 

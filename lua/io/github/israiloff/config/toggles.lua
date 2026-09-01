@@ -64,6 +64,14 @@ local items = {
 		icon = icons.ui.Notification,
 		apply = activity_setter("notify"),
 	},
+	resources = {
+		path = { "gui", "resources", "enabled" },
+		label = "Resource monitor",
+		icon = icons.ui.Gauge,
+		apply = function(value)
+			require("io.github.israiloff.config.resources").set_enabled(value)
+		end,
+	},
 	logger = {
 		path = { "logger", "enabled" },
 		label = "Logging",
@@ -190,6 +198,7 @@ function M.show_status()
 		"activity_lazy",
 		"activity_lsp",
 		"activity_notify",
+		"resources",
 		"logger",
 		"logger_debug",
 		"logger_info",
