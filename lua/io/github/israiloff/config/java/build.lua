@@ -13,32 +13,12 @@
 -- `rm -rf` is gone; `clean` is a build-tool goal and is passed as one.
 local M = {}
 
+local workspace_utils = require("io.github.israiloff.config.workspace-utils")
+
 local TITLE = "Build"
 
 ---The terminal of the most recent build, kept so the output can be recalled.
 local state = { terminal = nil }
-
----Directory of the current buffer, or the working directory for scratch ones.
-local function buffer_directory()
-	local name = vim.api.nvim_buf_get_name(0)
-
-	if name == "" then
-		return vim.fn.getcwd()
-	end
-
-	return vim.fs.dirname(name)
-end
-
----Nearest ancestor directory holding one of `markers`.
-local function project_root(markers)
-	local marker = vim.fs.find(markers, { upward = true, path = buffer_directory(), type = "file" })[1]
-
-	if not marker then
-		return nil
-	end
-
-	return vim.fs.dirname(marker)
-end
 
 ---Open a fresh terminal on `command`, replacing the previous build output.
 local function run(command, root, name)
@@ -86,30 +66,87 @@ local function run(command, root, name)
 	state.terminal:open()
 end
 
+---The executable that should drive the build in `root`.
+---
+---A wrapper checked into the project pins the build tool's version, and on a
+---machine that never installed the tool at all it is the only thing that can
+---run the build — the common case for Gradle, which is rarely on `PATH`
+---because every project ships `gradlew`. It only lives at the root of the
+---project, which is why the root has to be the outermost one rather than the
+---module the current file happens to sit in.
+---@param root string
+---@param wrapper string name of the wrapper script, without an extension
+---@param fallback string name of the tool as installed system-wide
+---@return string|nil
+local function launcher(root, wrapper, fallback)
+	local script = vim.fn.has("win32") == 1 and (wrapper .. ".bat") or wrapper
+
+	if vim.fn.executable(root .. "/" .. script) == 1 then
+		-- Relative, so the build output names the wrapper rather than repeating
+		-- the absolute path of the project on every line.
+		return "." .. (vim.fn.has("win32") == 1 and "\\" or "/") .. script
+	end
+
+	if vim.fn.executable(fallback) == 1 then
+		return fallback
+	end
+
+	return nil
+end
+
+---Run `arguments` through `tool` in the project the current file belongs to.
+---@param tool { markers: string[], wrapper: string, fallback: string, label: string }
+---@param arguments string
+local function build(tool, arguments)
+	local root = workspace_utils.find_build_root(tool.markers)
+
+	if not root then
+		vim.notify(
+			("No %s project above %s."):format(tool.label, workspace_utils.buffer_directory()),
+			vim.log.levels.WARN,
+			{ title = TITLE }
+		)
+		return
+	end
+
+	local executable = launcher(root, tool.wrapper, tool.fallback)
+
+	if not executable then
+		vim.notify(
+			("Neither %s/%s nor %s on PATH."):format(root, tool.wrapper, tool.fallback),
+			vim.log.levels.ERROR,
+			{ title = TITLE }
+		)
+		return
+	end
+
+	run(executable .. " " .. arguments, root, tool.label:lower())
+end
+
+local MAVEN = {
+	markers = workspace_utils.MAVEN_MARKERS,
+	wrapper = "mvnw",
+	fallback = "mvn",
+	label = "Maven",
+}
+
+local GRADLE = {
+	markers = workspace_utils.GRADLE_MARKERS,
+	wrapper = "gradlew",
+	fallback = "gradle",
+	label = "Gradle",
+}
+
 ---Run `goals` in the Maven project the current file belongs to.
 ---@param goals string
 function M.maven(goals)
-	local root = project_root({ "pom.xml" })
-
-	if not root then
-		vim.notify("No pom.xml above " .. buffer_directory() .. ".", vim.log.levels.WARN, { title = TITLE })
-		return
-	end
-
-	run("mvn " .. goals, root, "maven")
+	build(MAVEN, goals)
 end
 
----Run `tasks` through the Gradle wrapper of the current project.
+---Run `tasks` in the Gradle project the current file belongs to.
 ---@param tasks string
 function M.gradle(tasks)
-	local root = project_root({ "gradlew", "settings.gradle", "settings.gradle.kts", "build.gradle" })
-
-	if not root then
-		vim.notify("No Gradle project above " .. buffer_directory() .. ".", vim.log.levels.WARN, { title = TITLE })
-		return
-	end
-
-	run("./gradlew " .. tasks, root, "gradle")
+	build(GRADLE, tasks)
 end
 
 ---Show or hide the output of the most recent build.

@@ -436,6 +436,27 @@ local config = {
 			eclipse = { downloadSources = true },
 			maven = { downloadSources = true },
 
+			-- Gradle is imported the way the project describes itself.
+			--
+			-- `wrapper.enabled` makes JDTLS honour `gradle/wrapper/*.properties`
+			-- and build the model with the Gradle version the project pins,
+			-- instead of whatever version JDTLS happens to bundle — the same
+			-- version the build runner uses when it calls `./gradlew`, so the
+			-- editor and the terminal cannot disagree about the project.
+			--
+			-- `annotationProcessing` is what makes Lombok work in a Gradle
+			-- project: the generated getters exist only after the processors
+			-- have run, and without this JDTLS reports every one of them as an
+			-- unresolved symbol.
+			import = {
+				gradle = {
+					enabled = true,
+					wrapper = { enabled = true },
+					annotationProcessing = { enabled = true },
+				},
+				maven = { enabled = true },
+			},
+
 			configuration = {
 				updateBuildConfiguration = "interactive",
 			},

@@ -55,9 +55,15 @@ like an IDE, without giving up Neovim's startup time or keyboard-driven flow.
 | **ripgrep**       | Fast text search (for Telescope)   | ⭐ Recommended |
 | **fd**            | Fast file finder (for Telescope)   | ⭐ Recommended |
 | **yarn**          | Markdown preview UI                | ⚙️ Optional    |
+| **Maven**         | Maven builds without a `./mvnw`    | ⚙️ Optional    |
+| **Gradle**        | Gradle builds without a `./gradlew`| ⚙️ Optional    |
 
 > Neovim 0.11 is a hard minimum: the LSP setup uses `vim.lsp.config` /
 > `vim.lsp.enable`, which do not exist in earlier versions.
+
+> Maven and Gradle are optional because a project that checks in its wrapper
+> brings its own: the build runner prefers `./mvnw` and `./gradlew` and only
+> falls back to the system installation when a project has none.
 
 ### Font Requirements
 
@@ -328,7 +334,7 @@ JDTLS is started per project rather than per editor session, with its workspace
 keyed to the project root, so two checkouts of the same repository never share
 state.
 
-- **Project detection** — Maven and Gradle roots (`pom.xml`, `build.gradle`, wrappers) with a Git fallback
+- **Project detection** — the outermost Maven or Gradle root, so a multi-module project is imported whole, with a Git fallback
 - **Navigation** — go to definition, references, implementations, type definitions
 - **Refactoring** — extract method, variable and constant; organize imports
 - **Code lenses** — reference and implementation counts, refreshed as you edit
@@ -353,17 +359,30 @@ Full DAP support, wired to the Java debug adapter and test runner:
 
 ### Build Tools
 
-Maven and Gradle tasks run in an embedded terminal without leaving the editor —
-compile, test, package, install, deploy, clean, dependency refresh, and local
-repository purge.
+Maven and Gradle get the same menu, on the same keys, because they answer the
+same questions. `c` compiles, `p` packages, `i` installs into the local
+repository, `t` tests, `r` refreshes dependencies — `Java ▸ Maven` runs them as
+Maven goals, `Java ▸ Gradle` as Gradle tasks. Gradle spells several of them
+differently (a Maven install is `publishToMavenLocal`, a package is `assemble`),
+but which of the two a project uses does not change what you press.
 
-Every build runs in its own window, in the directory of the project the current
-file belongs to — the nearest `pom.xml` for Maven, the nearest wrapper or
-settings file for Gradle — rather than wherever the editor happens to be
-sitting. The window is separate from the `<M-1>` terminal, so a build never
-lands in the middle of an interactive shell, and it stays open after the process
-exits: the exit code is reported and the output remains scrollable. `Java ▸
-Build output` brings the last one back.
+Both run in an embedded terminal without leaving the editor, and both start from
+the **outermost** build file above the current one. That is the aggregator POM
+or the `settings.gradle` that declares the modules, not the module the file
+happens to sit in: a module built on its own cannot see its siblings, and in a
+Gradle project it has no wrapper in it either. The same root is what JDTLS
+imports, so the editor and the terminal always agree about what the project is.
+
+A wrapper checked into the project is preferred over the tool installed on the
+machine — `./gradlew` over `gradle`, `./mvnw` over `mvn` — so the build uses the
+version the project pins, and a machine that never installed Gradle at all can
+still build every Gradle project on it. When there is neither, the failure says
+so instead of the shell reporting a missing file.
+
+Every build runs in its own window, separate from the `<M-1>` terminal, so it
+never lands in the middle of an interactive shell, and it stays open after the
+process exits: the exit code is reported and the output remains scrollable.
+`Java ▸ Build output` brings the last one back.
 
 ### Startup and Feedback
 

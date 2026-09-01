@@ -130,25 +130,62 @@ which_key.add({
 		desc = icons.maven.Test .. " Test",
 	},
 
+	-- The same intentions as the Maven menu, on the same keys: `c` compiles,
+	-- `i` installs into the local repository, `t` tests. Gradle spells them
+	-- differently — a Maven install is `publishToMavenLocal`, a package is
+	-- `assemble` — but which of the two a project uses should not change what
+	-- you press. `clean` is prepended for the same reason it is in the Maven
+	-- goals: an incremental build that reuses a stale output is the one bug
+	-- these entries exist to rule out.
 	{ "<leader>jg", group = icons.gradle.Logo .. " Gradle" },
 	{
 		"<leader>jgb",
-		"<cmd>lua require('io.github.israiloff.config.java.build').gradle('build')<cr>",
+		"<cmd>lua require('io.github.israiloff.config.java.build').gradle('clean build')<cr>",
 		desc = icons.gradle.Build .. " Build",
 	},
 	{
-		"<leader>jgc",
+		"<leader>jgB",
+		"<cmd>lua require('io.github.israiloff.config.java.build').gradle('clean build -x test')<cr>",
+		desc = icons.gradle.BuildSkipTests .. " Build (skip tests)",
+	},
+	{
+		"<leader>jgC",
 		"<cmd>lua require('io.github.israiloff.config.java.build').gradle('clean')<cr>",
 		desc = icons.gradle.Clean .. " Clean",
 	},
 	{
+		"<leader>jgc",
+		"<cmd>lua require('io.github.israiloff.config.java.build').gradle('clean classes')<cr>",
+		desc = icons.gradle.Compile .. " Compile",
+	},
+	{
+		"<leader>jgd",
+		"<cmd>lua require('io.github.israiloff.config.java.build').gradle('clean publish')<cr>",
+		desc = icons.gradle.Publish .. " Publish",
+	},
+	{
+		"<leader>jgi",
+		"<cmd>lua require('io.github.israiloff.config.java.build').gradle('clean publishToMavenLocal')<cr>",
+		desc = icons.gradle.Install .. " Install to Maven local",
+	},
+	{
+		"<leader>jgl",
+		"<cmd>lua require('io.github.israiloff.config.java.build').gradle('tasks')<cr>",
+		desc = icons.gradle.Tasks .. " List tasks",
+	},
+	{
+		"<leader>jgp",
+		"<cmd>lua require('io.github.israiloff.config.java.build').gradle('clean assemble')<cr>",
+		desc = icons.gradle.Assemble .. " Assemble",
+	},
+	{
 		"<leader>jgr",
 		"<cmd>lua require('io.github.israiloff.config.java.build').gradle('--refresh-dependencies')<cr>",
-		desc = icons.gradle.Refresh .. " Refresh deps",
+		desc = icons.gradle.Refresh .. " Refresh dependencies",
 	},
 	{
 		"<leader>jgt",
-		"<cmd>lua require('io.github.israiloff.config.java.build').gradle('test')<cr>",
+		"<cmd>lua require('io.github.israiloff.config.java.build').gradle('clean test')<cr>",
 		desc = icons.gradle.Test .. " Test",
 	},
 
