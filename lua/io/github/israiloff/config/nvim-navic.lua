@@ -62,13 +62,6 @@ function M.attach(client, bufnr)
 	navic.attach(client, bufnr)
 end
 
--- The winbar is rebuilt on every CursorHold, so the `Winbar` highlight is derived
--- once here (and again whenever the colorscheme changes) instead of on every redraw.
-local function sync_winbar_highlight()
-	local normal_hl = vim.api.nvim_get_hl(0, { name = "Normal" })
-	vim.api.nvim_set_hl(0, "Winbar", { fg = normal_hl.fg })
-end
-
 local function get_filename()
 	log.debug(logger_name, "get_filename started")
 
@@ -108,7 +101,7 @@ local function get_filename()
 			file_icon = icons.ui.Watches
 		end
 
-		return " " .. "%#" .. hl_group .. "#" .. file_icon .. "%*" .. " " .. "%#Winbar#" .. filename .. "%*"
+		return " " .. "%#" .. hl_group .. "#" .. file_icon .. "%*" .. " " .. "%#WinBar#" .. filename .. "%*"
 	end
 end
 
@@ -186,12 +179,6 @@ end
 
 local function create_winbar()
 	vim.api.nvim_create_augroup("_winbar", {})
-
-	sync_winbar_highlight()
-	vim.api.nvim_create_autocmd("ColorScheme", {
-		group = "_winbar",
-		callback = sync_winbar_highlight,
-	})
 
 	vim.api.nvim_create_autocmd({
 		"CursorHoldI",
