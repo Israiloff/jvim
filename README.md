@@ -504,7 +504,7 @@ covers branches, commits and per-file history.
 
 ### User Interface
 
-- **Darcula** — JetBrains-inspired colorscheme, with optional transparency that survives colorscheme switching
+- **Darcula** — [`Israiloff/darcula-java`](https://github.com/Israiloff/darcula-java), every colour the literal hex from JetBrains' scheme, with optional transparency that survives colorscheme switching. It ships a matching lualine theme, which the statusline picks up on its own because it is left on `auto`, and a palette this config reads from instead of copying hex values around
 - **Breadcrumbs** — the current class/method path is shown in the winbar
 - **Statusline** — Git branch, diagnostics, active language servers and formatters, AI provider, clock
 - **Buffer bar** — open buffers with diagnostic counts and an explorer offset
