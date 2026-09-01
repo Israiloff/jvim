@@ -23,7 +23,12 @@ dashboard.section.header.val = {
 
 dashboard.section.header.opts = {
 	position = "center",
-	hl = "FloatBorder",
+	-- `AlphaHeader`, not `FloatBorder`. The banner was painted with a border
+	-- colour, which cost nothing while the colourscheme left that group alone
+	-- and turned the banner grey — on a grey slab — the moment it started
+	-- defining it. `AlphaHeader` is the group colourschemes provide for exactly
+	-- this, and this one paints it the Darcula keyword orange.
+	hl = "AlphaHeader",
 }
 
 -- Set the menu
