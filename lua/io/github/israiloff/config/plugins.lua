@@ -31,9 +31,11 @@ return {
 			"rktjmp/lush.nvim",
 		},
 		config = function()
+			-- Transparency first: the scheme leaves its surfaces unpainted when
+			-- it is told to before it loads, and `theme` is what loads it.
+			require("io.github.israiloff.config.transparent").setup()
 			require("io.github.israiloff.config.theme")
 			require("io.github.israiloff.config.colors")
-			require("io.github.israiloff.config.transparent").setup()
 		end,
 	},
 
