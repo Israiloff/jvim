@@ -31,9 +31,32 @@ dashboard.section.buttons.val = {
 	dashboard.button("q", icons.ui.SignOut .. " Quit", ":qa<CR>"),
 }
 
--- Set footer
-dashboard.section.footer.val = {
-	"Java NeoVim IDE v" .. properties.version,
+-- What the wordmark stands for, directly under it.
+--
+-- A logo and its expansion are one thing: `JVIM` only says anything once
+-- `Java NeoVim IDE` is next to it. Six lines further down, under the menu, it
+-- explained nothing and sat where most configurations put plugin-load counts.
+--
+-- It is dimmed on purpose. A subtitle in the same orange as the logo competes
+-- with it; `AlphaFooter` is the quiet secondary text the colourscheme already
+-- provides for this screen.
+dashboard.section.subtitle = {
+	type = "text",
+	val = "Java NeoVim IDE v" .. properties.version,
+	opts = {
+		position = "center",
+		hl = "AlphaFooter",
+	},
+}
+
+-- The stock layout ends on the footer, which is now empty. Ending on the
+-- buttons puts the last thing you look at on the only thing you can act on.
+dashboard.config.layout = {
+	{ type = "padding", val = 2 },
+	dashboard.section.header,
+	dashboard.section.subtitle,
+	{ type = "padding", val = 2 },
+	dashboard.section.buttons,
 }
 
 return dashboard
