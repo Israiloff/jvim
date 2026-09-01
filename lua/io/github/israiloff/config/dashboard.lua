@@ -21,14 +21,57 @@ dashboard.section.header.opts = {
 	hl = "AlphaHeader",
 }
 
--- Set the menu
+---One entry on the start screen.
+---
+---The icon carries the colour and the label stays neutral, the way the
+---which-key menus in this configuration read: colour on every word is colour
+---that says nothing, and a row of six identical grey lines has to be read
+---rather than scanned.
+---
+---Ranges are byte offsets into the label, which is why the icon's byte length
+---rather than its width ends the first one. Alpha adds the centring padding to
+---them itself.
+---@param shortcut string
+---@param icon string
+---@param label string
+---@param command string
+---@param icon_hl string
+local function entry(shortcut, icon, label, command, icon_hl)
+	local button = dashboard.button(shortcut, icon .. " " .. label, command)
+
+	button.opts.hl = {
+		{ icon_hl, 0, #icon },
+		{ "AlphaButtons", #icon, -1 },
+	}
+	button.opts.hl_shortcut = "AlphaShortcut"
+
+	return button
+end
+
+-- What there is to do before a project is open.
+--
+-- Finding a file and grepping for text used to be here and are gone: both
+-- search the directory the editor happened to start in, which on a start screen
+-- is the one thing nobody has chosen yet. Everything below either opens
+-- something, makes something, or is about the editor itself.
+--
+-- The colours are the ones this configuration already uses for those meanings:
+-- gold for the way in, the blue it marks changed things with, the green it
+-- marks additions with, the keyword orange of the banner for the editor's own
+-- settings, and grey for the one entry that is not starting work.
 dashboard.section.buttons.val = {
-	dashboard.button("f", icons.ui.FindFile .. " Find file", ":Telescope find_files<CR>"),
-	dashboard.button("e", icons.ui.NewFile .. " New file", ":ene <BAR> startinsert <CR>"),
-	dashboard.button("p", icons.ui.Project .. " Projects", ":Telescope projects<CR>"),
-	dashboard.button("r", icons.ui.History .. " Recent files", ":Telescope oldfiles<CR>"),
-	dashboard.button("t", icons.ui.FindText .. " Find text", ":Telescope live_grep<CR>"),
-	dashboard.button("q", icons.ui.SignOut .. " Quit", ":qa<CR>"),
+	entry("p", icons.ui.Project, "Projects", ":Telescope projects<CR>", "Function"),
+	entry("r", icons.ui.History, "Recent files", ":Telescope oldfiles<CR>", "Number"),
+	entry("e", icons.ui.NewFile, "New file", ":ene <BAR> startinsert<CR>", "String"),
+	entry(
+		"c",
+		icons.ui.Settings,
+		"Configuration",
+		":edit " .. vim.fn.stdpath("config") .. "/lua/io/github/israiloff/config/properties.lua<CR>",
+		"Keyword"
+	),
+	entry("u", icons.plugin.Update, "Update plugins", ":Lazy update<CR>", "Constant"),
+	entry("q", icons.ui.SignOut, "Quit", ":qa<CR>", "Comment"),
 }
 
 -- What the wordmark stands for, directly under it.
