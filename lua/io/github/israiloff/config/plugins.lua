@@ -292,6 +292,13 @@ return {
 		config = conf("bufferline"),
 	},
 	{
+		-- Loaded through the plugins that depend on it; the config only replaces
+		-- the handful of glyphs the installed font cannot draw.
+		"nvim-tree/nvim-web-devicons",
+		lazy = true,
+		config = conf("devicons"),
+	},
+	{
 		"nvim-lualine/lualine.nvim",
 		event = "VeryLazy",
 		dependencies = {

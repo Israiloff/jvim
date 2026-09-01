@@ -115,7 +115,7 @@ return {
 		Resume = "",
 		SearchList = "󱩾",
 		Registers = "󱃔",
-		Settings = "",
+		Settings = "",
 		Transparency = "󰗧",
 		Gauge = "󰾆",
         Neovim = "",
@@ -213,10 +213,10 @@ return {
 		Build = "",
 	},
 	spring = {
-		Logo = "",
-		Enable = "",
-		Disable = "",
-		Status = "",
+		Logo = "󰌪",
+		Enable = "",
+		Disable = "",
+		Status = "",
 	},
 	maven = {
 		Refresh = "",
@@ -249,9 +249,9 @@ return {
 	ai = {
 		Logo = "󰚩",
 		Tabby = "󰄛",
-		Disable = "",
+		Disable = "",
 		Edit = "󰏫",
-		Status = "",
+		Status = "",
 	},
 	search = {
 		Gui = "󱦞",
