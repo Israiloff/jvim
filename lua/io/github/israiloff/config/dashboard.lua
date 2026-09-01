@@ -3,22 +3,12 @@ local dashboard = require("alpha.themes.dashboard")
 local properties = require("io.github.israiloff.config.properties")
 
 dashboard.section.header.val = {
-	[[          JJJJJJJJJJJVVVVVVVV           VVVVVVVVIIIIIIIIIIMMMMMMMM               MMMMMMMM]],
-	[[          J:::::::::JV::::::V           V::::::VI::::::::IM:::::::M             M:::::::M]],
-	[[          J:::::::::JV::::::V           V::::::VI::::::::IM::::::::M           M::::::::M]],
-	[[          JJ:::::::JJV::::::V           V::::::VII::::::IIM:::::::::M         M:::::::::M]],
-	[[            J:::::J   V:::::V           V:::::V   I::::I  M::::::::::M       M::::::::::M]],
-	[[            J:::::J    V:::::V         V:::::V    I::::I  M:::::::::::M     M:::::::::::M]],
-	[[            J:::::J     V:::::V       V:::::V     I::::I  M:::::::M::::M   M::::M:::::::M]],
-	[[            J:::::j      V:::::V     V:::::V      I::::I  M::::::M M::::M M::::M M::::::M]],
-	[[            J:::::J       V:::::V   V:::::V       I::::I  M::::::M  M::::M::::M  M::::::M]],
-	[[JJJJJJJ     J:::::J        V:::::V V:::::V        I::::I  M::::::M   M:::::::M   M::::::M]],
-	[[J:::::J     J:::::J         V:::::V:::::V         I::::I  M::::::M    M:::::M    M::::::M]],
-	[[J::::::J   J::::::J          V:::::::::V          I::::I  M::::::M     MMMMM     M::::::M]],
-	[[J:::::::JJJ:::::::J           V:::::::V         II::::::IIM::::::M               M::::::M]],
-	[[ JJ:::::::::::::JJ             V:::::V          I::::::::IM::::::M               M::::::M]],
-	[[   JJ:::::::::JJ                V:::V           I::::::::IM::::::M               M::::::M]],
-	[[     JJJJJJJJJ                   VVV            IIIIIIIIIIMMMMMMMM               MMMMMMMM]],
+	[[     ██╗██╗   ██╗██╗███╗   ███╗]],
+	[[     ██║██║   ██║██║████╗ ████║]],
+	[[     ██║██║   ██║██║██╔████╔██║]],
+	[[██   ██║╚██╗ ██╔╝██║██║╚██╔╝██║]],
+	[[╚█████╔╝ ╚████╔╝ ██║██║ ╚═╝ ██║]],
+	[[ ╚════╝   ╚═══╝  ╚═╝╚═╝     ╚═╝]],
 }
 
 dashboard.section.header.opts = {
