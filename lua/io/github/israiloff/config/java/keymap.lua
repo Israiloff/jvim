@@ -25,126 +25,53 @@ local M = {}
 -- `assemble` task and a Gradle project has no `package` goal, so a menu that
 -- lists both is half wrong wherever you open it.
 --
--- These are registered against the buffer rather than globally, because which
--- of the two applies is a property of the file, not of the session: a Maven
--- service and a Gradle library are routinely open side by side. `cond` cannot
--- express this — which-key evaluates it once, while it is parsing the spec,
--- and keeps the answer.
+-- These are plain buffer-local keymaps rather than a which-key spec, and that
+-- is the whole point. `which_key.add` detaches every trigger it owns — the
+-- `<leader>` mapping included — and only puts them back on the next turn of the
+-- event loop. Calling it from `on_attach`, which is to say a second or two
+-- after a Java file opens and while the server is busy, meant that a space
+-- pressed inside that window did nothing at all.
+--
+-- which-key does not need the call. It builds its menu by reading the keymaps
+-- that actually exist, buffer-local ones included, and takes the label from
+-- `desc`. The group headings below stay in the shared spec: a group whose
+-- children are absent from this buffer has nothing under it and is dropped.
 -- ---------------------------------------------------------------------------
 
-local function maven_menu()
-	return {
-		{ "<leader>jm", group = icons.maven.Logo .. " Maven" },
-		{
-			"<leader>jmC",
-			"<cmd>lua require('io.github.israiloff.config.java.build').maven('clean')<cr>",
-			desc = icons.maven.Clean .. " Clean",
-		},
-		{
-			"<leader>jmc",
-			"<cmd>lua require('io.github.israiloff.config.java.build').maven('clean compile')<cr>",
-			desc = icons.maven.Compile .. " Compile",
-		},
-		{
-			"<leader>jmd",
-			"<cmd>lua require('io.github.israiloff.config.java.build').maven('clean deploy')<cr>",
-			desc = icons.maven.Deploy .. " Deploy",
-		},
-		{
-			"<leader>jme",
-			"<cmd>lua require('io.github.israiloff.config.java.build').maven('dependency:purge-local-repository')<cr>",
-			desc = icons.maven.Purge .. " Purge local repository",
-		},
-		{
-			"<leader>jmi",
-			"<cmd>lua require('io.github.israiloff.config.java.build').maven('clean install')<cr>",
-			desc = icons.maven.Install .. " Install",
-		},
-		{
-			"<leader>jmp",
-			"<cmd>lua require('io.github.israiloff.config.java.build').maven('clean package')<cr>",
-			desc = icons.maven.Package .. " Package",
-		},
-		{
-			"<leader>jmP",
-			"<cmd>lua require('io.github.israiloff.config.java.build').maven('clean package -DskipTests')<cr>",
-			desc = icons.maven.PackageSkipTests .. " Package (skip tests)",
-		},
-		{
-			"<leader>jmr",
-			"<cmd>lua require('io.github.israiloff.config.java.build').maven('clean -U dependency:resolve')<cr>",
-			desc = icons.maven.Refresh .. " Refresh dependencies",
-		},
-		{
-			"<leader>jmt",
-			"<cmd>lua require('io.github.israiloff.config.java.build').maven('clean test')<cr>",
-			desc = icons.maven.Test .. " Test",
-		},
-	}
-end
+local maven = {
+	prefix = "<leader>jm",
+	markers = workspace_utils.MAVEN_MARKERS,
+	runner = "maven",
+	entries = {
+		{ "C", icons.maven.Clean, "Clean", "clean" },
+		{ "c", icons.maven.Compile, "Compile", "clean compile" },
+		{ "d", icons.maven.Deploy, "Deploy", "clean deploy" },
+		{ "e", icons.maven.Purge, "Purge local repository", "dependency:purge-local-repository" },
+		{ "i", icons.maven.Install, "Install", "clean install" },
+		{ "p", icons.maven.Package, "Package", "clean package" },
+		{ "P", icons.maven.PackageSkipTests, "Package (skip tests)", "clean package -DskipTests" },
+		{ "r", icons.maven.Refresh, "Refresh dependencies", "clean -U dependency:resolve" },
+		{ "t", icons.maven.Test, "Test", "clean test" },
+	},
+}
 
-local function gradle_menu()
-	return {
-		-- The same intentions as the Maven menu, on the same keys: `c` compiles,
-		-- `i` installs into the local repository, `t` tests. Gradle spells them
-		-- differently — a Maven install is `publishToMavenLocal`, a package is
-		-- `assemble` — but which of the two a project uses should not change what
-		-- you press. `clean` is prepended for the same reason it is in the Maven
-		-- goals: an incremental build that reuses a stale output is the one bug
-		-- these entries exist to rule out.
-		{ "<leader>jg", group = icons.gradle.Logo .. " Gradle" },
-		{
-			"<leader>jgb",
-			"<cmd>lua require('io.github.israiloff.config.java.build').gradle('clean build')<cr>",
-			desc = icons.gradle.Build .. " Build",
-		},
-		{
-			"<leader>jgB",
-			"<cmd>lua require('io.github.israiloff.config.java.build').gradle('clean build -x test')<cr>",
-			desc = icons.gradle.BuildSkipTests .. " Build (skip tests)",
-		},
-		{
-			"<leader>jgC",
-			"<cmd>lua require('io.github.israiloff.config.java.build').gradle('clean')<cr>",
-			desc = icons.gradle.Clean .. " Clean",
-		},
-		{
-			"<leader>jgc",
-			"<cmd>lua require('io.github.israiloff.config.java.build').gradle('clean classes')<cr>",
-			desc = icons.gradle.Compile .. " Compile",
-		},
-		{
-			"<leader>jgd",
-			"<cmd>lua require('io.github.israiloff.config.java.build').gradle('clean publish')<cr>",
-			desc = icons.gradle.Publish .. " Publish",
-		},
-		{
-			"<leader>jgi",
-			"<cmd>lua require('io.github.israiloff.config.java.build').gradle('clean publishToMavenLocal')<cr>",
-			desc = icons.gradle.Install .. " Install to Maven local",
-		},
-		{
-			"<leader>jgl",
-			"<cmd>lua require('io.github.israiloff.config.java.build').gradle('tasks')<cr>",
-			desc = icons.gradle.Tasks .. " List tasks",
-		},
-		{
-			"<leader>jgp",
-			"<cmd>lua require('io.github.israiloff.config.java.build').gradle('clean assemble')<cr>",
-			desc = icons.gradle.Assemble .. " Assemble",
-		},
-		{
-			"<leader>jgr",
-			"<cmd>lua require('io.github.israiloff.config.java.build').gradle('--refresh-dependencies')<cr>",
-			desc = icons.gradle.Refresh .. " Refresh dependencies",
-		},
-		{
-			"<leader>jgt",
-			"<cmd>lua require('io.github.israiloff.config.java.build').gradle('clean test')<cr>",
-			desc = icons.gradle.Test .. " Test",
-		},
-	}
-end
+local gradle = {
+	prefix = "<leader>jg",
+	markers = workspace_utils.GRADLE_MARKERS,
+	runner = "gradle",
+	entries = {
+		{ "b", icons.gradle.Build, "Build", "clean build" },
+		{ "B", icons.gradle.BuildSkipTests, "Build (skip tests)", "clean build -x test" },
+		{ "C", icons.gradle.Clean, "Clean", "clean" },
+		{ "c", icons.gradle.Compile, "Compile", "clean classes" },
+		{ "d", icons.gradle.Publish, "Publish", "clean publish" },
+		{ "i", icons.gradle.Install, "Install to Maven local", "clean publishToMavenLocal" },
+		{ "l", icons.gradle.Tasks, "List tasks", "tasks" },
+		{ "p", icons.gradle.Assemble, "Assemble", "clean assemble" },
+		{ "r", icons.gradle.Refresh, "Refresh dependencies", "--refresh-dependencies" },
+		{ "t", icons.gradle.Test, "Test", "clean test" },
+	},
+}
 
 ---Give `bufnr` the menu for the build tool its project uses.
 ---
@@ -158,23 +85,21 @@ function M.setup_buffer(bufnr)
 		return
 	end
 
-	local spec = { buffer = bufnr }
+	for _, tool in ipairs({ maven, gradle }) do
+		if workspace_utils.find_build_root(tool.markers, bufnr) then
+			for _, item in ipairs(tool.entries) do
+				local key, icon, label, arguments = item[1], item[2], item[3], item[4]
 
-	if workspace_utils.find_build_root(workspace_utils.MAVEN_MARKERS, bufnr) then
-		vim.list_extend(spec, maven_menu())
-	end
-
-	if workspace_utils.find_build_root(workspace_utils.GRADLE_MARKERS, bufnr) then
-		vim.list_extend(spec, gradle_menu())
+				vim.keymap.set("n", tool.prefix .. key, function()
+					require("io.github.israiloff.config.java.build")[tool.runner](arguments)
+				end, { buffer = bufnr, silent = true, desc = icon .. " " .. label })
+			end
+		end
 	end
 
 	-- Marked either way: a project with no build file should not be walked up
 	-- again every time the server attaches another buffer of it.
 	vim.b[bufnr].jvim_build_menu = true
-
-	if #spec > 0 then
-		which_key.add(spec)
-	end
 end
 
 -- ---------------------------------------------------------------------------
@@ -231,6 +156,9 @@ which_key.add({
 		"<cmd>lua require'dapui'.toggle({reset = true})<cr>",
 		desc = icons.java.BugFix .. " Toggle DAP UI",
 	},
+
+	{ "<leader>jm", group = icons.maven.Logo .. " Maven" },
+	{ "<leader>jg", group = icons.gradle.Logo .. " Gradle" },
 
 	{ "<leader>jt", group = icons.code.Tests .. " Test" },
 	{ "<leader>jtc", "<Cmd>lua require('jdtls').test_class()<CR>", desc = icons.java.ClassTest .. " Run test class" },

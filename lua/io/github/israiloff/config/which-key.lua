@@ -315,3 +315,21 @@ which_key.add({
 		end,
 	},
 })
+
+-- ---------------------------------------------------------------------------
+-- Java
+--
+-- Registered here rather than from jdtls's `on_attach`, even though the menu
+-- only means anything in a Java buffer: every mapping in it is global anyway,
+-- so attaching was never what made it exist — it only decided when.
+--
+-- When matters. `which_key.add` detaches the triggers it owns, the `<leader>`
+-- mapping included, and restores them on the next turn of the event loop. Done
+-- from `on_attach` that lands a second or two into editing, and a space pressed
+-- in the gap did nothing. Done here it lands during startup, before there is
+-- anyone to press it.
+--
+-- The build-tool entries are not in that spec; they are buffer-local keymaps
+-- which-key reads directly. See `config/java/keymap.lua`.
+-- ---------------------------------------------------------------------------
+require("io.github.israiloff.config.java.keymap")
