@@ -15,11 +15,14 @@ local livepreview = require("livepreview")
 
 local SUPPORTED = { "markdown", "asciidoc", "html", "svg" }
 
+local HOST = "127.0.0.1"
+local PORT = 33235
+
 livepreview.setup({
-	address = "127.0.0.1",
+	address = HOST,
 	-- The port the previous plugin used, so a bookmark or a firewall rule that
 	-- pointed at the preview still does.
-	port = 33235,
+	port = PORT,
 	-- `false` roots the server at the working directory rather than at the
 	-- folder of the file being previewed. That is what makes a link to
 	-- `../other/doc.md` resolve: the whole project is reachable, not one folder.
@@ -35,28 +38,56 @@ livepreview.setup({
 	browser = "true",
 })
 
--- The previous plugin started itself when a Markdown buffer appeared, and that
--- is worth keeping: the address shows up without asking for it. One server
--- covers the whole working directory now, so this only ever fires once.
+---The address this buffer is served at, or `nil` when it is outside the root.
+---
+---Built here rather than read from the plugin, which prints it once with
+---`print` and is overwritten by the next message that comes along — and the
+---next message, when a language server is starting, is never far away.
+---@param bufnr integer
+---@return string|nil
+local function preview_url(bufnr)
+	local path = vim.api.nvim_buf_get_name(bufnr)
+
+	if path == "" then
+		return nil
+	end
+
+	local relative = require("livepreview.utils").get_relative_path(path, vim.fs.normalize(vim.uv.cwd() or ""))
+
+	if not relative then
+		return nil
+	end
+
+	return ("http://%s:%d/%s"):format(HOST, PORT, vim.uri_encode(relative))
+end
+
+-- The previous plugin started itself when a Markdown buffer appeared and echoed
+-- the address, and both are worth keeping. Nothing opens the page for you —
+-- inside a container there is no browser to open it with — so the address is
+-- the whole interface, and it goes through `vim.notify`, which puts it in the
+-- activity panel and keeps it in `:JvimNotifyLog` rather than on a message line
+-- that the next redraw takes away.
+--
+-- One server covers the whole working directory, so it is started once; the
+-- address is reported for every document, because every document has its own.
 local group = vim.api.nvim_create_augroup("JvimLivePreview", { clear = true })
 
 local function start_once()
-	if livepreview.is_running() then
-		return
+	if not livepreview.is_running() then
+		pcall(vim.cmd, "LivePreview start")
 	end
 
-	pcall(vim.cmd, "LivePreview start")
+	local url = preview_url(vim.api.nvim_get_current_buf())
+
+	if url then
+		vim.notify(url, vim.log.levels.INFO, { title = "Live preview" })
+	end
 end
 
 vim.api.nvim_create_autocmd("FileType", {
 	group = group,
 	pattern = SUPPORTED,
-	callback = start_once,
+	callback = function()
+		vim.schedule(start_once)
+	end,
 })
-
--- The `FileType` event that loaded this plugin has already fired by the time
--- the autocommand above exists, so the buffer that triggered it would be the
--- one buffer that never started a server.
-if vim.tbl_contains(SUPPORTED, vim.bo.filetype) then
-	vim.schedule(start_once)
-end
