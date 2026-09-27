@@ -390,10 +390,15 @@ return {
 	{ "archibate/lualine-time", lazy = true },
 
 	{
-		"iamcco/markdown-preview.nvim",
-		cmd = { "MarkdownPreviewToggle", "MarkdownPreview", "MarkdownPreviewStop" },
-		ft = { "markdown" },
-		build = "cd app && yarn install",
-		init = conf("markdown"),
+		-- Replaces `iamcco/markdown-preview.nvim`, unmaintained since 2023 and
+		-- unable to show two documents at once or follow a link between them.
+		-- Pure Lua, so there is no `yarn install` to run after an update.
+		"brianhuster/live-preview.nvim",
+		cmd = "LivePreview",
+		ft = { "markdown", "asciidoc", "html", "svg" },
+		dependencies = {
+			"nvim-telescope/telescope.nvim",
+		},
+		config = conf("markdown"),
 	},
 }

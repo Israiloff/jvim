@@ -53,7 +53,6 @@ like an IDE, without giving up Neovim's startup time or keyboard-driven flow.
 | **unzip**         | Extracting plugin archives         | ✅ Required    |
 | **ripgrep**       | Fast text search (for Telescope)   | ⭐ Recommended |
 | **fd**            | Fast file finder (for Telescope)   | ⭐ Recommended |
-| **yarn**          | Markdown preview UI                | ⚙️ Optional    |
 | **Maven**         | Maven builds without a `./mvnw`    | ⚙️ Optional    |
 | **Gradle**        | Gradle builds without a `./gradlew`| ⚙️ Optional    |
 
@@ -116,12 +115,6 @@ For proper icon display, install a [Nerd Font](https://www.nerdfonts.com/). Popu
    :Lazy       " plugin status
    :checkhealth
    ```
-
-### Markdown Preview (Optional)
-
-```bash
-cd ~/.local/share/nvim/lazy/markdown-preview.nvim && yarn install
-```
 
 ---
 
@@ -536,8 +529,14 @@ project you are sitting in is always in its own list.
 ### Editing
 
 Treesitter-based highlighting and indentation with incremental selection,
-comment toggling that follows the language, indentation guides, TODO comment
-highlighting, and a live Markdown preview.
+comment toggling that follows the language, indentation guides and TODO comment
+highlighting.
+
+Markdown, AsciiDoc, HTML and SVG get a live preview in the browser, served from
+the working directory rather than from the buffer: opening one document starts
+the server, every other file in the project is reachable at its own path, and a
+link from one document to another is a link that works. `:LivePreview start`
+prints the address and leaves the opening to you; `:LivePreview close` stops it.
 
 Modified buffers are written automatically when you leave insert mode and as
 text changes, debounced to at most one write every 135 ms. Suspend it for the
