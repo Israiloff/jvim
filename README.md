@@ -539,6 +539,11 @@ link from one document to another is a link that works. `Visualization ▸ Live 
 prints the address and leaves the opening to you, and `Stop preview` ends it. The
 menu is where rendering tools go as they arrive.
 
+The port is derived from the project directory, so two editors on two projects
+each get their own preview instead of the second one finding the port taken, and
+a given project answers on the same address every time — which is what makes it
+worth a bookmark.
+
 Modified buffers are written automatically when you leave insert mode and as
 text changes, debounced to at most one write every 135 ms. Suspend it for the
 session with `:ASToggle`.
