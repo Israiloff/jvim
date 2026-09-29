@@ -214,6 +214,13 @@ which_key.add({
 	{ "<leader>PS", "<cmd>Lazy clear<cr>", desc = icons.plugin.Status .. " Status" },
 	{ "<leader>Pu", "<cmd>Lazy update<cr>", desc = icons.plugin.Update .. " Update" },
 
+	-- Things that show you something rather than change it. Live preview is the
+	-- first; diagram and image rendering belong here as they arrive.
+	{ "<leader>v", group = icons.visual.Logo .. " Visualization" },
+	{ "<leader>vp", "<cmd>LivePreview start<cr>", desc = icons.visual.Preview .. " Live preview" },
+	{ "<leader>vs", "<cmd>LivePreview close<cr>", desc = icons.visual.Stop .. " Stop preview" },
+	{ "<leader>vf", "<cmd>LivePreview pick<cr>", desc = icons.ui.FindFile .. " Pick a document" },
+
 	{ "<leader>s", group = icons.ui.Search .. " Search" },
 	{ "<leader>sc", "<cmd>Telescope colorscheme<cr>", desc = icons.kind.Color .. " Colorscheme" },
 	{ "<leader>sC", "<cmd>Telescope commands<cr>", desc = icons.ui.List .. " Commands" },

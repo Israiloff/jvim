@@ -253,6 +253,13 @@ return {
 		Edit = "󰏫",
 		Status = "",
 	},
+	-- Rendering and preview tools. Everything that shows you something
+	-- rather than changes it.
+	visual = {
+		Logo = "󰨇",
+		Preview = "",
+		Stop = "",
+	},
 	search = {
 		Gui = "󱦞",
 		SearchCurrent = "",

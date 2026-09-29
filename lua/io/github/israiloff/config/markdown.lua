@@ -72,7 +72,25 @@ end
 -- address is reported for every document, because every document has its own.
 local group = vim.api.nvim_create_augroup("JvimLivePreview", { clear = true })
 
+---The directory the running server is serving, or `nil` when none is running.
+local function served_root()
+	local server = livepreview.serverObj
+	return server and server.webroot and vim.fs.normalize(server.webroot) or nil
+end
+
 local function start_once()
+	local root = vim.fs.normalize(vim.uv.cwd() or "")
+	local serving = served_root()
+
+	-- The server reads the working directory once, when it starts, and never
+	-- looks again — while `is_running` stays true for the rest of the session.
+	-- Open a second project and its `README.md` was served out of the first
+	-- one's directory: the right path against the wrong root, so the address
+	-- answered with a document from the project you had left.
+	if serving and serving ~= root then
+		pcall(vim.cmd, "LivePreview close")
+	end
+
 	if not livepreview.is_running() then
 		pcall(vim.cmd, "LivePreview start")
 	end
