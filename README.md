@@ -535,8 +535,9 @@ highlighting.
 Markdown, AsciiDoc, HTML and SVG get a live preview in the browser, served from
 the working directory rather than from the buffer: opening one document starts
 the server, every other file in the project is reachable at its own path, and a
-link from one document to another is a link that works. `:LivePreview start`
-prints the address and leaves the opening to you; `:LivePreview close` stops it.
+link from one document to another is a link that works. `Visualization ▸ Live preview`
+prints the address and leaves the opening to you, and `Stop preview` ends it. The
+menu is where rendering tools go as they arrive.
 
 Modified buffers are written automatically when you leave insert mode and as
 text changes, debounced to at most one write every 135 ms. Suspend it for the
