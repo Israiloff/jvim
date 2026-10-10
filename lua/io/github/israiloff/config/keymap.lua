@@ -41,3 +41,8 @@ vim.keymap.set("i", "<M-k>", "<Esc>:m .-2<CR>==gi", { desc = "Move line up" })
 vim.keymap.set("i", "˚", "<Esc>:m .-2<CR>==gi", { desc = "Move line up" })                                      -- Option + k
 vim.keymap.set("i", "<M-j>", "<Esc>:m .+1<CR>==gi", { desc = "Move line down" })
 vim.keymap.set("i", "∆", "<Esc>:m .+1<CR>==gi", { desc = "Move line down" })                                    -- Option + j
+
+-- macros: bare `q` is too easy to hit by accident, so recording moves to `Q`.
+-- Buffer-local `q` mappings (lir, dap-ui, notification log) still win.
+vim.keymap.set("n", "q", "<Nop>", { desc = "Disabled (use Q to record macro)" })
+vim.keymap.set("n", "Q", "q", { noremap = true, desc = "Record macro" })
