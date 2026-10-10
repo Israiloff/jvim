@@ -531,6 +531,35 @@ function M.stop()
 	close_window()
 end
 
+---Whether the dashboard is on screen in the current tab.
+---
+---Asked of every window rather than the current buffer: a picker opened from
+---the dashboard is a float of its own, and the panel has no business showing
+---up over the start screen just because the picker's prompt has focus.
+local function on_dashboard()
+	for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
+		local buf = vim.api.nvim_win_get_buf(win)
+
+		if vim.api.nvim_win_get_config(win).relative == "" and vim.bo[buf].filetype == "alpha" then
+			return true
+		end
+	end
+
+	return false
+end
+
+---Bring the panel in line with the switch and the screen: on when it is
+---switched on, except over the dashboard, where there is nothing yet to watch
+---and the panel only covers the start screen. Leaving the dashboard brings it
+---back without touching the saved switch.
+local function sync()
+	if config.enabled and not on_dashboard() then
+		M.start()
+	else
+		M.stop()
+	end
+end
+
 ---Put the panel on screen, or take it off.
 ---
 ---The switch is what `toggles` persists, so this is the whole of applying it:
@@ -538,12 +567,7 @@ end
 ---@param value boolean
 function M.set_enabled(value)
 	config.enabled = value == true
-
-	if config.enabled then
-		M.start()
-	else
-		M.stop()
-	end
+	sync()
 end
 
 function M.toggle()
@@ -558,7 +582,7 @@ function M.toggle()
 		return
 	end
 
-	M.set_enabled(not M.is_running())
+	M.set_enabled(not config.enabled)
 end
 
 ---Forget the baselines and peaks, so growth is measured from now on.
@@ -583,11 +607,22 @@ function M.setup()
 		M.reset()
 	end, { desc = "Measure resource growth from now on" })
 
-	if config.enabled then
-		M.start()
-	end
+	sync()
 
 	local group = vim.api.nvim_create_augroup("jvim_resources", { clear = true })
+
+	-- Scheduled so the layout has settled: alpha fires `AlphaClosed` while its
+	-- buffer is still being unloaded, and is still in a window at that point.
+	vim.api.nvim_create_autocmd({ "BufWinEnter", "WinEnter", "WinClosed", "TabEnter" }, {
+		group = group,
+		callback = vim.schedule_wrap(sync),
+	})
+
+	vim.api.nvim_create_autocmd("User", {
+		group = group,
+		pattern = { "AlphaReady", "AlphaClosed" },
+		callback = vim.schedule_wrap(sync),
+	})
 
 	vim.api.nvim_create_autocmd("VimLeavePre", {
 		group = group,
