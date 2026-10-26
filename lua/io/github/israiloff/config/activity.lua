@@ -300,9 +300,39 @@ local function build_lines()
 	-- " " + icon slot + " " + name + "  " + detail
 	local CHROME = 1 + ICON_CELLS + 1 + 2
 
+	-- " " + icon slot + " " before a notification's text.
+	local TEXT_CHROME = 1 + ICON_CELLS + 1
+
 	-- Shrink rather than disappear on a narrow terminal.
-	local max_width = math.min(config.max_width, math.max(vim.o.columns - 8, 24))
-	local text_width = math.max(max_width - (1 + ICON_CELLS + 1), 12)
+	local ceiling = math.max(vim.o.columns - 8, 24)
+	local max_width = math.min(config.max_width, ceiling)
+
+	-- A web address holds no spaces, so there is nowhere to wrap it: it gets cut
+	-- mid-path instead, and a terminal turns only the first of the two lines
+	-- into a link. Following it then lands on the wrong document, or nowhere,
+	-- and the rest has to be typed back by hand.
+	--
+	-- The panel widens to hold the longest address it has to show, as far as the
+	-- window allows. Only addresses: any other long run — a checksum, a base64
+	-- blob in a log line — still wraps, because widening the panel for those
+	-- buys nothing.
+	local widest_url = 0
+
+	for _, entry in ipairs(state.entries) do
+		if entry.kind == "notify" then
+			for word in tostring(entry.message or ""):gmatch("%S+") do
+				if word:match("^%a[%w+.-]*://") then
+					widest_url = math.max(widest_url, vim.fn.strdisplaywidth(word))
+				end
+			end
+		end
+	end
+
+	if widest_url > 0 then
+		max_width = math.min(math.max(max_width, widest_url + TEXT_CHROME), ceiling)
+	end
+
+	local text_width = math.max(max_width - TEXT_CHROME, 12)
 
 	local rows = {}
 	for _, entry in ipairs(state.entries) do
