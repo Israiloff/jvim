@@ -422,7 +422,7 @@ local function build_lines()
 		table.insert(marks, spans)
 	end
 
-	return lines, marks
+	return lines, marks, max_width
 end
 
 local function render()
@@ -431,12 +431,19 @@ local function render()
 		return
 	end
 
-	local lines, marks = build_lines()
+	-- The width the lines were laid out for, which is not always `max_width`
+	-- from the settings: an address is widened to fit. Clamping the window to
+	-- the setting instead was the whole bug — the line held the address in one
+	-- piece and the window, too narrow for it, wrapped it at its own edge. The
+	-- continuation came out flush against that edge rather than indented, and a
+	-- terminal makes a link of the first screen row only, so clicking followed
+	-- an address that stopped mid-path.
+	local lines, marks, laid_out = build_lines()
 	local width = 0
 	for _, line in ipairs(lines) do
 		width = math.max(width, vim.fn.strdisplaywidth(line))
 	end
-	width = math.min(width + 1, config.max_width)
+	width = math.min(width + 1, laid_out)
 	local height = #lines
 
 	-- Not enough room to draw without fighting the editor for space.
